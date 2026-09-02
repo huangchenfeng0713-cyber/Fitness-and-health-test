@@ -1,4 +1,4 @@
-name: Deploy codex chat test site
+name: Deploy UI preview site
 
 on:
   push:
@@ -21,12 +21,20 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout codex chat test branch
+      - name: Checkout preview config
+        uses: actions/checkout@v4
+        with:
+          path: preview
+
+      - name: Checkout app from main
         uses: actions/checkout@v4
         with:
           repository: huangchenfeng0713-cyber/Fitness-and-health
-          ref: codex-chat-test-version
+          ref: main
           path: site
+
+      - name: Apply UI preview patch
+        run: git apply --directory=site preview/ui-preview.patch
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
