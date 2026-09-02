@@ -21,11 +21,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout preview config
-        uses: actions/checkout@v4
-        with:
-          path: preview
-
       - name: Checkout app from main
         uses: actions/checkout@v4
         with:
@@ -34,7 +29,10 @@ jobs:
           path: site
 
       - name: Apply UI preview patch
-        run: git apply --directory=site preview/ui-preview.patch
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/huangchenfeng0713-cyber/Fitness-and-health/ui-preview/docs/ui-preview.patch -o ui-preview.patch
+          git apply --directory=site ui-preview.patch
+          test -n "$(git -C site diff --name-only)"
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
