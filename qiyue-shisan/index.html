@@ -1,0 +1,727 @@
+<title>七月十三的月亮</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@200;300;500;900&family=Ma+Shan+Zheng&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ── 一册夜里的黄历 ─────────────────────────────────
+   靛 #141A30  夜 #0A0E1C  月白 #F0EBDD
+   霜 #7D87A6  朱砂 #CE4238  灯金 #E2A73F
+   单一视觉世界：不随宿主主题反转，全部颜色显式绘制。 */
+:root{
+  --ink:#141A30; --night:#0A0E1C; --well:#101733;
+  --moon:#F0EBDD; --frost:#7D87A6; --frost-dim:#525C7A;
+  --cinnabar:#CE4238; --cinnabar-deep:#9E2E28; --lamp:#E2A73F;
+  --rule:rgba(125,135,166,.22); --rule-soft:rgba(125,135,166,.12);
+  --serif:"Noto Serif SC",Songti SC,SimSun,"Source Han Serif SC",serif;
+  --hand:"Ma Shan Zheng","Noto Serif SC",cursive,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --s1:8px; --s2:14px; --s3:22px; --s4:36px; --s5:58px; --s6:92px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ink); color:var(--moon);
+  font-family:var(--serif); font-weight:300; font-size:16px; line-height:1.95;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(120% 70% at 50% -10%, rgba(58,74,124,.34) 0%, rgba(20,26,48,0) 62%),
+    radial-gradient(80% 50% at 92% 108%, rgba(120,60,52,.13) 0%, rgba(20,26,48,0) 60%);
+  background-attachment:fixed;
+}
+.page{max-width:960px; margin:0 auto; padding-inline:20px; padding-block:0 var(--s6);}
+::selection{background:var(--cinnabar); color:#fff}
+:focus-visible{outline:2px solid var(--lamp); outline-offset:3px; border-radius:2px}
+p{margin:0}
+/* ── 版记：小标签 ── */
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.24em;
+  text-transform:uppercase; color:var(--frost-dim); font-weight:500;
+}
+.reg{ padding-block:var(--s6) 0; }
+.reg-head{display:flex; align-items:baseline; gap:var(--s3); margin-bottom:var(--s4); flex-wrap:wrap}
+.reg-head h2{
+  font-size:clamp(23px,4.4vw,30px); font-weight:500; margin:0;
+  letter-spacing:.14em; text-wrap:balance;
+}
+.reg-head .n{
+  font-family:var(--mono); font-size:12px; color:var(--cinnabar);
+  border:1px solid rgba(206,66,56,.4); padding:2px 7px; letter-spacing:.1em;
+}
+.lede{max-width:34em; color:#C8CCDA; font-size:16.5px}
+.dim{color:var(--frost)}
+hr.rule{border:0; border-top:1px solid var(--rule); margin:0}
+
+/* ── 首叶 ── */
+.leaf{
+  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--s4);
+  align-items:center; padding-block:var(--s5) var(--s4);
+}
+.leaf-main{display:flex; flex-direction:column; align-items:center; gap:var(--s3)}
+#heroMoon{width:min(58vw,266px); aspect-ratio:1; max-width:100%; display:block}
+.hero-cap{text-align:center; display:flex; flex-direction:column; gap:6px}
+.hero-cap .greg{font-family:var(--mono); font-size:14px; letter-spacing:.06em; color:#B7BECF}
+.hero-cap .gz{font-size:13px; letter-spacing:.3em; color:var(--frost-dim)}
+/* 竖排日期：黄历的书口 */
+.spine{
+  display:flex; flex-direction:row-reverse; align-items:flex-start; gap:var(--s3);
+  align-self:center; justify-self:end;
+  border-inline-start:1px solid var(--rule); padding-inline-start:var(--s3);
+  animation:spineIn 1s ease-out backwards;
+}
+@keyframes spineIn{from{opacity:0; transform:translateY(-10px)}}
+.spine .col-v{display:flex; flex-direction:column; align-items:center}
+.spine i{font-style:normal; display:block}
+.spine .yr{font-size:15px; color:var(--frost); font-weight:300; padding-top:6px}
+.spine .yr i{line-height:1.5; letter-spacing:0}
+.spine .day{
+  font-size:clamp(38px,8.2vw,54px); font-weight:900;
+  color:var(--moon); text-shadow:0 0 34px rgba(214,225,255,.28);
+}
+.spine .day i{line-height:1.18; letter-spacing:0}
+.spine .day i.red{color:var(--cinnabar)}
+.thesis{
+  grid-column:1/-1; max-width:min(31em,100%); margin-inline:auto; text-align:center;
+  font-size:clamp(17px,3.1vw,20px); line-height:2.15; color:#DCDFE9; text-wrap:balance;
+  padding-top:var(--s3);
+}
+.thesis b{font-weight:500; color:var(--moon); border-bottom:1px solid var(--cinnabar); padding-bottom:1px}
+.today-note{
+  grid-column:1/-1; margin-top:var(--s4); font-size:14px; color:var(--frost);
+  text-align:center; max-width:min(33em,100%); margin-inline:auto; line-height:2;
+}
+.today-note .hot{color:var(--lamp)}
+
+/* ── 三十个月亮 ── */
+.dial{
+  display:grid; grid-template-columns:repeat(15,1fr); gap:clamp(4px,1.2vw,9px);
+  margin-block:var(--s4) var(--s3);
+}
+.dial button{
+  appearance:none; background:none; border:0; padding:0 0 15px; cursor:pointer;
+  position:relative; display:block; width:100%;
+}
+.dial canvas{width:100%; aspect-ratio:1; display:block; opacity:.62; transition:opacity .25s}
+.dial button:hover canvas,.dial button:focus-visible canvas{opacity:1}
+.dial button[aria-pressed="true"] canvas{opacity:1; filter:drop-shadow(0 0 9px rgba(226,231,255,.55))}
+.dial .lab{
+  position:absolute; inset-inline:0; bottom:0; font-family:var(--mono);
+  font-size:9px; color:var(--frost-dim); letter-spacing:.02em;
+}
+.dial button[aria-pressed="true"] .lab{color:var(--moon)}
+.dial button.mark .lab{color:var(--cinnabar)}
+.dial button.mark::after{
+  content:""; position:absolute; left:50%; top:calc(50% - 7.5px); translate:-50% -50%;
+  width:calc(100% + 9px); aspect-ratio:1; border:1px solid var(--cinnabar);
+  border-radius:50%; opacity:.85; pointer-events:none;
+}
+.readout{
+  display:flex; align-items:center; gap:var(--s2) var(--s3); flex-wrap:wrap;
+  border-top:1px solid var(--rule); padding-top:var(--s2); min-height:44px;
+}
+.readout .rd-day{font-size:22px; font-weight:500; letter-spacing:.2em; min-width:2.6em}
+.readout .rd-name{color:var(--frost); letter-spacing:.16em}
+.readout .rd-pct{font-family:var(--mono); font-size:13px; color:var(--lamp); font-variant-numeric:tabular-nums}
+.readout .rd-yours{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; color:#fff;
+  background:var(--cinnabar-deep); padding:3px 9px;
+}
+
+/* ── 数 ── */
+.figs{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(178px,1fr));
+  gap:1px; background:var(--rule-soft); border-block:1px solid var(--rule);
+}
+.fig{background:var(--ink); padding:var(--s3) var(--s2) var(--s3) 0}
+.fig dt{font-family:var(--mono); font-size:10.5px; letter-spacing:.2em; color:var(--frost-dim); margin-bottom:9px}
+.fig dd{
+  margin:0; font-family:var(--mono); font-weight:400; font-variant-numeric:tabular-nums;
+  font-size:clamp(21px,3.6vw,26px); color:var(--moon); letter-spacing:-.01em; line-height:1.25;
+}
+.fig dd small{font-family:var(--serif); font-size:13px; color:var(--frost); letter-spacing:.12em; margin-inline-start:5px; font-weight:300}
+.fig.hot dd{color:var(--lamp)}
+
+/* ── 漂移图 ── */
+.chartwrap{overflow-x:auto; margin-block:var(--s4) var(--s2); padding-bottom:6px}
+.chartwrap svg{display:block; min-width:520px; width:100%; height:auto}
+.legend{display:flex; align-items:center; gap:var(--s2); flex-wrap:wrap; font-size:13.5px; color:var(--frost)}
+.legend canvas{width:34px; height:34px; flex:none}
+.legend b{color:var(--moon); font-weight:500}
+
+/* ── 宜忌 ── */
+.almanac{display:grid; grid-template-columns:1fr 1fr; gap:var(--s4); margin-top:var(--s3)}
+.col{display:grid; grid-template-columns:auto 1fr; gap:var(--s3); align-items:start}
+.col .mark{
+  flex:none; width:42px; height:42px; display:grid; place-items:center;
+  font-size:25px; font-weight:900; line-height:1;
+}
+.col.yi .mark{background:var(--cinnabar); color:#FFF4EE}
+.col.ji .mark{border:1px solid var(--frost-dim); color:var(--frost)}
+.col ul{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:9px}
+.col li{font-size:15.5px; line-height:1.7; text-indent:0}
+.col.ji li{color:var(--frost)}
+
+/* ── 点灯 ── */
+.sky{
+  position:relative; height:clamp(300px,52vw,392px); margin-top:var(--s4);
+  background:linear-gradient(180deg,#080C18 0%,#0C1226 52%,#141C36 86%,#0A1020 100%);
+  border:1px solid var(--rule); overflow:hidden;
+}
+.sky::after{ /* 水面 */
+  content:""; position:absolute; inset:auto 0 0 0; height:19%;
+  background:linear-gradient(180deg,rgba(226,167,63,.09),rgba(226,167,63,0) 72%);
+  border-top:1px solid rgba(226,167,63,.20);
+}
+.lslot{position:absolute; transform:translate(-50%,0)}
+.lslot.rising{animation:rise 2.8s cubic-bezier(.22,.68,.3,1) both}
+@keyframes rise{
+  from{transform:translate(-50%,var(--from,320px)); opacity:0}
+  18%{opacity:1}
+  to{transform:translate(-50%,0); opacity:1}
+}
+.lantern{
+  position:relative; display:block; width:20px; height:27px;
+  border-radius:5px 5px 8px 8px; cursor:pointer; border:0; padding:0;
+  background:linear-gradient(180deg,#F5C97A,#E2A73F 55%,#C0742A);
+  box-shadow:0 0 19px 5px rgba(226,167,63,.34), 0 0 50px 15px rgba(226,167,63,.12);
+  animation:bob var(--dur,9s) ease-in-out var(--del,0s) infinite alternate;
+}
+.lantern::before{content:""; position:absolute; inset:-4px 6px auto 6px; height:4px; background:rgba(255,240,215,.5); border-radius:2px}
+.lantern:hover,.lantern:focus-visible{box-shadow:0 0 26px 8px rgba(226,167,63,.55), 0 0 62px 20px rgba(226,167,63,.2)}
+@keyframes bob{from{translate:0 0} to{translate:var(--dx,9px) -13px}}
+.sky-hint{
+  position:absolute; inset:auto 0 8px 0; text-align:center;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.18em; color:rgba(125,135,166,.65);
+}
+.wish-read{
+  min-height:62px; display:flex; align-items:center; justify-content:center; padding:var(--s2) 0;
+  font-size:16.5px; color:var(--lamp); text-align:center; text-wrap:balance; line-height:1.85;
+}
+.wish-read .who{display:block; font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; color:var(--frost-dim); margin-top:5px}
+.compose{display:flex; gap:10px; flex-wrap:wrap; margin-top:var(--s2)}
+.compose input{
+  flex:1 1 240px; min-width:0; background:rgba(10,14,28,.75); color:var(--moon);
+  border:1px solid var(--rule); border-radius:0; padding:13px 15px;
+  font-family:var(--serif); font-size:16px; font-weight:300;
+}
+.compose input::placeholder{color:var(--frost-dim)}
+.compose input:focus{outline:none; border-color:var(--lamp)}
+.compose button{
+  flex:none; background:var(--cinnabar); color:#FFF4EE; border:0; padding:13px 26px;
+  font-family:var(--serif); font-size:16px; font-weight:500; letter-spacing:.32em;
+  text-indent:.32em; cursor:pointer; transition:background .2s;
+}
+.compose button:hover{background:var(--cinnabar-deep)}
+.compose button:disabled{background:var(--frost-dim); cursor:not-allowed}
+
+/* ── 跋 ── */
+.colophon{
+  margin-top:var(--s6); padding-top:var(--s4); border-top:1px solid var(--rule);
+  display:grid; grid-template-columns:1fr auto; gap:var(--s4); align-items:end;
+}
+.colophon p{max-width:33em; font-size:16px; line-height:2.15; color:#CFD4E0}
+.colophon p + p{margin-top:var(--s2)}
+.seal{
+  flex:none; width:88px; height:88px; background:var(--cinnabar); color:#FFF2EC;
+  display:grid; grid-template-columns:1fr 1fr; place-items:center;
+  font-family:var(--hand); font-size:29px; line-height:1; rotate:-3deg;
+  box-shadow:0 5px 26px rgba(206,66,56,.3); padding:7px;
+}
+.sign{font-family:var(--hand); font-size:19px; color:var(--frost); letter-spacing:.1em}
+
+/* ── 声 ── */
+.snd{
+  position:fixed; right:16px; bottom:16px; z-index:9; width:40px; height:40px;
+  border-radius:50%; border:1px solid var(--rule); background:rgba(10,14,28,.9);
+  color:var(--frost); font-family:var(--serif); font-size:15px; cursor:pointer;
+  backdrop-filter:blur(6px);
+}
+.snd[aria-pressed="true"]{color:var(--lamp); border-color:rgba(226,167,63,.5)}
+
+@media (max-width:640px){
+  .leaf{grid-template-columns:minmax(0,1fr)}
+  .leaf-main{justify-self:center}
+  .spine{
+    align-items:baseline; justify-content:center; gap:14px; width:100%;
+    justify-self:stretch; border-inline-start:0;
+    border-block-start:1px solid var(--rule); padding:var(--s3) 0 0;
+  }
+  .spine .col-v{flex-direction:row}
+  .spine .yr{padding-top:0; letter-spacing:.24em}
+  .spine .day{font-size:clamp(30px,9vw,42px)}
+  .spine .day i{line-height:1.2}
+  .dial{grid-template-columns:repeat(10,1fr)}
+  .almanac{grid-template-columns:1fr; gap:var(--s3)}
+  .colophon{grid-template-columns:1fr; justify-items:start; gap:var(--s3)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important; animation-iteration-count:1!important; transition-duration:.001ms!important}
+  .lslot{opacity:1}
+}
+</style>
+
+<div class="page">
+
+  <!-- ══ 首叶 ══ -->
+  <header class="leaf">
+    <div class="leaf-main">
+      <canvas id="heroMoon" width="532" height="532" role="img"
+        aria-label="农历七月十三的月亮，约九成六被照亮的盈凸月"></canvas>
+      <div class="hero-cap">
+        <p class="greg">2001-08-31　FRI</p>
+        <p class="gz">辛巳年 · 丙寅日 · 处暑</p>
+      </div>
+    </div>
+    <div class="spine" aria-label="辛巳年七月十三">
+      <div class="col-v day" aria-hidden="true"><i>七</i><i>月</i><i class="red">十</i><i class="red">三</i></div>
+      <div class="col-v yr" aria-hidden="true"><i>辛</i><i>巳</i><i>年</i></div>
+    </div>
+    <p class="thesis">
+      公历的生日，记住的是太阳站在哪里。<br>
+      农历的生日，记住的是<b>月亮长什么样</b>。
+    </p>
+    <p class="today-note" id="todayNote">　</p>
+  </header>
+
+  <!-- ══ 一 · 三十个月亮 ══ -->
+  <section class="reg">
+    <div class="reg-head"><span class="n">一</span><h2>三十个月亮</h2></div>
+    <p class="lede">一个农历月，月亮有三十种样子。挨个点点看——你的生日，永远停在第十三种。</p>
+    <div class="dial" id="dial" role="group" aria-label="农历三十天的月相，点选查看"></div>
+    <div class="readout" id="readout"></div>
+    <p class="lede" style="margin-top:var(--s3)">
+      二〇〇一到二〇四〇，四十个七月十三，月亮的照亮比例都落在 <span style="font-family:var(--mono);color:var(--lamp)">94.7%–98.2%</span> 之间，平均约九成六。
+      <span class="dim">很亮了，但始终差一点满——十三这一天的月亮，永远还留着往上长的余地。</span>
+    </p>
+  </section>
+
+  <!-- ══ 二 · 数 ══ -->
+  <section class="reg">
+    <div class="reg-head"><span class="n">二</span><h2>从那天到现在</h2></div>
+    <dl class="figs" id="figs"></dl>
+  </section>
+
+  <!-- ══ 三 · 漂移 ══ -->
+  <section class="reg">
+    <div class="reg-head"><span class="n">三</span><h2>四十次七月十三</h2></div>
+    <p class="lede">同一个生日，在公历上从来不肯待在一处：最早八月六日，最晚九月四日，来回游荡将近一个月。</p>
+    <div class="chartwrap"><svg id="drift" viewBox="0 0 640 400" role="img"
+      aria-label="散点图：2001 至 2040 年，农历七月十三对应的公历日期，在八月六日到九月四日之间来回移动"></svg></div>
+    <div class="legend">
+      <canvas id="legendMoon" width="96" height="96" aria-hidden="true"></canvas>
+      <p>四十个日子散开在一个月里，<b>四十枚月亮却是同一枚</b>。公历记的是号数，农历记的是月色。</p>
+    </div>
+  </section>
+
+  <!-- ══ 四 · 宜忌 ══ -->
+  <section class="reg">
+    <div class="reg-head"><span class="n">四</span><h2>本日宜忌</h2></div>
+    <div class="almanac">
+      <div class="col yi"><div class="mark">宜</div><ul>
+        <li>抬头，找一找那枚快满的月亮</li>
+        <li>把一整个晚上留给自己，不安排任何有用的事</li>
+        <li>吃一碗长寿面，汤要喝完</li>
+        <li>给很久没联系的人发一条不必回的消息</li>
+        <li>承认自己这一年已经做得很好了</li>
+      </ul></div>
+      <div class="col ji"><div class="mark">忌</div><ul>
+        <li>赶路</li>
+        <li>和昨天的自己比高低</li>
+        <li>说"来不及了"</li>
+        <li>把今天过成普通的一天</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <!-- ══ 五 · 点灯 ══ -->
+  <section class="reg">
+    <div class="reg-head"><span class="n">五</span><h2>点一盏灯</h2></div>
+    <p class="lede">农历七月的水边有放灯的旧俗：写一句话，交给它，让它自己往上走。<span class="dim" id="storeNote">灯留在这台设备上，下次打开还在。</span></p>
+    <div class="sky" id="sky"><p class="sky-hint">轻点任意一盏，读读上面写了什么</p></div>
+    <p class="wish-read" id="wishRead">　</p>
+    <form class="compose" id="compose">
+      <label class="visually-hidden" for="wishInput" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">写一句愿望</label>
+      <input id="wishInput" name="wish" type="text" maxlength="40" autocomplete="off" placeholder="写一句话…">
+      <button type="submit" id="wishBtn">点灯</button>
+    </form>
+  </section>
+
+  <!-- ══ 跋 ══ -->
+  <footer class="colophon">
+    <div>
+      <p>这一页是照着你的日子做的。月相是按农历十三真算的，公历那四十个号数也是一天一天推出来的，不是随手写的数字。</p>
+      <p>挑月亮不挑太阳的生日，我觉得是件很好的事——因为它每年都提醒你同一件事：<br>还没满，还在长，这不是缺憾，这是余地。</p>
+      <p class="sign">生辰吉乐。</p>
+    </div>
+    <div class="seal" aria-label="印：七月十三"><span>七</span><span>月</span><span>十</span><span>三</span></div>
+  </footer>
+</div>
+<button class="snd" id="snd" aria-pressed="true" title="声音">声</button>
+
+<script>
+"use strict";
+(function(){
+/* ═══ 农历（1900–2049 通用表） ═══ */
+var LI=[0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,
+0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,
+0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,
+0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,
+0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,
+0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,
+0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,
+0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,
+0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,
+0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,
+0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,
+0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,
+0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,
+0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,
+0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0];
+function leapM(y){return LI[y-1900]&0xf;}
+function leapD(y){return leapM(y)?((LI[y-1900]&0x10000)?30:29):0;}
+function monD(y,m){return (LI[y-1900]&(0x10000>>m))?30:29;}
+function yearD(y){var s=348,i;for(i=0x8000;i>0x8;i>>=1){if(LI[y-1900]&i)s++;}return s+leapD(y);}
+var SPRING={},acc=0,yy;
+for(yy=1900;yy<=2049;yy++){SPRING[yy]=acc;acc+=yearD(yy);}
+var BASE=Date.UTC(1900,0,31), DAY=864e5;
+function lunar2date(y,m,d){                      /* 农历 → 本地零点 Date */
+  var off=0,lm=leapM(y),i;
+  for(i=1;i<m;i++){off+=monD(y,i); if(lm&&i===lm)off+=leapD(y);}
+  var u=new Date(BASE+(SPRING[y]+off+d-1)*DAY);
+  return new Date(u.getUTCFullYear(),u.getUTCMonth(),u.getUTCDate());
+}
+/* ═══ 常量 ═══ */
+var BIRTH=lunar2date(2001,7,13);                 /* = 2001-08-31 */
+var CN=["零","一","二","三","四","五","六","七","八","九"];
+var DAYNAME=["初一","初二","初三","初四","初五","初六","初七","初八","初九","初十",
+"十一","十二","十三","十四","十五","十六","十七","十八","十九","二十",
+"廿一","廿二","廿三","廿四","廿五","廿六","廿七","廿八","廿九","三十"];
+var PHASE=[[1,4,"朔"],[5,7,"蛾眉月"],[8,9,"上弦"],[10,14,"盈凸月"],[15,16,"望"],
+[17,21,"亏凸月"],[22,24,"下弦"],[25,30,"残月"]];
+function phaseName(d){for(var i=0;i<PHASE.length;i++){if(d>=PHASE[i][0]&&d<=PHASE[i][1])return PHASE[i][2];}return"";}
+function frac(d){return ((d-0.1)/29.530589)%1;}                  /* 农历日 → 朔望相位 */
+function illum(t){return (1-Math.cos(2*Math.PI*t))/2;}
+function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate());}
+function num2cn(n){
+  n=Math.floor(n); if(n<0)return String(n);
+  if(n<=10)return n===10?"十":CN[n];
+  if(n<20)return "十"+(n%10?CN[n%10]:"");
+  if(n<100)return CN[Math.floor(n/10)]+"十"+(n%10?CN[n%10]:"");
+  return String(n);
+}
+function group(n){return String(Math.floor(n)).replace(/\B(?=(\d{3})+(?!\d))/g,",");}
+
+/* ═══ 画月亮 ═══ */
+var MARIA=[[-.34,-.24,.27,.22,-.35],[-.02,-.38,.22,.14,.2],[.21,-.08,.20,.25,.15],
+[-.17,.23,.30,.19,.5],[.41,.29,.13,.11,0]];
+function drawMoon(cv,t,o){
+  o=o||{};
+  var dpr=Math.min(2,window.devicePixelRatio||1);
+  var w=cv.clientWidth||cv.width, h=cv.clientHeight||cv.height;
+  if(!w||!h)return;
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  var c=cv.getContext("2d"); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h);
+  var R=Math.min(w,h)/2*(o.inset||0.9), cx=w/2, cy=h/2;
+  var th=2*Math.PI*t, cs=Math.cos(th), waxing=t<0.5;
+  if(o.halo){                                   /* 月晕 */
+    var hr=Math.min(w,h)/2, g=c.createRadialGradient(cx,cy,R*0.92,cx,cy,hr);
+    g.addColorStop(0,"rgba(206,220,255,.19)"); g.addColorStop(.42,"rgba(150,172,232,.06)");
+    g.addColorStop(1,"rgba(120,145,210,0)");
+    c.fillStyle=g; c.beginPath(); c.arc(cx,cy,hr,0,6.284); c.fill();
+  }
+  c.beginPath(); c.arc(cx,cy,R,0,6.284);        /* 地照面 */
+  c.fillStyle=o.dark||"#1C2340"; c.fill();
+  c.save();
+  if(!waxing){c.translate(cx,0); c.scale(-1,1); c.translate(-cx,0);}
+  c.beginPath();
+  c.arc(cx,cy,R,-Math.PI/2,Math.PI/2,false);    /* 明亮的一侧轮廓 */
+  c.ellipse(cx,cy,R*Math.abs(cs),R,0,Math.PI/2,-Math.PI/2,cs>0); /* 晨昏线 */
+  c.closePath(); c.clip();
+  var sg=c.createRadialGradient(cx-R*.26,cy-R*.3,R*.05,cx,cy,R*1.14);
+  sg.addColorStop(0,"#FCF8EE"); sg.addColorStop(.55,"#EFE9DA"); sg.addColorStop(1,"#C4BFB6");
+  c.fillStyle=sg; c.beginPath(); c.arc(cx,cy,R,0,6.284); c.fill();
+  if(o.maria!==false){                          /* 月海 */
+    c.globalAlpha=.10; c.fillStyle="#8A88A2";
+    try{c.filter="blur("+Math.max(1,R*.08)+"px)";}catch(e){}
+    for(var i=0;i<MARIA.length;i++){var m=MARIA[i];
+      c.beginPath(); c.ellipse(cx+m[0]*R,cy+m[1]*R,m[2]*R,m[3]*R,m[4],0,6.284); c.fill();}
+    try{c.filter="none";}catch(e){} c.globalAlpha=1;
+  }
+  c.restore();
+}
+
+/* ═══ 声 ═══ */
+var actx=null, sndOn=true, sndBtn=document.getElementById("snd");
+function tone(f,dur,gain,type){
+  if(!sndOn)return;
+  try{
+    if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();
+    if(actx.state==="suspended")actx.resume();
+    var o=actx.createOscillator(),g=actx.createGain(),n=actx.currentTime;
+    o.type=type||"sine"; o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,n);
+    g.gain.exponentialRampToValueAtTime(gain||.11,n+.015);
+    g.gain.exponentialRampToValueAtTime(.0001,n+(dur||1.4));
+    o.connect(g); g.connect(actx.destination); o.start(n); o.stop(n+(dur||1.4)+.05);
+  }catch(e){}
+}
+sndBtn.addEventListener("click",function(){
+  sndOn=!sndOn; sndBtn.setAttribute("aria-pressed",String(sndOn));
+  sndBtn.textContent=sndOn?"声":"静"; sndBtn.title=sndOn?"关闭声音":"打开声音";
+  if(sndOn)tone(587.33,.5,.07);
+});
+
+/* ═══ 首叶月亮 ═══ */
+var hero=document.getElementById("heroMoon"), T13=frac(13);
+var reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function paintHero(t){drawMoon(hero,t,{halo:true,inset:.62});}
+if(reduce){paintHero(T13);}
+else{
+  var t0=null, from=frac(11);
+  requestAnimationFrame(function step(ts){
+    if(t0===null)t0=ts;
+    var k=Math.min(1,(ts-t0)/1100), e=1-Math.pow(1-k,3);
+    paintHero(from+(T13-from)*e);
+    if(k<1)requestAnimationFrame(step);
+  });
+}
+drawMoon(document.getElementById("legendMoon"),T13,{inset:.9});
+
+/* ═══ 一 · 三十个月亮 ═══ */
+var dial=document.getElementById("dial"), readout=document.getElementById("readout"), cur=13;
+var dialCv=[];
+for(var d=1;d<=30;d++){
+  var b=document.createElement("button");
+  b.type="button"; b.dataset.d=d; b.setAttribute("aria-pressed",String(d===13));
+  b.setAttribute("aria-label","农历"+DAYNAME[d-1]+"，"+phaseName(d));
+  if(d===13)b.className="mark";
+  var cv=document.createElement("canvas"); cv.width=cv.height=64;
+  var lb=document.createElement("span"); lb.className="lab"; lb.textContent=DAYNAME[d-1];
+  b.appendChild(cv); b.appendChild(lb); dial.appendChild(b); dialCv.push(cv);
+}
+function paintDial(){for(var i=0;i<30;i++)drawMoon(dialCv[i],frac(i+1),{inset:.94,maria:false,dark:"#232B4A"});}
+function setDay(d,quiet){
+  cur=d;
+  var bs=dial.children,i;
+  for(i=0;i<bs.length;i++)bs[i].setAttribute("aria-pressed",String(+bs[i].dataset.d===d));
+  paintHero(frac(d));
+  var pct=(illum(frac(d))*100).toFixed(1);
+  readout.innerHTML='<span class="rd-day">'+DAYNAME[d-1]+'</span>'+
+    '<span class="rd-name">'+phaseName(d)+'</span>'+
+    '<span class="rd-pct">照亮 '+pct+'%</span>'+
+    (d===13?'<span class="rd-yours">你的月亮 · 将圆未圆</span>':'');
+  if(!quiet)tone(392+ (d%5)*58,.3,.045,"triangle");
+}
+dial.addEventListener("click",function(e){
+  var b=e.target.closest("button"); if(b)setDay(+b.dataset.d);
+});
+var dragging=false;
+dial.addEventListener("pointerdown",function(){dragging=true;});
+window.addEventListener("pointerup",function(){dragging=false;});
+dial.addEventListener("pointermove",function(e){
+  if(!dragging)return;
+  var el=document.elementFromPoint(e.clientX,e.clientY);
+  var b=el&&el.closest?el.closest("button"):null;
+  if(b&&+b.dataset.d!==cur)setDay(+b.dataset.d);
+});
+
+/* ═══ 今天的位置 ═══ */
+function occurrence(y){return lunar2date(y,7,13);}
+function nearest(now){
+  var t=midnight(now).getTime(), last=null, next=null, count=0, y;
+  for(y=2001;y<=2049;y++){
+    var o=occurrence(y).getTime();
+    if(o<=t){last=o; count++;} else {next=o; break;}
+  }
+  return {last:last,next:next,age:Math.max(0,count-1),isToday:last===t};
+}
+var now=new Date(), st=nearest(now);
+var note=document.getElementById("todayNote");
+var MD=function(ms){var x=new Date(ms);
+  return (x.getFullYear()!==now.getFullYear()?x.getFullYear()+"年":"")+(x.getMonth()+1)+"月"+x.getDate()+"日";};
+if(st.isToday){
+  note.innerHTML='今天正是你的第 <span class="hot">'+num2cn(st.age)+'</span> 个七月十三。<br>'+
+                 '天上那枚，就是下面这枚。<span class="hot">生辰吉乐。</span>';
+}else{
+  var dLast=Math.round((midnight(now)-st.last)/DAY);
+  var dNext=st.next?Math.round((st.next-midnight(now))/DAY):null;
+  note.innerHTML='今天是 '+(now.getFullYear())+' 年 '+(now.getMonth()+1)+' 月 '+now.getDate()+' 日。'+
+    '你的第 '+num2cn(st.age)+' 个七月十三在 <span class="hot">'+dLast+'</span> 天前（'+MD(st.last)+'）'+
+    (dNext!==null?'，下一个在 <span class="hot">'+dNext+'</span> 天后（'+MD(st.next)+'）':'')+'。<br>'+
+    '不过点灯这件事，从来不必挑日子。';
+}
+document.getElementById("wishInput").placeholder="写给 "+st.age+" 岁的一句话…";
+
+/* ═══ 二 · 数 ═══ */
+var figs=document.getElementById("figs");
+var FIG=[["ALIVE","已活"],["MOONS","见过的满月"],["BEATS","心跳约"],["NEXT","距下一个七月十三"]];
+FIG.forEach(function(f){
+  var dt=document.createElement("dt"), dd=document.createElement("dd");
+  var w=document.createElement("div"); w.className="fig"+(f[0]==="NEXT"?" hot":"");
+  dt.textContent=f[1]; dd.id="fig"+f[0]; dd.textContent="—";
+  w.appendChild(dt); w.appendChild(dd); figs.appendChild(w);
+});
+function tick(){
+  var n=new Date(), ms=n-BIRTH;
+  var days=Math.floor((midnight(n)-BIRTH)/DAY);
+  document.getElementById("figALIVE").innerHTML=group(days)+'<small>天</small>';
+  document.getElementById("figMOONS").innerHTML=group(days/29.530589)+'<small>回</small>';
+  document.getElementById("figBEATS").innerHTML=group(ms/60000*75)+'<small>次</small>';
+  var s=nearest(n);
+  if(s.isToday){
+    document.getElementById("figNEXT").innerHTML='就是今天<small>🌔</small>';
+  }else if(s.next){
+    var left=s.next-n, dd2=Math.floor(left/DAY);
+    var hh=Math.floor(left%DAY/36e5), mm=Math.floor(left%36e5/6e4), ss=Math.floor(left%6e4/1000);
+    var p=function(v){return v<10?"0"+v:""+v;};
+    document.getElementById("figNEXT").innerHTML=dd2+'<small>天</small>'+
+      ' <span style="font-size:.68em">'+p(hh)+':'+p(mm)+':'+p(ss)+'</span>';
+  }
+}
+tick(); setInterval(tick,1000);
+
+/* ═══ 三 · 漂移图 ═══ */
+var DRIFT=[[2001,8,31],[2002,8,21],[2003,8,10],[2004,8,28],[2005,8,17],[2006,8,6],[2007,8,25],
+[2008,8,13],[2009,9,1],[2010,8,22],[2011,8,12],[2012,8,29],[2013,8,19],[2014,8,8],[2015,8,26],
+[2016,8,15],[2017,9,3],[2018,8,23],[2019,8,13],[2020,8,31],[2021,8,20],[2022,8,10],[2023,8,28],
+[2024,8,16],[2025,9,4],[2026,8,25],[2027,8,14],[2028,9,1],[2029,8,22],[2030,8,11],[2031,8,30],
+[2032,8,18],[2033,8,7],[2034,8,26],[2035,8,16],[2036,9,3],[2037,8,23],[2038,8,13],[2039,9,1],[2040,8,20]];
+(function(){
+  var W=640,H=400,ML=46,MR=58,MT=30,MB=34,PW=W-ML-MR,PH=H-MT-MB;
+  var X0=1,X1=37;                                   /* 8月1日 → 9月6日 */
+  var idx=function(m,d){return m===8?d:31+d;};
+  var x=function(i){return ML+(i-X0)/(X1-X0)*PW;};
+  var y=function(k){return MT+(k+0.5)/DRIFT.length*PH;};
+  var thisYear=new Date().getFullYear();
+  var s=['<defs><radialGradient id="dot"><stop offset="0" stop-color="#FDFAF2"/>'+
+    '<stop offset=".6" stop-color="#EDE6D6"/><stop offset="1" stop-color="#B9B4AC"/></radialGradient>'+
+    '<radialGradient id="glow"><stop offset="0" stop-color="#D6E1FF" stop-opacity=".34"/>'+
+    '<stop offset="1" stop-color="#D6E1FF" stop-opacity="0"/></radialGradient></defs>'];
+  [[5,"8月5日"],[15,"8月15日"],[25,"8月25日"],[36,"9月5日"]].forEach(function(t){
+    s.push('<line x1="'+x(t[0]).toFixed(1)+'" y1="'+MT+'" x2="'+x(t[0]).toFixed(1)+'" y2="'+(MT+PH)+
+      '" stroke="rgba(125,135,166,.16)" stroke-width="1"/>');
+    s.push('<text x="'+x(t[0]).toFixed(1)+'" y="'+(MT-11)+'" fill="#7D87A6" font-size="10.5" '+
+      'font-family="IBM Plex Mono, monospace" text-anchor="middle" letter-spacing=".04em">'+t[1]+'</text>');
+  });
+  DRIFT.forEach(function(r,k){
+    var yr=r[0], px=x(idx(r[1],r[2])), py=y(k);
+    var mine=(yr===2001), nowy=(yr===thisYear);
+    if(yr%5===0||mine)s.push('<text x="'+(ML-13)+'" y="'+(py+3.6).toFixed(1)+'" fill="'+(mine?"#CE4238":"#525C7A")+
+      '" font-size="10" font-family="IBM Plex Mono, monospace" text-anchor="end">'+yr+'</text>');
+    s.push('<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="9" fill="url(#glow)"/>');
+    s.push('<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="3.9" fill="url(#dot)"/>');
+    if(mine||nowy){
+      s.push('<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="8.5" fill="none" stroke="#CE4238" stroke-width="1.2"/>');
+      s.push('<text x="'+(px+13).toFixed(1)+'" y="'+(py+3.6).toFixed(1)+'" fill="#CE4238" font-size="10" '+
+        'font-family="IBM Plex Mono, monospace" letter-spacing=".08em">'+(mine?"第一次":"今年")+'</text>');
+    }
+  });
+  s.push('<line x1="'+ML+'" y1="'+(MT+PH+9)+'" x2="'+(ML+PW)+'" y2="'+(MT+PH+9)+'" stroke="rgba(125,135,166,.3)"/>');
+  s.push('<text x="'+ML+'" y="'+(MT+PH+25)+'" fill="#525C7A" font-size="10" '+
+    'font-family="IBM Plex Mono, monospace">最早 8月6日</text>');
+  s.push('<text x="'+(ML+PW)+'" y="'+(MT+PH+25)+'" fill="#525C7A" font-size="10" '+
+    'font-family="IBM Plex Mono, monospace" text-anchor="end">最晚 9月4日</text>');
+  document.getElementById("drift").innerHTML=s.join("");
+})();
+
+/* ═══ 五 · 点灯 ═══ */
+var sky=document.getElementById("sky"), wishRead=document.getElementById("wishRead");
+var skyHint=sky.querySelector(".sky-hint"), storeNote=document.getElementById("storeNote");
+var KEY="qys.lanterns.v1";
+var SEED=[
+  {id:"seed-1",t:"愿你今年像十三的月亮——还没满，还在长。",seed:true},
+  {id:"seed-2",t:"愿你想起这一天的时候，是笑着的。",seed:true},
+  {id:"seed-3",t:"愿你有得选，并且选了就不后悔。",seed:true}];
+var DB=null, live=Object.create(null), booted=false;
+
+function hash32(str){var h=2166136261,i;
+  for(i=0;i<str.length;i++){h^=str.charCodeAt(i); h=Math.imul(h,16777619);}
+  return h>>>0;}
+function placeOf(id){var h=hash32(id);           /* 同一盏灯每次都回到同一处 */
+  return {left:11+h%78, top:13+(h>>>7)%54, dur:(6.5+(h>>>13)%60/10),
+          dx:(h>>>19)%20-10, del:-((h>>>23)%70)/10};}
+function readLocal(){try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return [];}}
+function writeLocal(a){try{localStorage.setItem(KEY,JSON.stringify(a.slice(-24)));}catch(e){}}
+
+function makeLantern(w,fresh){
+  var pos=placeOf(w.id);
+  var slot=document.createElement("span");
+  slot.className="lslot";
+  slot.style.left=pos.left+"%"; slot.style.top=pos.top+"%";
+  slot.style.setProperty("--from",Math.round((sky.clientHeight||340)*0.86)+"px");
+  var b=document.createElement("button");
+  b.type="button"; b.className="lantern";
+  b.setAttribute("aria-label","灯：" + w.t);
+  b.style.setProperty("--dur",pos.dur.toFixed(1)+"s");
+  b.style.setProperty("--del",pos.del.toFixed(1)+"s");
+  b.style.setProperty("--dx",pos.dx+"px");
+  b.addEventListener("click",function(){
+    wishRead.innerHTML=esc(w.t)+'<span class="who">'+(w.seed?"— 来自这一页":"— 写下的愿")+'</span>';
+    tone(523.25,1.1,.07);
+  });
+  slot.appendChild(b); sky.appendChild(slot);
+  if(fresh)slot.classList.add("rising");
+  live[w.id]=slot;
+  return slot;
+}
+function esc(t){var d=document.createElement("div"); d.textContent=t; return d.innerHTML;}
+function syncSky(list,animateNew){
+  var keep=Object.create(null),i,w;
+  for(i=0;i<list.length;i++){
+    w=list[i]; keep[w.id]=1;
+    if(!live[w.id])makeLantern(w,animateNew&&booted);
+  }
+  for(var id in live){                            /* 撤掉已删除的灯 */
+    if(!keep[id]){ if(live[id].parentNode)live[id].parentNode.removeChild(live[id]); delete live[id]; }
+  }
+  booted=true;
+}
+function localList(){
+  return SEED.concat(readLocal().slice(-9).map(function(w,i){
+    return {id:w.id||("loc-"+(w.ts||i)), t:w.t};
+  }));
+}
+syncSky(localList(),false);                        /* 先用本地的画出来，页面从不空着 */
+wishRead.innerHTML=esc(SEED[0].t)+'<span class="who">— 来自这一页</span>';
+
+if(window.claude&&window.claude.use){
+  window.claude.use("db").then(function(db){
+    if(!db)return;
+    DB=db;
+    storeNote.textContent="换台设备打开，灯也还在。";
+    db.collection("lanterns").orderBy("ts","desc").limit(9).onSnapshot(function(snap){
+      var rows=snap.docs.map(function(d){
+        var v=d.data()||{}; return {id:d.id, t:String(v.t||"")};
+      }).filter(function(r){return r.t;});
+      syncSky(SEED.concat(rows),true);
+    },function(){ DB=null; storeNote.textContent="灯留在这台设备上，下次打开还在。"; });
+  }, function(){});
+}
+
+document.getElementById("compose").addEventListener("submit",function(e){
+  e.preventDefault();
+  var inp=document.getElementById("wishInput"), v=inp.value.trim();
+  if(!v)return;
+  var id="w-"+Date.now().toString(36)+"-"+Math.floor(Math.random()*1e6).toString(36);
+  var w={id:id,t:v,ts:Date.now()};
+  if(DB){
+    DB.collection("lanterns").doc(id).set({t:v,ts:w.ts})["catch"](function(){
+      var a=readLocal(); a.push(w); writeLocal(a);   /* 写不进去也不能把话弄丢 */
+      if(!live[id])makeLantern(w,true);
+    });
+    if(!live[id])makeLantern(w,true);                /* 先亮起来，不等回执 */
+  }else{
+    var a=readLocal(); a.push(w); writeLocal(a);
+    makeLantern(w,true);
+  }
+  wishRead.innerHTML=esc(v)+'<span class="who">— 已经上去了</span>';
+  inp.value="";
+  [587.33,698.46,880].forEach(function(f,i){setTimeout(function(){tone(f,1.7,.085);},i*230);});
+});
+
+/* ═══ 尺寸变化重绘 ═══ */
+var rt;
+function repaint(){paintHero(frac(cur)); paintDial(); drawMoon(document.getElementById("legendMoon"),T13,{inset:.9});}
+window.addEventListener("resize",function(){clearTimeout(rt); rt=setTimeout(repaint,180);});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){});
+paintDial(); setDay(13,true);
+})();
+</script>
