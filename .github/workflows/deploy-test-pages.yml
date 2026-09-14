@@ -21,6 +21,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout deploy source
+        uses: actions/checkout@v4
+        with:
+          path: deploy-source
+
       - name: Checkout app from main
         uses: actions/checkout@v4
         with:
@@ -33,6 +38,11 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/huangchenfeng0713-cyber/Fitness-and-health/ui-preview/docs/ui-preview.patch -o ui-preview.patch
           git apply --directory=site ui-preview.patch
           test -n "$(git -C site diff --name-only)"
+
+      - name: Add clothing alert prototype
+        run: |
+          mkdir -p site/clothing-alert
+          cp deploy-source/clothing-alert/index.html site/clothing-alert/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
