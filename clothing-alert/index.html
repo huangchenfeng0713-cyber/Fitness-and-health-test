@@ -2,44 +2,12 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#0b0b0c">
-  <title>着装检测实验版</title>
-  <style>
-    :root{color-scheme:dark;--bg:#0b0b0c;--card:#171719;--line:#2a2a2e;--text:#f4f4f5;--muted:#a1a1aa;--ok:#52d273;--warn:#ffbd3f;--danger:#ff4d4f}
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif}body{padding:env(safe-area-inset-top) 14px calc(18px + env(safe-area-inset-bottom))}.app{width:min(100%,680px);margin:auto}header{padding:8px 2px 12px}h1{font-size:22px;margin:0 0 6px}.sub,.note,.tiny{color:var(--muted);line-height:1.5}.sub{font-size:13px}.camera{position:relative;overflow:hidden;border-radius:22px;background:#000;aspect-ratio:3/4;border:1px solid var(--line)}video{width:100%;height:100%;object-fit:cover;display:block;transform:scaleX(-1)}.rear video{transform:none}.overlay{position:absolute;inset:0;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:12px}.badge{align-self:flex-start;border-radius:999px;padding:7px 10px;font-size:12px;background:rgba(10,10,10,.72);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14)}.badge.ok{color:#baf4c7}.badge.warn{color:#ffe1a3}.badge.danger{color:#ffc3c3}.meter{height:8px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.16);margin-top:auto}.meter>div{height:100%;width:0;background:var(--ok);transition:.25s}.controls,.panel{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px}.row{display:flex;align-items:center;gap:10px}.row+.row{margin-top:12px}button{border:0;border-radius:14px;min-height:48px;padding:0 16px;font-size:15px;font-weight:650;background:#fff;color:#111;flex:1}button.secondary{color:var(--text);background:#29292d}button.danger{background:#3a1718;color:#ffd2d2}button:disabled{opacity:.45}.grow{flex:1}input[type=range]{width:100%}.kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}.kv div:nth-child(odd){color:var(--muted)}.note{margin-top:10px;font-size:12px}.tiny{font-size:11px;margin-top:10px}.alarm{position:fixed;inset:0;z-index:10;background:rgba(180,0,0,.88);display:none;align-items:center;justify-content:center;text-align:center;padding:30px;backdrop-filter:blur(8px)}.alarm.show{display:flex}.alarm h2{font-size:34px;margin:0 0 10px}.alarm p{margin:0 0 22px}.alarm button{width:100%;max-width:320px;flex:none}
-  </style>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta http-equiv="refresh" content="0; url=../face-score/">
+  <title>正在跳转</title>
+  <script>location.replace('../face-score/');</script>
 </head>
-<body>
-<div class="app">
-  <header><h1>着装检测 · 实验版</h1><div class="sub">画面只在本机浏览器内分析，不上传、不保存。连续多次判定为高风险才报警。</div></header>
-  <div class="camera" id="cameraBox"><video id="video" playsinline muted autoplay></video><div class="overlay"><div id="statusBadge" class="badge">尚未启动</div><div class="meter"><div id="riskBar"></div></div></div></div>
-  <div class="controls"><div class="row"><button id="startBtn">启动检测</button><button id="flipBtn" class="secondary" disabled>切换镜头</button></div><div class="row"><button id="stopBtn" class="danger" disabled>停止</button></div></div>
-  <div class="panel"><div class="row"><label class="grow" for="threshold">报警灵敏度</label><strong id="thresholdText">72%</strong></div><input id="threshold" type="range" min="55" max="95" value="72" step="1"><div class="note">数值越低越敏感，也越容易误报。第一版建议 70%～80%。</div></div>
-  <div class="panel"><div class="kv"><div>当前风险</div><div id="riskText">—</div><div>Porn</div><div id="pornText">—</div><div>Sexy</div><div id="sexyText">—</div><div>Neutral</div><div id="neutralText">—</div><div>连续命中</div><div id="hitsText">0 / 3</div><div>模型状态</div><div id="modelText">未加载</div></div><div class="tiny">这是内容分类模型，不是真正的衣物分割模型；泳装、裸上身、健身场景等可能误报或漏报。</div></div>
-</div>
-<div class="alarm" id="alarm"><div><h2>⚠️ 着装警报</h2><p>连续检测到疑似裸露画面。</p><button id="dismissBtn">关闭警报并继续</button></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/nsfwjs@4.4.0/dist/browser/nsfwjs.min.js"></script>
-<script>
-(()=>{
-const $=id=>document.getElementById(id),video=$('video'),cameraBox=$('cameraBox'),startBtn=$('startBtn'),stopBtn=$('stopBtn'),flipBtn=$('flipBtn'),statusBadge=$('statusBadge'),riskBar=$('riskBar'),riskText=$('riskText'),pornText=$('pornText'),sexyText=$('sexyText'),neutralText=$('neutralText'),hitsText=$('hitsText'),modelText=$('modelText'),threshold=$('threshold'),thresholdText=$('thresholdText'),alarm=$('alarm'),dismissBtn=$('dismissBtn');
-const MODEL_URL='https://cdn.jsdelivr.net/gh/infinitered/nsfwjs@v4.4.0/models/mobilenet_v2/model.json';
-const REQUIRED_HITS=3,INTERVAL_MS=750;
-let model=null,stream=null,running=false,busy=false,facingMode='user',consecutiveHits=0,audioCtx=null,interval=null;
-threshold.oninput=()=>thresholdText.textContent=threshold.value+'%';
-function setBadge(text,kind=''){statusBadge.textContent=text;statusBadge.className='badge'+(kind?' '+kind:'')}
-async function unlockAudio(){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')await audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();g.gain.value=.00001;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.03)}catch(e){}}
-function beep(){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const now=audioCtx.currentTime;[0,.22,.44].forEach(x=>{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.setValueAtTime(880,now+x);g.gain.setValueAtTime(.0001,now+x);g.gain.exponentialRampToValueAtTime(.24,now+x+.02);g.gain.exponentialRampToValueAtTime(.0001,now+x+.16);o.connect(g);g.connect(audioCtx.destination);o.start(now+x);o.stop(now+x+.18)});if(navigator.vibrate)navigator.vibrate([180,100,180,100,250])}catch(e){}}
-async function ensureModel(){if(model)return;modelText.textContent='加载中…';setBadge('正在加载模型');if(!window.tf)throw new Error('TensorFlow.js 加载失败');if(!window.nsfwjs)throw new Error('NSFWJS 加载失败');tf.enableProdMode();await tf.ready();try{model=await window.nsfwjs.load(MODEL_URL)}catch(e){console.error('model load failed',e);throw new Error('模型文件加载失败，请刷新后重试')}modelText.textContent='已就绪'}
-async function openCamera(){if(!navigator.mediaDevices?.getUserMedia)throw new Error('当前浏览器不支持摄像头，或页面不是 HTTPS。');if(stream)stream.getTracks().forEach(t=>t.stop());stream=await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:{ideal:facingMode},width:{ideal:720},height:{ideal:1280}}});video.srcObject=stream;await video.play();cameraBox.classList.toggle('rear',facingMode==='environment')}
-const pct=x=>Math.round((x||0)*100);
-function triggerAlarm(){alarm.classList.add('show');beep()}
-async function classifyFrame(){if(!running||busy||!model||video.readyState<2||alarm.classList.contains('show'))return;busy=true;try{const predictions=await model.classify(video,5),m={};predictions.forEach(p=>m[p.className]=p.probability);const porn=m.Porn||0,sexy=m.Sexy||0,neutral=m.Neutral||0,risk=Math.min(1,Math.max(porn,sexy*.86,porn+sexy*.58)),limit=+threshold.value/100,hit=risk>=limit&&neutral<.62;consecutiveHits=hit?consecutiveHits+1:Math.max(0,consecutiveHits-1);riskText.textContent=pct(risk)+'%';pornText.textContent=pct(porn)+'%';sexyText.textContent=pct(sexy)+'%';neutralText.textContent=pct(neutral)+'%';hitsText.textContent=Math.min(consecutiveHits,REQUIRED_HITS)+' / '+REQUIRED_HITS;riskBar.style.width=pct(risk)+'%';riskBar.style.background=risk>=limit?'var(--danger)':risk>=limit*.75?'var(--warn)':'var(--ok)';if(consecutiveHits>=REQUIRED_HITS){setBadge('疑似未着装','danger');consecutiveHits=0;triggerAlarm()}else if(hit)setBadge('正在复核…','warn');else setBadge('未触发','ok')}catch(e){console.error(e);setBadge('识别出错')}finally{busy=false}}
-async function start(){startBtn.disabled=true;try{await unlockAudio();await Promise.all([ensureModel(),openCamera()]);running=true;stopBtn.disabled=false;flipBtn.disabled=false;startBtn.textContent='检测中';setBadge('正在检测','ok');interval=setInterval(classifyFrame,INTERVAL_MS);classifyFrame()}catch(e){console.error(e);running=false;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}startBtn.disabled=false;startBtn.textContent='重新启动';modelText.textContent=model?'已就绪':'加载失败';setBadge(e.message||'启动失败');alert((e.message||'启动失败')+'\n\n请确认网络正常，并允许 Safari 使用摄像头。')}}
-function stop(){running=false;busy=false;clearInterval(interval);interval=null;if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}video.srcObject=null;consecutiveHits=0;hitsText.textContent='0 / 3';setBadge('已停止');startBtn.disabled=false;startBtn.textContent='启动检测';stopBtn.disabled=true;flipBtn.disabled=true}
-startBtn.onclick=start;stopBtn.onclick=stop;flipBtn.onclick=async()=>{if(!running)return;flipBtn.disabled=true;facingMode=facingMode==='user'?'environment':'user';try{await openCamera()}catch(e){facingMode=facingMode==='user'?'environment':'user';await openCamera().catch(()=>{});alert('切换镜头失败。')}finally{flipBtn.disabled=false}};dismissBtn.onclick=async()=>{alarm.classList.remove('show');consecutiveHits=0;await unlockAudio();setBadge('继续检测','ok')};document.addEventListener('visibilitychange',()=>{if(document.hidden)busy=false});window.addEventListener('beforeunload',stop);
-})();
-</script>
+<body style="background:#09090b;color:#f5f5f6;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;padding:24px">
+  正在跳转到颜值检测实验版……
 </body>
 </html>
