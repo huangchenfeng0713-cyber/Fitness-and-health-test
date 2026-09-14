@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <meta name="theme-color" content="#0b0b0c" />
+  <title>颜值检测 · 亚洲面孔参考</title>
+  <style>
+    :root{color-scheme:dark;--bg:#09090b;--card:#17171a;--line:#2b2b30;--text:#f5f5f6;--muted:#a1a1aa;--soft:#27272b;--good:#70d68a;--warn:#f0c66a;--accent:#f4f4f5}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif}
+    body{padding:calc(10px + env(safe-area-inset-top)) 14px calc(22px + env(safe-area-inset-bottom))}
+    .app{width:min(100%,680px);margin:auto}
+    header{padding:6px 2px 14px}h1{font-size:23px;margin:0 0 7px}.sub{font-size:13px;color:var(--muted);line-height:1.5}
+    .viewer{position:relative;overflow:hidden;background:#000;border:1px solid var(--line);border-radius:24px;aspect-ratio:3/4}
+    video,canvas{width:100%;height:100%;display:block;object-fit:cover}video{transform:scaleX(-1)}canvas{display:none}
+    .overlay{position:absolute;inset:0;pointer-events:none;padding:12px;display:flex;flex-direction:column;justify-content:space-between}
+    .pill{align-self:flex-start;padding:7px 10px;border-radius:999px;background:rgba(0,0,0,.64);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.13);font-size:12px}
+    .guide{align-self:center;width:66%;height:70%;border:1px dashed rgba(255,255,255,.32);border-radius:46% 46% 44% 44%;margin:auto}
+    .controls,.panel,.scorecard{margin-top:12px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:18px}
+    .row{display:flex;gap:10px;align-items:center}.row+.row{margin-top:10px}
+    button,.uploadLabel{border:0;border-radius:14px;min-height:48px;padding:0 15px;font-size:15px;font-weight:650;display:flex;align-items:center;justify-content:center;flex:1;background:var(--accent);color:#111;text-align:center}
+    button.secondary,.uploadLabel.secondary{background:var(--soft);color:var(--text)}button:disabled{opacity:.45}
+    input[type=file]{display:none}
+    .scorecard{display:none}.scoreTop{display:flex;align-items:center;gap:16px}.bigScore{font-size:64px;font-weight:760;letter-spacing:-3px;line-height:1}.scoreMeta{flex:1}.scoreTitle{font-size:17px;font-weight:700}.scoreNote{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.45}
+    .metrics{margin-top:15px;display:grid;gap:11px}.metricHead{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}.bar{height:7px;border-radius:999px;background:#2a2a2f;overflow:hidden}.fill{height:100%;background:var(--good);border-radius:inherit}
+    .kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}.kv div:nth-child(odd){color:var(--muted)}
+    .note{font-size:12px;color:var(--muted);line-height:1.55}.note strong{color:var(--text)}
+    .error{color:#ffd0d0}.good{color:#bceac7}.tiny{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>颜值检测 · 亚洲面孔参考</h1>
+    <div class="sub">娱乐性质的面部几何协调度评分。只分析面部关键点，不识别人种、不上传照片，也不把分数当作客观“美丑”。</div>
+  </header>
+
+  <div class="viewer" id="viewer">
+    <video id="video" playsinline muted autoplay></video>
+    <canvas id="canvas"></canvas>
+    <div class="overlay" id="overlay">
+      <div class="pill" id="status">模型尚未加载</div>
+      <div class="guide"></div>
+      <div class="pill">正脸 · 光线均匀 · 不遮挡五官</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="row">
+      <button id="cameraBtn">开启前置相机</button>
+      <label class="uploadLabel secondary" for="photoInput">上传照片</label>
+      <input id="photoInput" type="file" accept="image/*" />
+    </div>
+    <div class="row">
+      <button id="scoreBtn" disabled>拍照并评分</button>
+      <button id="retryBtn" class="secondary" disabled>重新拍</button>
+    </div>
+  </div>
+
+  <div class="scorecard" id="scorecard">
+    <div class="scoreTop">
+      <div class="bigScore" id="totalScore">--</div>
+      <div class="scoreMeta">
+        <div class="scoreTitle" id="scoreTitle">等待分析</div>
+        <div class="scoreNote" id="scoreNote">评分越高，只表示更接近这套面部几何规则。</div>
+      </div>
+    </div>
+    <div class="metrics" id="metrics"></div>
+  </div>
+
+  <div class="panel">
+    <div class="kv">
+      <div>参考模式</div><div>亚洲面孔 · 实验</div>
+      <div>检测方式</div><div>MediaPipe 面部关键点</div>
+      <div>照片处理</div><div>仅本机浏览器</div>
+      <div>人种识别</div><div>不进行</div>
+    </div>
+    <div class="tiny">“亚洲面孔参考”目前只是采用较宽的几何比例区间，避免强行套用单一黄金比例；它不是经过亚洲人群颜值标签数据训练出的审美模型。后续如果要做真正的数据驱动版，需要单独的数据集和偏差校准。</div>
+  </div>
+</div>
+
+<script type="module">
+import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/+esm";
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const overlay = document.getElementById('overlay');
+const statusEl = document.getElementById('status');
+const cameraBtn = document.getElementById('cameraBtn');
+const scoreBtn = document.getElementById('scoreBtn');
+const retryBtn = document.getElementById('retryBtn');
+const photoInput = document.getElementById('photoInput');
+const scorecard = document.getElementById('scorecard');
+const totalScore = document.getElementById('totalScore');
+const scoreTitle = document.getElementById('scoreTitle');
+const scoreNote = document.getElementById('scoreNote');
+const metricsEl = document.getElementById('metrics');
+
+let faceLandmarker = null;
+let stream = null;
+let modelPromise = null;
+
+function setStatus(t, cls='') { statusEl.textContent = t; statusEl.className = 'pill ' + cls; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function gaussian(v,target,sigma){ return 100*Math.exp(-0.5*Math.pow((v-target)/sigma,2)); }
+
+async function ensureModel(){
+  if(faceLandmarker) return faceLandmarker;
+  if(modelPromise) return modelPromise;
+  setStatus('正在加载面部模型…');
+  modelPromise = (async()=>{
+    const vision = await FilesetResolver.forVisionTasks(
+      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/wasm'
+    );
+    faceLandmarker = await FaceLandmarker.createFromOptions(vision,{
+      baseOptions:{
+        modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
+        delegate:'CPU'
+      },
+      runningMode:'IMAGE',
+      numFaces:1,
+      minFaceDetectionConfidence:0.55,
+      minFacePresenceConfidence:0.55
+    });
+    setStatus('模型已就绪','good');
+    return faceLandmarker;
+  })().catch(err=>{ modelPromise=null; setStatus('模型加载失败','error'); throw err; });
+  return modelPromise;
+}
+
+async function startCamera(){
+  try{
+    await ensureModel();
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    stream = await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:'user',width:{ideal:1080},height:{ideal:1440}}});
+    video.srcObject = stream;
+    await video.play();
+    video.style.display='block'; canvas.style.display='none'; overlay.style.display='flex';
+    scoreBtn.disabled=false; retryBtn.disabled=true; scorecard.style.display='none';
+    cameraBtn.textContent='相机已开启';
+    setStatus('准备拍照','good');
+  }catch(err){
+    console.error(err);
+    setStatus('无法启动相机','error');
+    alert('无法启动相机或模型。请使用 Safari/Chrome 的 HTTPS 页面，并允许摄像头权限。');
+  }
+}
+
+function drawCapture(source,w,h){
+  canvas.width=w; canvas.height=h;
+  ctx.save();
+  if(source===video){
+    ctx.translate(w,0); ctx.scale(-1,1); ctx.drawImage(source,0,0,w,h);
+  }else{
+    ctx.drawImage(source,0,0,w,h);
+  }
+  ctx.restore();
+  video.style.display='none'; canvas.style.display='block'; overlay.style.display='none';
+}
+
+function point(lm,i,w,h){ return {x:lm[i].x*w,y:lm[i].y*h}; }
+function d(a,b){ return Math.hypot(a.x-b.x,a.y-b.y); }
+
+function analyzeGeometry(lm,w,h){
+  const P=i=>point(lm,i,w,h);
+  const top=P(10), chin=P(152), leftCheek=P(234), rightCheek=P(454), nose=P(1);
+  const faceH=d(top,chin), faceW=d(leftCheek,rightCheek);
+  if(!isFinite(faceH)||!isFinite(faceW)||faceW<1) throw new Error('关键点异常');
+
+  const leftEyeOuter=P(33), leftEyeInner=P(133), rightEyeInner=P(362), rightEyeOuter=P(263);
+  const eyeLC={x:(leftEyeOuter.x+leftEyeInner.x)/2,y:(leftEyeOuter.y+leftEyeInner.y)/2};
+  const eyeRC={x:(rightEyeOuter.x+rightEyeInner.x)/2,y:(rightEyeOuter.y+rightEyeInner.y)/2};
+  const roll=Math.abs(Math.atan2(eyeRC.y-eyeLC.y,eyeRC.x-eyeLC.x)*180/Math.PI);
+  const yawRatio=d(nose,leftCheek)/Math.max(1,d(nose,rightCheek));
+  if(roll>13) return {qualityError:'头部倾斜较明显，请尽量摆正后重拍。'};
+  if(yawRatio<0.68||yawRatio>1.47) return {qualityError:'脸部侧转较明显，请尽量正对镜头后重拍。'};
+  if(faceW/w<0.22) return {qualityError:'脸部在画面中太小，请靠近一点后重拍。'};
+
+  const midX=(P(10).x+P(168).x+P(1).x+P(2).x+P(152).x)/5;
+  const pairs=[[33,263],[133,362],[61,291],[234,454],[70,300],[105,334],[159,386],[145,374]];
+  let symErr=0;
+  for(const [a,b] of pairs){
+    const A=P(a),B=P(b);
+    symErr += Math.abs(Math.abs(A.x-midX)-Math.abs(B.x-midX))/faceW;
+    symErr += 0.55*Math.abs(A.y-B.y)/faceH;
+  }
+  symErr/=pairs.length;
+  const symmetry=clamp(100-symErr*430,0,100);
+
+  const faceRatio=faceH/faceW;
+  const proportion=gaussian(faceRatio,1.36,0.22);
+
+  const eyeWidthL=d(leftEyeOuter,leftEyeInner), eyeWidthR=d(rightEyeOuter,rightEyeInner);
+  const eyeGap=d(leftEyeInner,rightEyeInner);
+  const eyeGapRatio=eyeGap/Math.max(1,(eyeWidthL+eyeWidthR)/2);
+  const eyeSpacing=gaussian(eyeGapRatio,1.0,0.30);
+  const eyeBalance=clamp(100-Math.abs(eyeWidthL-eyeWidthR)/Math.max(eyeWidthL,eyeWidthR)*190,0,100);
+  const eyes=0.62*eyeSpacing+0.38*eyeBalance;
+
+  const mouthW=d(P(61),P(291));
+  const noseW=d(P(98),P(327));
+  const mouthNose=mouthW/Math.max(1,noseW);
+  const mouthScore=gaussian(mouthNose,1.55,0.40);
+
+  const centerErr=(Math.abs(P(1).x-midX)+Math.abs(P(13).x-midX)+Math.abs(P(152).x-midX))/(3*faceW);
+  const center=clamp(100-centerErr*620,0,100);
+
+  const lowerRatio=d(P(1),chin)/faceH;
+  const vertical=gaussian(lowerRatio,0.39,0.085);
+  const layout=0.45*eyes+0.30*mouthScore+0.25*vertical;
+
+  const contourLeft=d(P(172),chin), contourRight=d(P(397),chin);
+  const contour=clamp(100-Math.abs(contourLeft-contourRight)/Math.max(contourLeft,contourRight)*210,0,100);
+
+  const metrics=[
+    ['对称度',symmetry],
+    ['五官布局',layout],
+    ['脸型比例',proportion],
+    ['中心线',center],
+    ['轮廓平衡',contour]
+  ];
+  let score=0.29*symmetry+0.25*layout+0.18*proportion+0.16*center+0.12*contour;
+  score=clamp(score,0,100);
+  return {score,metrics,roll,yawRatio};
+}
+
+function drawLandmarkHints(lm,w,h){
+  const ids=[10,152,234,454,33,133,362,263,1,61,291];
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,.82)';
+  ids.forEach(i=>{const p=point(lm,i,w,h);ctx.beginPath();ctx.arc(p.x,p.y,Math.max(2,w/300),0,Math.PI*2);ctx.fill();});
+  ctx.restore();
+}
+
+function resultLabel(s){
+  if(s>=90) return ['几何协调度很高','这张照片在对称、比例和五官布局上非常贴近当前规则。'];
+  if(s>=82) return ['几何协调度较高','整体结构比较均衡，少数指标与参考区间存在偏差。'];
+  if(s>=72) return ['整体协调','大部分几何指标处于较平衡区间。'];
+  if(s>=62) return ['有明显个人特征','若换成更正的角度、焦段和光线，分数可能明显变化。'];
+  return ['与当前规则差异较大','这不等于“不好看”；当前算法只看有限的几何指标，也很受拍摄角度影响。'];
+}
+
+function renderResult(r){
+  if(r.qualityError){
+    scorecard.style.display='block'; totalScore.textContent='—'; scoreTitle.textContent='请重拍'; scoreNote.textContent=r.qualityError; metricsEl.innerHTML=''; retryBtn.disabled=false; return;
+  }
+  const s=Math.round(r.score);
+  const [title,note]=resultLabel(s);
+  totalScore.textContent=s; scoreTitle.textContent=title; scoreNote.textContent=note;
+  metricsEl.innerHTML=r.metrics.map(([name,val])=>`<div><div class="metricHead"><span>${name}</span><strong>${Math.round(val)}</strong></div><div class="bar"><div class="fill" style="width:${clamp(val,0,100)}%"></div></div></div>`).join('');
+  scorecard.style.display='block'; retryBtn.disabled=false;
+}
+
+async function analyzeCanvas(){
+  try{
+    await ensureModel();
+    setStatus('正在分析…');
+    const res=faceLandmarker.detect(canvas);
+    if(!res.faceLandmarks||!res.faceLandmarks.length){
+      renderResult({qualityError:'没有检测到清晰的单张人脸，请正对镜头并保证光线充足。'}); return;
+    }
+    const lm=res.faceLandmarks[0];
+    const r=analyzeGeometry(lm,canvas.width,canvas.height);
+    if(!r.qualityError) drawLandmarkHints(lm,canvas.width,canvas.height);
+    renderResult(r);
+    setStatus('分析完成','good');
+  }catch(err){
+    console.error(err); renderResult({qualityError:'分析失败，请刷新页面后再试。'});
+  }
+}
+
+cameraBtn.addEventListener('click',startCamera);
+scoreBtn.addEventListener('click',async()=>{
+  if(!video.videoWidth) return;
+  drawCapture(video,video.videoWidth,video.videoHeight);
+  scoreBtn.disabled=true;
+  await analyzeCanvas();
+});
+retryBtn.addEventListener('click',()=>{
+  scorecard.style.display='none';
+  if(stream){ video.style.display='block'; canvas.style.display='none'; overlay.style.display='flex'; scoreBtn.disabled=false; retryBtn.disabled=true; setStatus('准备拍照','good'); }
+});
+photoInput.addEventListener('change',async e=>{
+  const file=e.target.files?.[0]; if(!file) return;
+  try{
+    await ensureModel();
+    const url=URL.createObjectURL(file); const img=new Image();
+    img.onload=async()=>{
+      const max=1600; let w=img.naturalWidth,h=img.naturalHeight; const scale=Math.min(1,max/Math.max(w,h)); w=Math.round(w*scale);h=Math.round(h*scale);
+      drawCapture(img,w,h); URL.revokeObjectURL(url); scoreBtn.disabled=true; retryBtn.disabled=false; await analyzeCanvas();
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);alert('无法读取这张照片。');}; img.src=url;
+  }catch(err){ console.error(err); alert('模型加载失败，请刷新页面再试。'); }
+});
+
+ensureModel().catch(()=>{});
+window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
+</script>
+</body>
+</html>
