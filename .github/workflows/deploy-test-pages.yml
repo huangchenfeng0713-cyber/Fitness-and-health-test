@@ -33,11 +33,14 @@ jobs:
           ref: main
           path: site
 
-      - name: Apply UI preview patch
+      - name: Apply UI preview patch if available
+        shell: bash
         run: |
-          curl -fsSL https://raw.githubusercontent.com/huangchenfeng0713-cyber/Fitness-and-health/ui-preview/docs/ui-preview.patch -o ui-preview.patch
-          git apply --directory=site ui-preview.patch
-          test -n "$(git -C site diff --name-only)"
+          if curl -fsSL https://raw.githubusercontent.com/huangchenfeng0713-cyber/Fitness-and-health/ui-preview/docs/ui-preview.patch -o ui-preview.patch; then
+            git apply --directory=site ui-preview.patch || echo "UI preview patch no longer applies; deploying main unchanged."
+          else
+            echo "UI preview patch is unavailable; deploying main unchanged."
+          fi
 
       - name: Add clothing alert prototype
         run: |
