@@ -42,8 +42,10 @@ jobs:
             echo "UI preview patch is unavailable; deploying main unchanged."
           fi
 
-      - name: Add clothing alert prototype
+      - name: Add face score prototype
         run: |
+          mkdir -p site/face-score
+          cp deploy-source/face-score/index.html site/face-score/index.html
           mkdir -p site/clothing-alert
           cp deploy-source/clothing-alert/index.html site/clothing-alert/index.html
 
