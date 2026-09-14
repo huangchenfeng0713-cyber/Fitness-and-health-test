@@ -44,10 +44,13 @@ jobs:
 
       - name: Add face score prototype
         run: |
-          mkdir -p site/face-score
-          cp deploy-source/face-score/index.html site/face-score/index.html
+          # 整目录复制：face-score 还带有同源的 MediaPipe 运行时与模型文件（vendor/）
+          rm -rf site/face-score
+          cp -R deploy-source/face-score site/face-score
           mkdir -p site/clothing-alert
           cp deploy-source/clothing-alert/index.html site/clothing-alert/index.html
+          echo "deployed face-score files:"
+          find site/face-score -type f | sort
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

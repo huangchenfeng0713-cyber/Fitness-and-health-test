@@ -8,6 +8,7 @@
   <style>
     :root{color-scheme:dark;--bg:#09090b;--card:#17171a;--line:#2b2b30;--text:#f5f5f6;--muted:#a1a1aa;--soft:#27272b;--good:#70d68a;--warn:#f0c66a;--accent:#f4f4f5}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    [hidden]{display:none!important}   /* 下面的 button/.row 都设了 display:flex，会盖掉 hidden 属性 */
     html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif}
     body{padding:calc(10px + env(safe-area-inset-top)) 14px calc(22px + env(safe-area-inset-bottom))}
     .app{width:min(100%,680px);margin:auto}
@@ -25,6 +26,9 @@
     .scorecard{display:none}.scoreTop{display:flex;align-items:center;gap:16px}.bigScore{font-size:64px;font-weight:760;letter-spacing:-3px;line-height:1}.scoreMeta{flex:1}.scoreTitle{font-size:17px;font-weight:700}.scoreNote{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.45}
     .metrics{margin-top:15px;display:grid;gap:11px}.metricHead{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}.bar{height:7px;border-radius:999px;background:#2a2a2f;overflow:hidden}.fill{height:100%;background:var(--good);border-radius:inherit}
     .kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;font-size:13px}.kv div:nth-child(odd){color:var(--muted)}
+    .loadRow{display:flex;gap:10px;align-items:flex-end}.loadInfo{flex:1;min-width:0}
+    .loadText{font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:6px}
+    .loadRow button{flex:0 0 auto;min-width:88px;min-height:40px;font-size:13px}
     .note{font-size:12px;color:var(--muted);line-height:1.55}.note strong{color:var(--text)}
     .error{color:#ffd0d0}.good{color:#bceac7}.tiny{font-size:11px;color:var(--muted);line-height:1.5;margin-top:10px}
   </style>
@@ -40,7 +44,7 @@
     <video id="video" playsinline muted autoplay></video>
     <canvas id="canvas"></canvas>
     <div class="overlay" id="overlay">
-      <div class="pill" id="status">模型尚未加载</div>
+      <div class="pill" id="status">正在加载识别引擎…</div>
       <div class="guide"></div>
       <div class="pill">正脸 · 光线均匀 · 不遮挡五官</div>
     </div>
@@ -55,6 +59,13 @@
     <div class="row">
       <button id="scoreBtn" disabled>拍照并评分</button>
       <button id="retryBtn" class="secondary" disabled>重新拍</button>
+    </div>
+    <div class="row loadRow" id="loadRow">
+      <div class="loadInfo">
+        <div class="loadText" id="loadText">正在准备识别引擎…</div>
+        <div class="bar"><div class="fill" id="loadFill" style="width:4%"></div></div>
+      </div>
+      <button id="reloadBtn" class="secondary" hidden>重新加载</button>
     </div>
   </div>
 
@@ -81,7 +92,24 @@
 </div>
 
 <script type="module">
-import { FaceLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/+esm";
+/* 资源来源：优先本站同源副本（部署在 GitHub Pages，国内可直连），CDN 仅作为兜底。
+   之前的版本用顶层静态 import 直接依赖 cdn.jsdelivr.net，
+   一旦该域名不可达，整个模块不会执行：按钮全部失效、状态卡在“模型尚未加载”。 */
+const LIB_VER = '0.10.22-rc.20250304';
+const npmMirrors = path => [
+  `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${LIB_VER}/${path}`,
+  `https://fastly.jsdelivr.net/npm/@mediapipe/tasks-vision@${LIB_VER}/${path}`,
+  `https://registry.npmmirror.com/@mediapipe/tasks-vision/${LIB_VER}/files/${path}`,
+  `https://unpkg.com/@mediapipe/tasks-vision@${LIB_VER}/${path}`
+];
+const LIB_SOURCES   = ['./vendor/tasks-vision/vision_bundle.mjs', ...npmMirrors('vision_bundle.mjs')];
+const WASM_SOURCES  = ['./vendor/tasks-vision/wasm', ...npmMirrors('wasm')];
+const MODEL_SOURCES = [
+  './vendor/models/face_landmarker.task',
+  'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'
+];
+const T_IMPORT = 20000, T_PROBE = 8000, T_HEAD = 20000, T_STALL = 25000, T_ENGINE = 180000;
+const MODEL_CACHE = 'face-score-model-v1';
 
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
@@ -97,54 +125,160 @@ const totalScore = document.getElementById('totalScore');
 const scoreTitle = document.getElementById('scoreTitle');
 const scoreNote = document.getElementById('scoreNote');
 const metricsEl = document.getElementById('metrics');
+const loadRow = document.getElementById('loadRow');
+const loadText = document.getElementById('loadText');
+const loadFill = document.getElementById('loadFill');
+const reloadBtn = document.getElementById('reloadBtn');
 
 let faceLandmarker = null;
 let stream = null;
 let modelPromise = null;
 
 function setStatus(t, cls='') { statusEl.textContent = t; statusEl.className = 'pill ' + cls; }
+function setLoad(text, ratio, cls=''){
+  loadRow.hidden = false;
+  loadText.textContent = text;
+  loadText.className = 'loadText ' + cls;
+  if(ratio !== null && ratio !== undefined) loadFill.style.width = `${clamp(ratio*100,4,100)}%`;
+}
+
+/* 让任何一步都有超时，避免请求被挂住时页面永远停在“加载中” */
+function withTimeout(promise, ms, label){
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject)=>{ timer = setTimeout(()=>reject(new Error(`${label}超时`)), ms); })
+  ]).finally(()=>clearTimeout(timer));
+}
+function shortUrl(u){ return u.startsWith('./') ? '本站副本' : new URL(u, location.href).host; }
 function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function gaussian(v,target,sigma){ return 100*Math.exp(-0.5*Math.pow((v-target)/sigma,2)); }
+
+/* 动态 import + 逐个镜像重试：某个源不可达时继续换下一个，而不是整段脚本失效 */
+async function loadLib(){
+  const errs = [];
+  for(const url of LIB_SOURCES){
+    try{
+      const mod = await withTimeout(import(url), T_IMPORT, '脚本加载');
+      if(!mod || !mod.FaceLandmarker || !mod.FilesetResolver) throw new Error('模块内容不完整');
+      return mod;
+    }catch(err){ errs.push(`${shortUrl(url)}: ${err.message}`); }
+  }
+  throw new Error('识别脚本无法加载 · ' + errs.join(' / '));
+}
+
+/* 先探测哪个 wasm 目录可达，再交给 MediaPipe，避免它内部卡在不可达的域名上 */
+async function pickWasmBase(){
+  for(const base of WASM_SOURCES){
+    try{
+      const res = await withTimeout(
+        fetch(`${base}/vision_wasm_internal.js`, {headers:{Range:'bytes=0-0'}, cache:'force-cache'}),
+        T_PROBE, 'wasm 探测');
+      if(res.ok || res.status === 206) return base;
+    }catch(err){ /* 换下一个源 */ }
+  }
+  return WASM_SOURCES[0];
+}
+
+/* 自己下载模型（3.6MB）以便显示进度、设置超时并缓存，然后用 modelAssetBuffer 传入 */
+async function loadModelBytes(){
+  try{
+    const cache = await caches.open(MODEL_CACHE);
+    const hit = await cache.match(MODEL_SOURCES[0]);
+    if(hit){
+      const buf = new Uint8Array(await hit.arrayBuffer());
+      if(buf.length > 1e6){ setLoad('模型已从本地缓存读取', 1); return buf; }
+    }
+  }catch(err){ /* 隐私模式下 Cache 不可用，忽略 */ }
+
+  const errs = [];
+  for(const url of MODEL_SOURCES){
+    const ac = new AbortController();
+    try{
+      const res = await withTimeout(fetch(url, {signal: ac.signal}), T_HEAD, '连接模型服务器');
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const total = Number(res.headers.get('content-length')) || 0;
+      let bytes;
+      if(res.body && res.body.getReader){
+        const reader = res.body.getReader();
+        const chunks = []; let got = 0;
+        for(;;){
+          const {done, value} = await withTimeout(reader.read(), T_STALL, '模型下载')
+            .catch(err=>{ ac.abort(); throw err; });
+          if(done) break;
+          chunks.push(value); got += value.length;
+          setLoad(total ? `正在下载面部模型 ${Math.round(got/total*100)}%`
+                        : `正在下载面部模型 ${(got/1048576).toFixed(1)}MB`,
+                  total ? got/total : null);
+        }
+        bytes = new Uint8Array(got);
+        let off = 0; for(const c of chunks){ bytes.set(c, off); off += c.length; }
+      }else{
+        bytes = new Uint8Array(await res.arrayBuffer());
+      }
+      if(bytes.length < 1e6) throw new Error('模型文件不完整');
+      try{ (await caches.open(MODEL_CACHE)).put(MODEL_SOURCES[0], new Response(bytes)); }catch(err){}
+      return bytes;
+    }catch(err){ errs.push(`${shortUrl(url)}: ${err.message}`); }
+  }
+  throw new Error('面部模型无法下载 · ' + errs.join(' / '));
+}
 
 async function ensureModel(){
   if(faceLandmarker) return faceLandmarker;
   if(modelPromise) return modelPromise;
-  setStatus('正在加载面部模型…');
+  setStatus('正在加载识别引擎…');
+  setLoad('正在准备识别引擎…', 0.05);
+  reloadBtn.hidden = true;
   modelPromise = (async()=>{
-    const vision = await FilesetResolver.forVisionTasks(
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.22-rc.20250304/wasm'
-    );
-    faceLandmarker = await FaceLandmarker.createFromOptions(vision,{
-      baseOptions:{
-        modelAssetPath:'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task',
-        delegate:'CPU'
-      },
+    const [{FaceLandmarker, FilesetResolver}, wasmBase, modelBytes] = await Promise.all([
+      loadLib(), pickWasmBase(), loadModelBytes()
+    ]);
+    setLoad('正在初始化识别引擎，首次加载约 10MB…', 0.9);
+    const vision = await withTimeout(FilesetResolver.forVisionTasks(wasmBase), T_ENGINE, '引擎初始化');
+    faceLandmarker = await withTimeout(FaceLandmarker.createFromOptions(vision,{
+      baseOptions:{ modelAssetBuffer: modelBytes, delegate:'CPU' },
       runningMode:'IMAGE',
       numFaces:1,
       minFaceDetectionConfidence:0.55,
       minFacePresenceConfidence:0.55
-    });
-    setStatus('模型已就绪','good');
+    }), T_ENGINE, '引擎初始化');
+    setStatus(stream ? '准备拍照' : '模型已就绪','good');
+    setLoad('识别引擎已就绪', 1, 'good');
+    setTimeout(()=>{ if(faceLandmarker) loadRow.hidden = true; }, 1200);
+    if(stream) scoreBtn.disabled = false;
     return faceLandmarker;
-  })().catch(err=>{ modelPromise=null; setStatus('模型加载失败','error'); throw err; });
+  })().catch(err=>{
+    modelPromise = null;
+    console.error(err);
+    setStatus('引擎加载失败','error');
+    setLoad(`加载失败：${err.message}`, 1, 'error');
+    reloadBtn.hidden = false;
+    throw err;
+  });
   return modelPromise;
 }
 
+/* 相机不再等模型下载完才打开：预览先可用，模型在后台并行加载 */
 async function startCamera(){
+  ensureModel().catch(()=>{});
   try{
-    await ensureModel();
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      throw new Error('当前浏览器不支持相机');
+    }
     if(stream) stream.getTracks().forEach(t=>t.stop());
     stream = await navigator.mediaDevices.getUserMedia({audio:false,video:{facingMode:'user',width:{ideal:1080},height:{ideal:1440}}});
     video.srcObject = stream;
     await video.play();
     video.style.display='block'; canvas.style.display='none'; overlay.style.display='flex';
-    scoreBtn.disabled=false; retryBtn.disabled=true; scorecard.style.display='none';
+    retryBtn.disabled=true; scorecard.style.display='none';
+    scoreBtn.disabled = !faceLandmarker;
     cameraBtn.textContent='相机已开启';
-    setStatus('准备拍照','good');
+    setStatus(faceLandmarker ? '准备拍照' : '相机已开启 · 引擎仍在加载','good');
   }catch(err){
     console.error(err);
     setStatus('无法启动相机','error');
-    alert('无法启动相机或模型。请使用 Safari/Chrome 的 HTTPS 页面，并允许摄像头权限。');
+    alert('无法启动相机：' + err.message + '\n请在 HTTPS 页面用 Safari/Chrome 打开，并允许摄像头权限。微信内置浏览器可能不支持，请用系统浏览器。');
   }
 }
 
@@ -278,13 +412,17 @@ scoreBtn.addEventListener('click',async()=>{
   scoreBtn.disabled=true;
   await analyzeCanvas();
 });
+reloadBtn.addEventListener('click',()=>{ ensureModel().catch(()=>{}); });
 retryBtn.addEventListener('click',()=>{
   scorecard.style.display='none';
   if(stream){ video.style.display='block'; canvas.style.display='none'; overlay.style.display='flex'; scoreBtn.disabled=false; retryBtn.disabled=true; setStatus('准备拍照','good'); }
 });
 photoInput.addEventListener('change',async e=>{
-  const file=e.target.files?.[0]; if(!file) return;
+  const file=e.target.files?.[0];
+  e.target.value='';                 // 允许重复选择同一张照片
+  if(!file) return;
   try{
+    setStatus('正在加载识别引擎…');
     await ensureModel();
     const url=URL.createObjectURL(file); const img=new Image();
     img.onload=async()=>{
@@ -292,7 +430,7 @@ photoInput.addEventListener('change',async e=>{
       drawCapture(img,w,h); URL.revokeObjectURL(url); scoreBtn.disabled=true; retryBtn.disabled=false; await analyzeCanvas();
     };
     img.onerror=()=>{URL.revokeObjectURL(url);alert('无法读取这张照片。');}; img.src=url;
-  }catch(err){ console.error(err); alert('模型加载失败，请刷新页面再试。'); }
+  }catch(err){ console.error(err); alert('识别引擎加载失败：' + err.message + '\n可点击“重新加载”重试。'); }
 });
 
 ensureModel().catch(()=>{});
