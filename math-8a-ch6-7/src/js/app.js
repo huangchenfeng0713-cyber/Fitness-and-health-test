@@ -21,7 +21,7 @@
   function headHTML(d, sec) {
     var eb = '';
     if (sec.ch) {
-      eb = '<span class="sec-no">' + sec.no + '</span><span>' + sec.title + '</span>';
+      eb = (sec.no && sec.no !== '回顾' ? '<span class="sec-no">' + sec.no + '</span>' : '') + '<span>' + sec.title + '</span>';
       if (d.lesson) eb += '<span aria-hidden="true">·</span><span>' + d.lesson + '</span>';
     }
     return '<header class="slide-head"><div class="eyebrow">' + eb + '</div>' +
@@ -69,6 +69,7 @@
     n = M.clamp(n, 0, rec.steps);
     var prevStep = rec.step;
     rec.step = n;
+    var fresh = null;
     $$('[data-step]', rec.el).forEach(function (s) {
       var k = +s.getAttribute('data-step');
       var hide = k > n;
@@ -76,10 +77,15 @@
       if (!hide && k === n && n > prevStep && !quiet) {
         s.classList.remove('step-now'); void s.offsetWidth;
         if (s.hasAttribute('data-glow')) s.classList.add('step-now');
+        fresh = s;
       }
     });
     if (rec.hooks.onStep) {
       try { rec.hooks.onStep(n, prevStep); } catch (err) { console.error(err); }
+    }
+    if (!quiet && n > prevStep) {
+      var now = rec.el.querySelector('.pline.now') || fresh;
+      if (now) M.ensureVisible(now);
     }
     if (slides[cur] === rec.def) updateDock();
   }
@@ -211,7 +217,7 @@
         lastCh = sec.ch; lastSec = null;
       }
       if (d.sec !== lastSec) {
-        if (sec.ch) html += '<div class="toc-sec-title"><span class="no">' + (sec.no.indexOf('章') >= 0 ? '' : sec.no) + '</span><span>' + (sec.no.indexOf('章') >= 0 ? '章首页' : sec.title) + '</span></div>';
+        if (sec.ch) html += '<div class="toc-sec-title"><span class="no">' + (sec.no.indexOf('章') >= 0 || sec.no === '回顾' ? '' : sec.no) + '</span><span>' + (sec.no.indexOf('章') >= 0 ? '章首页' : sec.title) + '</span></div>';
         lastSec = d.sec; lastLesson = null;
       }
       if (d.lesson && d.lesson !== lastLesson) { html += '<div class="toc-lesson">' + d.lesson + '</div>'; lastLesson = d.lesson; }

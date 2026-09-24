@@ -181,17 +181,125 @@ table.small-t th, table.small-t td { padding: .3rem .4rem; }
   .dcard { width: 3.9rem; height: 5rem; font-size: .95rem; }
 }
 
+.s1t { color: var(--s1); } .s2t { color: var(--s2); } .s3t { color: var(--s3); } .s4t { color: var(--s4); }
+.textual-stats .stat .val { font-size: 1.05rem; white-space: normal; line-height: 1.5; padding-top: .15rem; }
+
+
+/* 知识地图 */
+.map-host { display: flex; min-height: 0; }
+.kmap { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 3rem; padding: .4rem 0 .6rem; }
+.kmap-lines { position: absolute; left: 0; top: 0; pointer-events: none; overflow: visible; }
+.kroot {
+  position: relative; z-index: 1; padding: .65rem 1.9rem; border-radius: 16px;
+  background: var(--accent); color: var(--on-accent); font-size: 1.45rem; font-weight: 800; letter-spacing: .14em;
+  box-shadow: var(--shadow-lg);
+}
+.kbranches { position: relative; z-index: 1; width: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; }
+.kb { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: .85rem 1rem 1rem; box-shadow: var(--shadow); }
+.kb h4 { display: flex; align-items: center; gap: .5rem; font-size: 1.08rem; margin: 0; }
+.kb h4 i { width: .8rem; height: .8rem; border-radius: 50%; background: var(--c); flex: none; }
+.kb-sub { font-size: .74rem; color: var(--ink-3); margin: .15rem 0 .6rem; }
+.kleaves { display: flex; flex-wrap: wrap; gap: .4rem; }
+.kleaf {
+  border: 1px solid var(--line-2); background: var(--surface-2); border-radius: 99px; padding: .3rem .8rem;
+  font-size: .84rem; font-weight: 600; color: var(--ink);
+  transition: border-color .2s, background-color .2s, color .2s, transform .2s var(--ease);
+}
+.kleaf:hover { border-color: var(--accent); background: var(--accent-tint); color: var(--accent-strong); transform: translateY(-1px); }
+.review-qs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem .8rem; align-content: start; }
+.review-qs details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: .5rem .85rem; }
+.review-qs summary { cursor: pointer; font-weight: 600; font-size: .88rem; }
+.review-qs details p { font-size: .84rem; color: var(--ink-2); margin-top: .35rem; line-height: 1.7; }
+.quiz-wrap { width: 100%; max-width: 64rem; margin: 0 auto; }
+.q-fig { display: flex; justify-content: center; }
+.q-fig svg { width: min(100%, 34rem); height: auto; }
+@media (min-width: 901px) {
+  .q-card.has-fig { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 25rem); column-gap: 1.4rem; align-items: start; }
+  .q-card.has-fig > * { grid-column: 1; }
+  .q-card.has-fig > .q-fig { grid-column: 2; grid-row: 1 / span 5; align-self: center; }
+  .q-card.has-fig .q-opts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 1100px) { .kbranches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .kbranches, .review-qs { grid-template-columns: minmax(0, 1fr); } }
+
 /* ---------- 第七章 ---------- */
-.illus-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; flex: 1; min-height: 0; }
-.illus { display: flex; flex-direction: column; gap: .3rem; background: var(--surface); border: 1px solid var(--line); border-radius: 13px; padding: .55rem .7rem .6rem; min-height: 0; }
-.illus .q { font-size: .86rem; font-weight: 600; }
-.illus .fig { min-height: 8rem; }
-.illus .ans { font-size: .8rem; color: var(--green); font-weight: 700; min-height: 1.3em; }
+.fact-list li svg { color: var(--accent); }
+.fact-list li b.num { color: var(--accent-strong); }
+.ang.pulse { animation: angPulse 1.4s ease-in-out infinite; }
+@keyframes angPulse { 50% { opacity: .62; } }
+.blank-toggle { display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem; color: var(--ink-2); cursor: pointer; padding: .2rem .55rem; border-radius: 8px; border: 1px solid var(--line-2); background: var(--surface); white-space: nowrap; }
+.blank-toggle input { accent-color: var(--accent); width: 1rem; height: 1rem; }
+
+/* 定义卡、改写、练习表 */
+.scroll-y { flex: 1 1 0%; min-height: 0; overflow: auto; padding: .2rem; }
+.prop-picks { display: flex; flex-wrap: wrap; gap: .4rem; }
+.rewrite { flex: 1 1 0%; min-height: 10rem; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: .8rem; padding: .6rem .4rem; }
+.rw-src { font-size: 1.5rem; font-weight: 700; }
+.rw-dst { font-size: 1.3rem; }
+.rw-arrow { color: var(--accent); }
+.rw-arrow .ico { width: 2rem; height: 2rem; transform: rotate(90deg); }
+.rewrite .if-word, .rewrite .then-word { margin: 0 .15em; color: var(--accent-strong); }
+.practice-table td { white-space: normal; line-height: 1.6; }
+.practice-table td.q-cell { text-align: left; min-width: 16rem; font-size: .9rem; }
+.hide-a { opacity: 0; transition: opacity .45s var(--ease); }
+[data-a] { transition: opacity .45s var(--ease); }
+
+.slide-illus .slide-body { grid-template-rows: minmax(0, 1fr) auto; }
+.illus-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: .8rem; min-height: 0; }
+.illus { display: flex; flex-direction: column; gap: .35rem; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: .6rem .8rem .65rem; min-height: 0; box-shadow: var(--shadow); }
+.illus .q { font-size: .95rem; font-weight: 700; }
+.illus .fig { min-height: 0; flex: 1; }
+.illus .ans { margin: 0; font-size: .86rem; font-weight: 700; color: var(--green); background: transparent; padding: 0; }
+.ans:empty { display: none; }
+.slide-illus .bubble::before, .slide-illus .bubble::after { display: none; }
+
+/* 归纳检验 */
+.claim { font-size: 1.02rem; line-height: 1.7; padding: .55rem .8rem; border-radius: 12px; background: var(--surface-2); border: 1px dashed var(--line-2); }
+.ntiles { flex: 1 1 0%; min-height: 8rem; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(5.4rem, 1fr)); gap: .45rem; align-content: start; padding: .1rem; }
+.ntile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .05rem; padding: .4rem .3rem; border-radius: 11px; border: 1.5px solid var(--line-2); background: var(--surface); }
+.ntile small { font-size: .68rem; color: var(--ink-3); font-family: var(--math); font-style: italic; }
+.ntile b { font-family: var(--num); font-size: 1.15rem; }
+.ntile em { font-style: normal; font-size: .72rem; font-weight: 700; color: var(--red); }
+.ntile.ok { border-color: var(--green); background: var(--green-tint); }
+.ntile.bad { border-color: var(--red); background: var(--red-tint); animation: shake .45s; }
+
+/* 为什么要证明 */
+.why-flow { display: grid; grid-template-columns: minmax(0, 5fr) auto minmax(0, 6fr); gap: 1.2rem; align-items: center; width: 100%; }
+.why-col { display: flex; flex-direction: column; gap: .6rem; }
+.why-col h3 { font-size: 1.05rem; letter-spacing: .08em; color: var(--ink-2); }
+.why-card { position: relative; padding: .6rem .9rem; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.why-card b { font-size: .95rem; }
+.why-card p { font-size: .84rem; color: var(--ink-2); margin-top: .1rem; }
+.why-card .chip { position: absolute; right: .7rem; top: .6rem; }
+.why-arrow { color: var(--accent); }
+.why-arrow .ico { width: 2.6rem; height: 2.6rem; stroke-width: 2.2; }
+@media (max-width: 900px) {
+  .illus-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .illus .fig { min-height: 12rem; }
+  .why-flow { grid-template-columns: minmax(0, 1fr); }
+  .why-arrow { transform: rotate(90deg); justify-self: center; }
+}
 
 .prop-line { font-size: 1.1rem; line-height: 1.9; }
 .cond { background: var(--s1-tint); border-bottom: 2.5px solid var(--s1); padding: 0 .15em; border-radius: 3px; }
 .conc { background: var(--s2-tint); border-bottom: 2.5px solid var(--s2); padding: 0 .15em; border-radius: 3px; }
 .if-word, .then-word { font-weight: 800; color: var(--ink); }
+
+/* 7.2 三类角卡片 */
+.type-card {
+  display: grid; grid-template-columns: 4.6rem minmax(0, 1fr); gap: .15rem .7rem; align-items: baseline;
+  padding: .65rem .9rem .7rem; border-radius: 14px; background: var(--surface); border: 1px solid var(--line);
+  border-left: 5px solid var(--c, var(--accent)); box-shadow: var(--shadow);
+}
+.type-card b { grid-row: span 2; font-size: 1.08rem; color: var(--c, var(--accent)); align-self: center; }
+.type-card span { font-size: .96rem; line-height: 1.65; }
+.type-card .shape { font-style: normal; font-family: var(--num); font-weight: 800; font-size: 1.25em; color: var(--c, var(--accent)); margin-left: .1em; }
+.type-card small { font-size: .86rem; color: var(--ink-2); font-family: var(--num); letter-spacing: .02em; }
+.quiz-inline { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; min-height: 2.2rem; font-size: .95rem; }
+.quiz-inline .btn.on { border-color: var(--green); color: var(--green); background: var(--green-tint); }
+.alt-proof { background: var(--surface); border: 1px dashed var(--line-2); border-radius: 12px; padding: .5rem .85rem; }
+.alt-proof summary { cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--accent-strong); }
+.alt-proof p { margin-top: .4rem; line-height: 1.75; }
 
 .tree-wrap { position: relative; flex: 1; min-height: 20rem; }
 .fact-list { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; counter-reset: f; }
@@ -222,3 +330,149 @@ table.small-t th, table.small-t td { padding: .3rem .4rem; }
 @media (max-width: 520px) {
   .cover-h1 { font-size: 2.6rem; }
 }
+
+/* ---------- 7.2 第2课时 ---------- */
+svg .t-kai { font-family: var(--kai); fill: var(--ink); }
+svg .bubble-shape { fill: var(--surface); stroke: var(--line-2); }
+svg .pulse-ring { transform-box: fill-box; transform-origin: center; animation: ringPulse 1.1s ease-in-out infinite; }
+@keyframes ringPulse { 0%, 100% { transform: scale(.8); } 50% { transform: scale(1.25); } }
+.contra { display: flex; flex-direction: column; gap: .3rem; }
+.contra p { position: relative; padding: .32rem .6rem .32rem 2.1rem; border-radius: 10px; line-height: 1.7; }
+.contra .no { position: absolute; left: .55rem; top: .32rem; font-weight: 700; color: var(--accent-strong); }
+.contra p.bad { background: var(--red-tint); }
+.contra p.bad .no { color: var(--red); }
+.contra p.good { background: var(--green-tint); }
+.contra p.good .no { color: var(--green); }
+.box.ex .analysis { margin-top: .35rem; }
+
+.proof-flow { list-style: none; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: .7rem; counter-reset: none; }
+.proof-flow li {
+  position: relative; display: flex; flex-direction: column; gap: .4rem; padding: .85rem .85rem .9rem;
+  border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.proof-flow li:not(:last-child)::after {
+  content: ""; position: absolute; right: -.62rem; top: 1.45rem; width: .55rem; height: .55rem;
+  border-top: 2.5px solid var(--accent); border-right: 2.5px solid var(--accent); transform: rotate(45deg);
+}
+.proof-flow .pf-no {
+  width: 1.9rem; height: 1.9rem; border-radius: 50%; display: grid; place-items: center;
+  background: var(--accent); color: var(--on-accent); font-family: var(--num); font-weight: 700;
+}
+.proof-flow b { font-size: 1.02rem; }
+.proof-flow .pf-body { font-size: .88rem; line-height: 1.65; color: var(--ink-2); }
+.proof-flow svg.mini { width: 100%; max-width: 11rem; height: auto; }
+.proof-flow svg.mini line { stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; }
+.proof-flow svg.mini line.acc { stroke: var(--accent); }
+.proof-flow svg.mini path { fill: none; stroke-width: 2.4; }
+.proof-flow svg.mini path.a1 { stroke: var(--a1); }
+.proof-flow svg.mini path.a2 { stroke: var(--a2); }
+.proof-flow svg.mini text { font-size: 13px; font-family: var(--num); fill: var(--ink-2); }
+.proof-flow svg.mini text.v { font-family: var(--math); font-style: italic; fill: var(--ink); }
+.flow-think { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 1rem; align-items: center; margin-top: .4rem; }
+svg .meet-arrow { fill: none; stroke: var(--accent); stroke-width: 3; stroke-linecap: round; }
+svg .meet-node rect { fill: var(--surface); stroke: var(--line-2); stroke-width: 2; }
+svg .meet-node.given rect { fill: var(--s1-tint); stroke: var(--s1); }
+svg .meet-node.goal rect { fill: var(--amber-tint); stroke: var(--amber); }
+svg .meet-node.bridge rect { fill: var(--green-tint); stroke: var(--green); }
+svg .meet-node text { fill: var(--ink); }
+
+.swap-board { display: flex; flex-direction: column; gap: .6rem; padding: .8rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); }
+.swap-row { display: flex; align-items: center; justify-content: center; gap: .8rem; }
+.swap-row .chip { min-width: 8.8rem; justify-content: center; }
+.swap-row .arrow { font-size: 1.4rem; color: var(--ink-3); font-weight: 700; }
+.swap-row .chip { display: inline-flex; align-items: center; padding: .45rem .9rem; border-radius: 12px; font-weight: 700; font-size: 1.05rem; border: 2px solid transparent; transition: background-color .4s, border-color .4s, color .4s; }
+.swap-row .chip.is-cond { background: var(--s1-tint); border-color: var(--s1); color: var(--s1); }
+.swap-row .chip.is-conc { background: var(--amber-tint); border-color: var(--amber); color: var(--amber); }
+.swap-board.prop .swap-row .chip.par { order: 0; }
+.swap-board.prop .swap-row .arrow { order: 1; }
+.swap-board.prop .swap-row .chip.ang { order: 2; }
+.cmp-note { font-size: .98rem; line-height: 1.8; padding: .2rem .2rem; }
+.cmp-note .c-judge, .cmp-note .c-prop { color: var(--accent-strong); }
+
+.judge-list { display: flex; flex-direction: column; gap: .6rem; }
+.judge-card { padding: .7rem .85rem; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); cursor: pointer; transition: border-color .3s, box-shadow .3s; }
+.judge-card.on { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-tint); }
+.judge-card .jq { display: flex; gap: .3rem; font-size: 1.02rem; line-height: 1.7; }
+.judge-card .jn { color: var(--accent-strong); font-weight: 700; white-space: nowrap; }
+.judge-card .jbtns { display: flex; gap: .45rem; margin-top: .4rem; }
+.judge-card .btn.good { border-color: var(--green); color: var(--green); background: var(--green-tint); }
+.judge-card .btn.bad { border-color: var(--red); color: var(--red); background: var(--red-tint); }
+.judge-card .jwhy { margin-top: .45rem; font-size: .9rem; line-height: 1.75; color: var(--ink-2); }
+.legend-row { display: flex; gap: 1.2rem; font-size: .82rem; color: var(--ink-2); }
+.legend-row .sw { display: inline-block; width: 1.4rem; height: .3rem; border-radius: 2px; margin-right: .35rem; vertical-align: middle; }
+.chip-tag { display: inline-block; font-size: .78rem; font-weight: 700; padding: .1rem .55rem; border-radius: 999px; background: var(--accent-tint); color: var(--accent-strong); margin-bottom: .2rem; }
+
+.mir-state { font-size: .9rem; font-weight: 700; padding: .3rem .75rem; border-radius: 999px; }
+.mir-state.ok { background: var(--green-tint); color: var(--green); }
+.mir-state.no { background: var(--red-tint); color: var(--red); }
+svg .mirror-face { stroke: var(--ink-2); stroke-width: 6; stroke-linecap: round; transition: stroke .3s; }
+svg .mirror-back { stroke: var(--ink-3); stroke-width: 1.6; fill: none; }
+svg .mirror.hot .mirror-face { stroke: var(--accent); }
+svg .ray { stroke: var(--amber); stroke-width: 3; stroke-linecap: round; transition: stroke .3s; }
+svg .ray.hot { stroke: var(--red); }
+svg .ray.good { stroke: var(--green); }
+svg .ray-ref { stroke: var(--ink-3); stroke-width: 1.6; stroke-dasharray: 6 6; transition: opacity .3s; }
+svg .sun { fill: var(--marker); stroke: var(--amber); stroke-width: 2; }
+svg .sun-ray { stroke: var(--amber); stroke-width: 2.4; stroke-linecap: round; }
+svg .eye { fill: var(--surface); stroke: var(--ink-2); stroke-width: 2; }
+svg .eye-pupil { fill: var(--ink); }
+svg .photon { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; filter: drop-shadow(0 0 4px var(--marker)); }
+
+.bend-rel { font-size: 1.05rem; text-align: center; padding: .45rem .8rem; border-radius: 12px; background: var(--surface-2); transition: background-color .3s; }
+.bend-rel.k1 { background: var(--accent-tint); }
+.bend-rel.k2 { background: var(--amber-tint); }
+
+@media (max-width: 1100px) {
+  .proof-flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .proof-flow li::after { display: none; }
+  .flow-think { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .proof-flow { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- 第七章 回顾：证明之树 ---------- */
+.tree-legend { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .82rem; color: var(--ink-2); }
+.tree-legend i { display: inline-block; width: .85rem; height: .85rem; border-radius: 4px; border: 2px solid var(--c); margin-right: .3rem; vertical-align: -2px; }
+.tree-card { min-height: 11rem; padding: .9rem 1rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .55rem; }
+.tc-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; text-align: center; color: var(--ink-3); font-size: .92rem; line-height: 1.7; }
+.tc-empty .ico { width: 2.2rem; height: 2.2rem; color: var(--accent); }
+.tc-kind { align-self: flex-start; font-size: .75rem; font-weight: 700; padding: .12rem .6rem; border-radius: 999px; color: var(--c); border: 1.5px solid var(--c); }
+.tc-full { font-size: 1.05rem; line-height: 1.75; font-weight: 600; }
+.tc-row { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: .5rem; align-items: start; font-size: .85rem; }
+.tc-row > b { color: var(--ink-3); font-weight: 600; padding-top: .25rem; }
+.tc-row > div { display: flex; flex-wrap: wrap; gap: .35rem; }
+.tchip { font: inherit; font-size: .84rem; padding: .22rem .6rem; border-radius: 999px; border: 1.5px solid var(--c, var(--line-2)); color: var(--ink); background: var(--surface); cursor: pointer; transition: transform .2s var(--ease), background-color .2s; }
+.tchip:hover { transform: translateY(-1px); background: var(--surface-2); }
+.tchip.plain { cursor: default; border-style: dashed; border-color: var(--line-2); color: var(--ink-2); }
+.tc-go { align-self: flex-start; margin-top: .2rem; }
+svg .tnode { cursor: pointer; transition: opacity .35s; }
+svg .tnode rect { fill: var(--surface); stroke-width: 2.2; transition: stroke-width .25s, filter .25s; }
+svg .tnode text { fill: var(--ink); }
+svg .tnode.k-fact rect { fill: var(--amber-tint); }
+svg .tnode.k-thm rect { fill: var(--accent-tint); }
+svg .tnode.k-judge rect { fill: var(--s1-tint); }
+svg .tnode.k-prop rect { fill: var(--green-tint); }
+svg .tnode.k-more rect { stroke-dasharray: 6 4; }
+svg .tnode:hover rect, svg .tnode:focus-visible rect { stroke-width: 3.2; }
+svg .tnode:focus { outline: none; }
+svg .tnode.sel rect { stroke-width: 4; filter: drop-shadow(0 4px 10px rgba(0, 0, 0, .18)); }
+svg .tnode.dim { opacity: .28; }
+svg .tedge { fill: none; stroke: var(--line-2); stroke-width: 2.2; transition: stroke .3s, opacity .3s, stroke-width .3s; }
+svg .tedge.up { stroke: var(--accent); stroke-width: 3.4; }
+svg .tedge.down { stroke: var(--amber); stroke-width: 3; stroke-dasharray: 7 5; }
+svg .tedge.dim { opacity: .25; }
+svg .tflow { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; pointer-events: none; }
+
+.think-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.think-card { position: relative; display: flex; flex-direction: column; gap: .5rem; padding: 1rem 1.05rem 1rem 1.05rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); transition: border-color .3s; }
+.think-card.open { border-color: var(--accent); }
+.think-card .tk-no { position: absolute; right: .9rem; top: .4rem; font-family: var(--num); font-weight: 800; font-size: 2.4rem; line-height: 1; color: var(--accent-tint); pointer-events: none; }
+.think-card .tk-q { font-weight: 700; line-height: 1.7; padding-right: 1.6rem; }
+.think-card .tk-btn { align-self: flex-start; }
+.think-card .tk-a { font-size: .88rem; line-height: 1.75; color: var(--ink-2); display: flex; flex-direction: column; gap: .35rem; }
+.linkish { align-self: flex-start; font: inherit; font-size: .84rem; color: var(--accent-strong); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: .25rem; }
+.linkish .ico { width: 1rem; height: 1rem; }
+.linkish:hover { text-decoration: underline; }
+@media (max-width: 1100px) { .think-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .think-grid { grid-template-columns: minmax(0, 1fr); } }

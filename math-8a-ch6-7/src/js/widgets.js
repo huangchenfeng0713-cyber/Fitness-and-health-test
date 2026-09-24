@@ -14,6 +14,7 @@
     items.forEach(function (it) {
       var s = M.el('div', { 'class': 'stat ' + (it.cls || '') });
       s.innerHTML = '<div class="k">' + it.label + '</div><div class="val"><span class="v-num">—</span>' + (it.unit ? '<small>' + it.unit + '</small>' : '') + '</div>';
+      if (it.color) s.querySelector('.val').style.color = it.color;
       wrap.appendChild(s);
       map[it.key] = { box: s, num: s.querySelector('.v-num'), d: it.d == null ? 2 : it.d, fixed: it.fixed };
     });
@@ -143,6 +144,7 @@
       cur = M.clamp(i, 0, qs.length - 1);
       var q = qs[cur];
       card.innerHTML = '';
+      card.classList.toggle('has-fig', !!q.fig);
       var stem = M.el('div', { 'class': 'q-stem', html: '<span class="qn">' + (cur + 1) + '</span>' + q.stem });
       card.appendChild(stem);
       if (q.fig) { var fh = M.el('div', { 'class': 'q-fig' }); card.appendChild(fh); q.fig(fh); }
@@ -211,7 +213,7 @@
       binEls[b.id] = be;
     });
     var cards = M.shuffle(o.items, o.seed || 7).map(function (it) {
-      var c = M.el('button', { type: 'button', 'class': 'sort-card', html: it.html });
+      var c = M.el('button', { type: 'button', 'class': 'sort-card', html: '<span>' + it.html + '</span>' });
       c._it = it;
       c.addEventListener('click', function (e) {
         e.stopPropagation();
@@ -244,7 +246,7 @@
         if (done === cards.length) fb.innerHTML += '<br><b>全部分类完成！</b>';
       } else {
         c.classList.remove('no'); void c.offsetWidth; c.classList.add('no');
-        fb.innerHTML = '<b class="red">再想想。</b>' + (it.hint || '判断它是否对一件事情作出了判断。');
+        fb.innerHTML = '<b class="red">再想想。</b>' + (it.hint || o.hint || '');
         setTimeout(function () { c.classList.remove('no'); }, 600);
       }
     }

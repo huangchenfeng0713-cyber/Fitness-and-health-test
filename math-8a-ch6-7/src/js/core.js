@@ -130,7 +130,9 @@
     spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M18 6l-2.5 2.5M8.5 15.5L6 18"/>',
     book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5"/>',
     layers: '<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/>',
-    grid: '<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>'
+    grid: '<path d="M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z"/>',
+    swap: '<path d="M7 4L3 8l4 4M3 8h14M17 12l4 4-4 4M21 16H7"/>',
+    tree: '<path d="M12 21v-7M12 14l-5-4M12 14l5-4M7 10V6M17 10V6M12 14V9"/><circle cx="7" cy="5" r="1.6"/><circle cx="17" cy="5" r="1.6"/><circle cx="12" cy="8" r="1.6"/>'
   };
   M.icon = function (name, cls) {
     return '<svg class="ico' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || '') + '</svg>';
@@ -175,7 +177,7 @@
   };
   M.setLabel = function (t, str) {
     while (t.firstChild) t.removeChild(t.firstChild);
-    var re = /\{([^}]*)\}|_(\w)|\^(\w)|([^{_^]+)/g, m;
+    var re = /\{([^}]*)\}|_(\w+)|\^(\w+)|([^{_^]+)/g, m;
     str = String(str);
     while ((m = re.exec(str))) {
       var sp = document.createElementNS(NS, 'tspan');
@@ -462,6 +464,25 @@
     set: function (k, v) { try { global.localStorage.setItem('shuju-zhengming:' + k, JSON.stringify(v)); } catch (e) { /* 存储不可用时忽略 */ } }
   };
   var toastTimer = 0;
+  /* 让元素在最近的可滚动容器中可见（逐步呈现时自动跟随） */
+  M.ensureVisible = function (el, pad) {
+    if (!el) return;
+    pad = pad == null ? 14 : pad;
+    var p = el.parentElement;
+    while (p && p !== document.body) {
+      var oy = getComputedStyle(p).overflowY;
+      if ((oy === 'auto' || oy === 'scroll') && p.scrollHeight > p.clientHeight + 2) break;
+      p = p.parentElement;
+    }
+    if (!p || p === document.body) return;
+    var r = el.getBoundingClientRect(), pr = p.getBoundingClientRect();
+    if (!r.height) return;
+    var top = r.top - pr.top + p.scrollTop, bottom = top + r.height, want = null;
+    if (bottom + pad > p.scrollTop + p.clientHeight) want = Math.min(top - pad, bottom + pad - p.clientHeight);
+    else if (top - pad < p.scrollTop) want = top - pad;
+    if (want != null) p.scrollTo({ top: Math.max(0, want), behavior: M.reduced ? 'auto' : 'smooth' });
+  };
+
   M.toast = function (msg, ms) {
     var t = document.getElementById('toast');
     if (!t) return;
