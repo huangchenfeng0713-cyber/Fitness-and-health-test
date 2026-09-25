@@ -15,44 +15,44 @@
     more: { name: '更多结论', color: 'var(--a4)' }
   };
   var NODES = {
-    D2: { x: 75, y: 545, t: ['补角的定义'], k: 'def', full: '如果两个角的和等于 180°，那么这两个角互为补角（互补）。', go: 's712-def' },
-    D3: { x: 210, y: 545, t: ['余角的定义'], k: 'def', full: '如果两个角的和等于 90°，那么这两个角互为余角（互余）。', go: 's712-def' },
-    F1: { x: 345, y: 545, t: ['两点之间', '线段最短'], k: 'fact', full: '两点之间线段最短。', go: 's713-facts' },
-    D1: { x: 490, y: 545, t: ['平角的定义'], k: 'def', full: '一条射线绕它的端点旋转，当终边和始边成一条直线时，所成的角叫作平角。平角等于 180°。', go: 's712-def' },
-    F2: { x: 660, y: 545, t: ['同位角相等，', '两直线平行'], k: 'fact', full: '两条直线被第三条直线所截，如果同位角相等，那么这两条直线平行。', go: 's721-fact' },
-    F3: { x: 900, y: 545, t: ['过直线外一点有且只有', '一条直线与这条直线平行'], k: 'fact', full: '过直线外一点有且只有一条直线与这条直线平行。', go: 's713-facts' },
-    T1: { x: 75, y: 430, t: ['同角（等角）的', '补角相等'], k: 'thm', full: '同角（或等角）的补角相等。', go: 's713-thm', by: ['D2'], extra: '等式的性质' },
-    T2: { x: 210, y: 430, t: ['同角（等角）的', '余角相等'], k: 'thm', full: '同角（或等角）的余角相等。', go: 's713-thm', by: ['D3'], extra: '等式的性质' },
-    T3: { x: 345, y: 430, t: ['三角形两边之和', '大于第三边'], k: 'thm', full: '三角形的任意两边之和大于第三边。', go: 's713-practice', by: ['F1'] },
-    P1: { x: 820, y: 430, t: ['两直线平行，', '同位角相等'], k: 'prop', full: '两条平行直线被第三条直线所截，同位角相等。', go: 's722-corr', by: ['F2', 'F3'], extra: '*假设 ∠1 ≠ ∠2，推出矛盾' },
-    T4: { x: 165, y: 315, t: ['对顶角相等'], k: 'thm', full: '对顶角相等。', go: 's713-vertical', by: ['D1', 'D2', 'T1'] },
-    J2: { x: 500, y: 315, t: ['同旁内角互补，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果同旁内角互补，那么这两条直线平行。', go: 's721-same', by: ['D1', 'D2', 'F2'], extra: '等式的性质、等量代换' },
-    P4: { x: 700, y: 315, t: ['平行于同一条直线的', '两条直线平行'], k: 'prop', full: '平行于同一条直线的两条直线平行。', go: 's722-trans', by: ['P1', 'F2'], extra: '等量代换' },
-    P3: { x: 930, y: 315, t: ['两直线平行，', '同旁内角互补'], k: 'prop', full: '两条平行直线被第三条直线所截，同旁内角互补。', go: 's722-same', by: ['P1', 'D1', 'D2'], extra: '等量代换' },
-    J1: { x: 330, y: 200, t: ['内错角相等，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果内错角相等，那么这两条直线平行。', go: 's721-alt', by: ['T4', 'F2'], extra: '等量代换' },
+    D2: { x: 75, y: 515, t: ['补角的定义'], k: 'def', full: '如果两个角的和等于 180°，那么这两个角互为补角（互补）。', go: 's712-def' },
+    D3: { x: 210, y: 515, t: ['余角的定义'], k: 'def', full: '如果两个角的和等于 90°，那么这两个角互为余角（互余）。', go: 's712-def' },
+    F1: { x: 345, y: 515, t: ['两点之间', '线段最短'], k: 'fact', full: '两点之间线段最短。', go: 's713-facts' },
+    D1: { x: 490, y: 515, t: ['平角的定义'], k: 'def', full: '一条射线绕它的端点旋转，当终边和始边成一条直线时，所成的角叫作平角。平角等于 180°。', go: 's712-def' },
+    F2: { x: 660, y: 515, t: ['同位角相等，', '两直线平行'], k: 'fact', full: '两条直线被第三条直线所截，如果同位角相等，那么这两条直线平行。', go: 's721-fact' },
+    F3: { x: 900, y: 515, t: ['过直线外一点有且只有', '一条直线与这条直线平行'], k: 'fact', full: '过直线外一点有且只有一条直线与这条直线平行。', go: 's713-facts' },
+    T1: { x: 75, y: 410, t: ['同角（等角）的', '补角相等'], k: 'thm', full: '同角（或等角）的补角相等。', go: 's713-thm', by: ['D2'], extra: '等式的性质' },
+    T2: { x: 210, y: 410, t: ['同角（等角）的', '余角相等'], k: 'thm', full: '同角（或等角）的余角相等。', go: 's713-thm', by: ['D3'], extra: '等式的性质' },
+    T3: { x: 345, y: 410, t: ['三角形两边之和', '大于第三边'], k: 'thm', full: '三角形的任意两边之和大于第三边。', go: 's713-practice', by: ['F1'] },
+    P1: { x: 820, y: 410, t: ['两直线平行，', '同位角相等'], k: 'prop', full: '两条平行直线被第三条直线所截，同位角相等。', go: 's722-corr', by: ['F2', 'F3'], extra: '*假设 ∠1 ≠ ∠2，推出矛盾' },
+    T4: { x: 165, y: 305, t: ['对顶角相等'], k: 'thm', full: '对顶角相等。', go: 's713-vertical', by: ['D1', 'D2', 'T1'] },
+    J2: { x: 500, y: 305, t: ['同旁内角互补，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果同旁内角互补，那么这两条直线平行。', go: 's721-same', by: ['D1', 'D2', 'F2'], extra: '等式的性质、等量代换' },
+    P4: { x: 700, y: 305, t: ['平行于同一条直线的', '两条直线平行'], k: 'prop', full: '平行于同一条直线的两条直线平行。', go: 's722-trans', by: ['P1', 'F2'], extra: '等量代换' },
+    P3: { x: 930, y: 305, t: ['两直线平行，', '同旁内角互补'], k: 'prop', full: '两条平行直线被第三条直线所截，同旁内角互补。', go: 's722-same', by: ['P1', 'D1', 'D2'], extra: '等量代换' },
+    J1: { x: 370, y: 200, t: ['内错角相等，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果内错角相等，那么这两条直线平行。', go: 's721-alt', by: ['T4', 'F2'], extra: '等量代换' },
     P2: { x: 640, y: 200, t: ['两直线平行，', '内错角相等'], k: 'prop', full: '两条平行直线被第三条直线所截，内错角相等。', go: 's722-alt', by: ['P1', 'T4'], extra: '等量代换' },
-    X: { x: 490, y: 85, t: ['平行线间的“拐角”', '∠BED = ∠B + ∠D'], k: 'more', full: '如果 AB ∥ CD，点 E 在两条平行线之间，那么 ∠BED = ∠B + ∠D。', go: 's722-bend', by: ['P4', 'P2'] }
+    X: { x: 490, y: 95, t: ['平行线间的“拐角”', '∠BED = ∠B + ∠D'], k: 'more', full: '如果 AB ∥ CD，点 E 在两条平行线之间，那么 ∠BED = ∠B + ∠D。', go: 's722-bend', by: ['P4', 'P2'] }
   };
-  var ROWS = [545, 430, 315, 200, 85];
+  var ROWS = [515, 410, 305, 200, 95];
 
   M.slide({
-    id: 's7r-tree', sec: '7.R', kind: '回顾与思考', title: '证明之树：每个定理从哪里来？', layout: 'split lab-wide',
+    id: 's7r-tree', sec: '7.R', kind: '回顾与思考', title: '证明之树：每个定理从哪里来？', layout: 'full',
     html: function () {
       return '' +
-        '<div class="col scroll">' +
-        '  <p>每一个定理，都只能用<b>定义</b>、<b>基本事实</b>和<b>已经证明的定理</b>来证明。以它们为根，定理一层一层“长”上去，就是一棵证明之树。</p>' +
-        '  <div class="tree-legend" id="treeLegend"></div>' +
-        '  <div class="tree-card" id="treeCard"></div>' +
-        '  <p class="small muted">等式的性质、等量代换等也常作为证明的依据，图中没有画出。</p>' +
-        '</div>' +
-        '<div class="col"><div class="panel lab">' +
-        '  <div class="row between"><span class="panel-title" style="margin:0">点一点树上的结论</span><button type="button" class="btn sm" id="treeGrow">' + M.icon('tree') + '重新生长</button></div>' +
+        '<div class="tree-stage">' +
         '  <div class="fig" id="treeFig"></div>' +
-        '</div></div>';
+        '  <div class="tree-intro">' +
+        '    <p>每一个定理，都只能用<b>定义</b>、<b>基本事实</b>和<b>已经证明的定理</b>来证明。以它们为根，定理一层层“长”上去。</p>' +
+        '    <div class="tree-legend" id="treeLegend"></div>' +
+        '    <button type="button" class="btn sm" id="treeGrow">' + M.icon('tree') + '重新生长</button>' +
+        '  </div>' +
+        '  <div class="tree-card" id="treeCard"></div>' +
+        '</div>' +
+        '<p class="small muted tree-foot">等式的性质、等量代换等也常作为证明的依据，图中没有画出。</p>';
     },
     mount: function (body, api) {
       var A = api.anim;
-      var svg = M.canvas(M.$('#treeFig', body), 1040, 600);
+      var svg = M.canvas(M.$('#treeFig', body), 1040, 560);
       var gE = S('g', {}, svg), gN = S('g', {}, svg);
       var keys = Object.keys(NODES);
       /* 图例 */
@@ -101,16 +101,16 @@
       }
       function showCard(k) {
         if (!k) {
-          card.innerHTML = '<div class="tc-empty">' + M.icon('tree') + '<p>点击右边树上的任意一个结论，<br>看看它的证明用到了哪些依据。</p></div>';
+          card.innerHTML = '<div class="tc-empty">' + M.icon('tree') + '<p>点一点树上的任意一个结论，<br>看看它的证明用到了哪些依据。</p></div>';
           return;
         }
         var n = NODES[k], kids = children(k);
-        var html = '<span class="tc-kind" style="--c:' + KIND[n.k].color + '">' + KIND[n.k].name + '</span>' +
+        var html = '<div class="tc-head"><span class="tc-kind" style="--c:' + KIND[n.k].color + '">' + KIND[n.k].name + '</span>' +
+          '<button type="button" class="linkish tc-go">' + (n.by ? '看证明' : '回到这一页') + M.icon('arrow') + '</button></div>' +
           '<p class="tc-full">' + n.full.replace(/([A-Z]{2,3}|[A-Z](?=[ ，。∥=+]))/g, function (s) { return m(s); }) + '</p>';
         if (n.by) html += '<div class="tc-row"><b>证明的依据</b><div>' + chips(n.by, 'up') + (n.extra ? '<span class="tchip plain">' + n.extra + '</span>' : '') + '</div></div>';
         else html += '<div class="tc-row"><b>地位</b><div><span class="tchip plain">' + (n.k === 'fact' ? '基本事实，不需要证明，直接作为依据' : '定义，是证明的出发点') + '</span></div></div>';
         if (kids.length) html += '<div class="tc-row"><b>它又支撑了</b><div>' + chips(kids, 'down') + '</div></div>';
-        html += '<button type="button" class="btn sm primary tc-go">' + (n.by ? '去看它的证明' : '回到这一页') + M.icon('arrow') + '</button>';
         card.innerHTML = html;
         M.$$('.tchip[data-k]', card).forEach(function (c) { c.addEventListener('click', function () { select(c.getAttribute('data-k')); }); });
         M.$('.tc-go', card).addEventListener('click', function () { M.go(n.go); });

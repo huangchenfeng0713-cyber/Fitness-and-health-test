@@ -404,8 +404,8 @@ sub, sup { font-size: .68em; line-height: 0; }
 }
 .toc-ch > h3 i { width: .6rem; height: .6rem; border-radius: 3px; background: var(--dot, var(--ink-3)); }
 .toc-sec { margin: .15rem 0 .5rem; }
-.toc-sec > .toc-sec-title {
-  display: flex; gap: .5rem; align-items: baseline; font-weight: 700; font-size: .9rem;
+.toc-sec-title {
+  display: flex; gap: .5rem; align-items: baseline; font-weight: 700; font-size: .9rem; margin-top: .35rem;
   padding: .35rem .6rem; color: var(--ink);
 }
 .toc-sec-title .no { font-family: var(--num); color: var(--dot, var(--accent)); }
@@ -859,7 +859,8 @@ svg .bg-fill { fill: var(--surface-2); }
 .reveal-btn { align-self: flex-start; }
 .answer { border-left: 0; padding: .6rem .8rem; border-radius: 10px; background: var(--green-tint); color: var(--ink); line-height: 1.7; }
 .answer b.ok { color: var(--green); }
-.flip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .7rem; }
+.flip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr)); gap: .7rem; }
+@media (max-height: 820px) { .flip, .flip-in { min-height: 5.8rem; } }
 .flip { position: relative; min-height: 7.2rem; perspective: 900px; border: 0; padding: 0; background: transparent; text-align: left; }
 .flip-in { position: relative; width: 100%; height: 100%; min-height: 7.2rem; transition: transform .7s var(--ease); transform-style: preserve-3d; }
 .flip.on .flip-in { transform: rotateY(180deg); }
@@ -916,6 +917,8 @@ svg .bg-fill { fill: var(--surface-2); }
   .panel.lab { min-height: 16rem; }
   .fig { min-height: 15rem; }
   .col.scroll { overflow: visible; }
+  .row > .grow { flex-basis: 100%; max-width: none !important; }
+  table.data { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
 
 /* ---- styles/slides.css ---- */
@@ -1355,18 +1358,31 @@ svg .photon { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; filt
 /* ---------- 第七章 回顾：证明之树 ---------- */
 .tree-legend { display: flex; flex-wrap: wrap; gap: .4rem .9rem; font-size: .82rem; color: var(--ink-2); }
 .tree-legend i { display: inline-block; width: .85rem; height: .85rem; border-radius: 4px; border: 2px solid var(--c); margin-right: .3rem; vertical-align: -2px; }
-.tree-card { min-height: 11rem; padding: .9rem 1rem; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .55rem; }
-.tc-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; text-align: center; color: var(--ink-3); font-size: .92rem; line-height: 1.7; }
-.tc-empty .ico { width: 2.2rem; height: 2.2rem; color: var(--accent); }
-.tc-kind { align-self: flex-start; font-size: .75rem; font-weight: 700; padding: .12rem .6rem; border-radius: 999px; color: var(--c); border: 1.5px solid var(--c); }
-.tc-full { font-size: 1.05rem; line-height: 1.75; font-weight: 600; }
-.tc-row { display: grid; grid-template-columns: 5.6rem minmax(0, 1fr); gap: .5rem; align-items: start; font-size: .85rem; }
-.tc-row > b { color: var(--ink-3); font-weight: 600; padding-top: .25rem; }
+.slide-body.layout-full:has(> .tree-stage) { grid-template-rows: minmax(0, 1fr) auto; }
+.tree-stage { position: relative; min-height: 0; height: 100%; display: flex; padding: .5rem; border-radius: 18px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+.tree-stage > .fig { flex: 1 1 0%; min-height: 20rem; }
+.tree-intro, .tree-card { position: absolute; top: .8rem; width: min(20rem, 28%); z-index: 2; }
+.tree-intro { left: .9rem; display: flex; flex-direction: column; gap: .5rem; font-size: .86rem; line-height: 1.7; color: var(--ink-2); }
+.tree-intro .btn { align-self: flex-start; }
+.tree-card { right: .9rem; max-height: 48%; overflow-y: auto; padding: .7rem .85rem; border-radius: 14px; background: var(--surface); border: 1px solid var(--line-2); box-shadow: var(--shadow); display: flex; flex-direction: column; gap: .45rem; }
+.tree-foot { margin-top: -.4rem; }
+@media (max-width: 900px) {
+  .tree-stage { flex-direction: column; gap: .8rem; height: auto; }
+  .tree-intro, .tree-card { position: static; width: auto; max-height: none; }
+  .tree-stage > .fig { order: 2; min-height: 14rem; }
+  .tree-card { order: 3; }
+}
+.tc-empty { display: flex; align-items: center; gap: .6rem; color: var(--ink-3); font-size: .84rem; line-height: 1.6; }
+.tc-empty .ico { width: 1.8rem; height: 1.8rem; flex: none; color: var(--accent); }
+.tc-kind { font-size: .75rem; font-weight: 700; padding: .12rem .6rem; border-radius: 999px; color: var(--c); border: 1.5px solid var(--c); }
+.tc-full { font-size: .95rem; line-height: 1.65; font-weight: 600; }
+.tc-head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.tc-row { display: flex; flex-direction: column; gap: .25rem; font-size: .8rem; }
+.tc-row > b { color: var(--ink-3); font-weight: 600; font-size: .74rem; }
 .tc-row > div { display: flex; flex-wrap: wrap; gap: .35rem; }
-.tchip { font: inherit; font-size: .84rem; padding: .22rem .6rem; border-radius: 999px; border: 1.5px solid var(--c, var(--line-2)); color: var(--ink); background: var(--surface); cursor: pointer; transition: transform .2s var(--ease), background-color .2s; }
+.tchip { font: inherit; font-size: .78rem; padding: .16rem .5rem; border-radius: 999px; border: 1.5px solid var(--c, var(--line-2)); color: var(--ink); background: var(--surface); cursor: pointer; transition: transform .2s var(--ease), background-color .2s; }
 .tchip:hover { transform: translateY(-1px); background: var(--surface-2); }
 .tchip.plain { cursor: default; border-style: dashed; border-color: var(--line-2); color: var(--ink-2); }
-.tc-go { align-self: flex-start; margin-top: .2rem; }
 svg .tnode { cursor: pointer; transition: opacity .35s; }
 svg .tnode rect { fill: var(--surface); stroke-width: 2.2; transition: stroke-width .25s, filter .25s; }
 svg .tnode text { fill: var(--ink); }
@@ -1397,6 +1413,21 @@ svg .tflow { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; point
 .linkish:hover { text-decoration: underline; }
 @media (max-width: 1100px) { .think-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .think-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* 矮屏（如 1366×768 的笔记本、投影）：封面紧凑一些 */
+@media (min-width: 901px) and (max-height: 820px) {
+  .cover { gap: 1.4rem; }
+  .cover-main { gap: .5rem; }
+  .cover-h1 { font-size: 3.5rem; }
+  .cover-lead { font-size: .95rem; line-height: 1.65; }
+  .cover-hero { min-height: 10rem; max-height: 14.5rem; }
+  .cover-side { gap: .6rem; }
+  .ch-card { padding: .7rem 1rem .75rem; }
+  .ch-card header { margin-bottom: .25rem; }
+  .sec-list { gap: 0; }
+  .sec-list button { padding: .28rem .55rem; }
+  .ch-keys { margin-top: .3rem; font-size: .7rem; line-height: 1.55; }
+}
 
 </style>
 </head>
@@ -2741,7 +2772,7 @@ svg .tflow { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; point
       var arc2 = S('path', { d: M.geo.sectorPath(X2, 30, 0, tdir), fill: 'var(--c7)', opacity: 0 }, gR);
       var eq1 = M.label(gR, X1.x + 42, X1.y - 12, '∠1', { 'font-size': 17, 'class': 't-ink', opacity: 0 });
       var eq2 = M.label(gR, X2.x + 42, X2.y - 12, '∠2', { 'font-size': 17, 'class': 't-ink', opacity: 0 });
-      var par = S('text', { x: 150, y: 296, 'text-anchor': 'middle', 'font-size': 17, 'class': 't-ink', opacity: 0, text: '∠1 = ∠2  ⇒  a ∥ b' }, gR);
+      var par = M.label(gR, 150, 296, '∠1 = ∠2  ⇒  {a} ∥ {b}', { 'text-anchor': 'middle', 'font-size': 17, 'class': 't-ink', opacity: 0 });
       M.label(gR, 296, 97, '{a}', { 'font-size': 18 });
       M.label(gR, 296, 219, '{b}', { 'font-size': 18 });
 
@@ -7990,44 +8021,44 @@ svg .tflow { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; point
     more: { name: '更多结论', color: 'var(--a4)' }
   };
   var NODES = {
-    D2: { x: 75, y: 545, t: ['补角的定义'], k: 'def', full: '如果两个角的和等于 180°，那么这两个角互为补角（互补）。', go: 's712-def' },
-    D3: { x: 210, y: 545, t: ['余角的定义'], k: 'def', full: '如果两个角的和等于 90°，那么这两个角互为余角（互余）。', go: 's712-def' },
-    F1: { x: 345, y: 545, t: ['两点之间', '线段最短'], k: 'fact', full: '两点之间线段最短。', go: 's713-facts' },
-    D1: { x: 490, y: 545, t: ['平角的定义'], k: 'def', full: '一条射线绕它的端点旋转，当终边和始边成一条直线时，所成的角叫作平角。平角等于 180°。', go: 's712-def' },
-    F2: { x: 660, y: 545, t: ['同位角相等，', '两直线平行'], k: 'fact', full: '两条直线被第三条直线所截，如果同位角相等，那么这两条直线平行。', go: 's721-fact' },
-    F3: { x: 900, y: 545, t: ['过直线外一点有且只有', '一条直线与这条直线平行'], k: 'fact', full: '过直线外一点有且只有一条直线与这条直线平行。', go: 's713-facts' },
-    T1: { x: 75, y: 430, t: ['同角（等角）的', '补角相等'], k: 'thm', full: '同角（或等角）的补角相等。', go: 's713-thm', by: ['D2'], extra: '等式的性质' },
-    T2: { x: 210, y: 430, t: ['同角（等角）的', '余角相等'], k: 'thm', full: '同角（或等角）的余角相等。', go: 's713-thm', by: ['D3'], extra: '等式的性质' },
-    T3: { x: 345, y: 430, t: ['三角形两边之和', '大于第三边'], k: 'thm', full: '三角形的任意两边之和大于第三边。', go: 's713-practice', by: ['F1'] },
-    P1: { x: 820, y: 430, t: ['两直线平行，', '同位角相等'], k: 'prop', full: '两条平行直线被第三条直线所截，同位角相等。', go: 's722-corr', by: ['F2', 'F3'], extra: '*假设 ∠1 ≠ ∠2，推出矛盾' },
-    T4: { x: 165, y: 315, t: ['对顶角相等'], k: 'thm', full: '对顶角相等。', go: 's713-vertical', by: ['D1', 'D2', 'T1'] },
-    J2: { x: 500, y: 315, t: ['同旁内角互补，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果同旁内角互补，那么这两条直线平行。', go: 's721-same', by: ['D1', 'D2', 'F2'], extra: '等式的性质、等量代换' },
-    P4: { x: 700, y: 315, t: ['平行于同一条直线的', '两条直线平行'], k: 'prop', full: '平行于同一条直线的两条直线平行。', go: 's722-trans', by: ['P1', 'F2'], extra: '等量代换' },
-    P3: { x: 930, y: 315, t: ['两直线平行，', '同旁内角互补'], k: 'prop', full: '两条平行直线被第三条直线所截，同旁内角互补。', go: 's722-same', by: ['P1', 'D1', 'D2'], extra: '等量代换' },
-    J1: { x: 330, y: 200, t: ['内错角相等，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果内错角相等，那么这两条直线平行。', go: 's721-alt', by: ['T4', 'F2'], extra: '等量代换' },
+    D2: { x: 75, y: 515, t: ['补角的定义'], k: 'def', full: '如果两个角的和等于 180°，那么这两个角互为补角（互补）。', go: 's712-def' },
+    D3: { x: 210, y: 515, t: ['余角的定义'], k: 'def', full: '如果两个角的和等于 90°，那么这两个角互为余角（互余）。', go: 's712-def' },
+    F1: { x: 345, y: 515, t: ['两点之间', '线段最短'], k: 'fact', full: '两点之间线段最短。', go: 's713-facts' },
+    D1: { x: 490, y: 515, t: ['平角的定义'], k: 'def', full: '一条射线绕它的端点旋转，当终边和始边成一条直线时，所成的角叫作平角。平角等于 180°。', go: 's712-def' },
+    F2: { x: 660, y: 515, t: ['同位角相等，', '两直线平行'], k: 'fact', full: '两条直线被第三条直线所截，如果同位角相等，那么这两条直线平行。', go: 's721-fact' },
+    F3: { x: 900, y: 515, t: ['过直线外一点有且只有', '一条直线与这条直线平行'], k: 'fact', full: '过直线外一点有且只有一条直线与这条直线平行。', go: 's713-facts' },
+    T1: { x: 75, y: 410, t: ['同角（等角）的', '补角相等'], k: 'thm', full: '同角（或等角）的补角相等。', go: 's713-thm', by: ['D2'], extra: '等式的性质' },
+    T2: { x: 210, y: 410, t: ['同角（等角）的', '余角相等'], k: 'thm', full: '同角（或等角）的余角相等。', go: 's713-thm', by: ['D3'], extra: '等式的性质' },
+    T3: { x: 345, y: 410, t: ['三角形两边之和', '大于第三边'], k: 'thm', full: '三角形的任意两边之和大于第三边。', go: 's713-practice', by: ['F1'] },
+    P1: { x: 820, y: 410, t: ['两直线平行，', '同位角相等'], k: 'prop', full: '两条平行直线被第三条直线所截，同位角相等。', go: 's722-corr', by: ['F2', 'F3'], extra: '*假设 ∠1 ≠ ∠2，推出矛盾' },
+    T4: { x: 165, y: 305, t: ['对顶角相等'], k: 'thm', full: '对顶角相等。', go: 's713-vertical', by: ['D1', 'D2', 'T1'] },
+    J2: { x: 500, y: 305, t: ['同旁内角互补，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果同旁内角互补，那么这两条直线平行。', go: 's721-same', by: ['D1', 'D2', 'F2'], extra: '等式的性质、等量代换' },
+    P4: { x: 700, y: 305, t: ['平行于同一条直线的', '两条直线平行'], k: 'prop', full: '平行于同一条直线的两条直线平行。', go: 's722-trans', by: ['P1', 'F2'], extra: '等量代换' },
+    P3: { x: 930, y: 305, t: ['两直线平行，', '同旁内角互补'], k: 'prop', full: '两条平行直线被第三条直线所截，同旁内角互补。', go: 's722-same', by: ['P1', 'D1', 'D2'], extra: '等量代换' },
+    J1: { x: 370, y: 200, t: ['内错角相等，', '两直线平行'], k: 'judge', full: '两条直线被第三条直线所截，如果内错角相等，那么这两条直线平行。', go: 's721-alt', by: ['T4', 'F2'], extra: '等量代换' },
     P2: { x: 640, y: 200, t: ['两直线平行，', '内错角相等'], k: 'prop', full: '两条平行直线被第三条直线所截，内错角相等。', go: 's722-alt', by: ['P1', 'T4'], extra: '等量代换' },
-    X: { x: 490, y: 85, t: ['平行线间的“拐角”', '∠BED = ∠B + ∠D'], k: 'more', full: '如果 AB ∥ CD，点 E 在两条平行线之间，那么 ∠BED = ∠B + ∠D。', go: 's722-bend', by: ['P4', 'P2'] }
+    X: { x: 490, y: 95, t: ['平行线间的“拐角”', '∠BED = ∠B + ∠D'], k: 'more', full: '如果 AB ∥ CD，点 E 在两条平行线之间，那么 ∠BED = ∠B + ∠D。', go: 's722-bend', by: ['P4', 'P2'] }
   };
-  var ROWS = [545, 430, 315, 200, 85];
+  var ROWS = [515, 410, 305, 200, 95];
 
   M.slide({
-    id: 's7r-tree', sec: '7.R', kind: '回顾与思考', title: '证明之树：每个定理从哪里来？', layout: 'split lab-wide',
+    id: 's7r-tree', sec: '7.R', kind: '回顾与思考', title: '证明之树：每个定理从哪里来？', layout: 'full',
     html: function () {
       return '' +
-        '<div class="col scroll">' +
-        '  <p>每一个定理，都只能用<b>定义</b>、<b>基本事实</b>和<b>已经证明的定理</b>来证明。以它们为根，定理一层一层“长”上去，就是一棵证明之树。</p>' +
-        '  <div class="tree-legend" id="treeLegend"></div>' +
-        '  <div class="tree-card" id="treeCard"></div>' +
-        '  <p class="small muted">等式的性质、等量代换等也常作为证明的依据，图中没有画出。</p>' +
-        '</div>' +
-        '<div class="col"><div class="panel lab">' +
-        '  <div class="row between"><span class="panel-title" style="margin:0">点一点树上的结论</span><button type="button" class="btn sm" id="treeGrow">' + M.icon('tree') + '重新生长</button></div>' +
+        '<div class="tree-stage">' +
         '  <div class="fig" id="treeFig"></div>' +
-        '</div></div>';
+        '  <div class="tree-intro">' +
+        '    <p>每一个定理，都只能用<b>定义</b>、<b>基本事实</b>和<b>已经证明的定理</b>来证明。以它们为根，定理一层层“长”上去。</p>' +
+        '    <div class="tree-legend" id="treeLegend"></div>' +
+        '    <button type="button" class="btn sm" id="treeGrow">' + M.icon('tree') + '重新生长</button>' +
+        '  </div>' +
+        '  <div class="tree-card" id="treeCard"></div>' +
+        '</div>' +
+        '<p class="small muted tree-foot">等式的性质、等量代换等也常作为证明的依据，图中没有画出。</p>';
     },
     mount: function (body, api) {
       var A = api.anim;
-      var svg = M.canvas(M.$('#treeFig', body), 1040, 600);
+      var svg = M.canvas(M.$('#treeFig', body), 1040, 560);
       var gE = S('g', {}, svg), gN = S('g', {}, svg);
       var keys = Object.keys(NODES);
       /* 图例 */
@@ -8076,16 +8107,16 @@ svg .tflow { fill: var(--marker); stroke: var(--amber); stroke-width: 1.5; point
       }
       function showCard(k) {
         if (!k) {
-          card.innerHTML = '<div class="tc-empty">' + M.icon('tree') + '<p>点击右边树上的任意一个结论，<br>看看它的证明用到了哪些依据。</p></div>';
+          card.innerHTML = '<div class="tc-empty">' + M.icon('tree') + '<p>点一点树上的任意一个结论，<br>看看它的证明用到了哪些依据。</p></div>';
           return;
         }
         var n = NODES[k], kids = children(k);
-        var html = '<span class="tc-kind" style="--c:' + KIND[n.k].color + '">' + KIND[n.k].name + '</span>' +
+        var html = '<div class="tc-head"><span class="tc-kind" style="--c:' + KIND[n.k].color + '">' + KIND[n.k].name + '</span>' +
+          '<button type="button" class="linkish tc-go">' + (n.by ? '看证明' : '回到这一页') + M.icon('arrow') + '</button></div>' +
           '<p class="tc-full">' + n.full.replace(/([A-Z]{2,3}|[A-Z](?=[ ，。∥=+]))/g, function (s) { return m(s); }) + '</p>';
         if (n.by) html += '<div class="tc-row"><b>证明的依据</b><div>' + chips(n.by, 'up') + (n.extra ? '<span class="tchip plain">' + n.extra + '</span>' : '') + '</div></div>';
         else html += '<div class="tc-row"><b>地位</b><div><span class="tchip plain">' + (n.k === 'fact' ? '基本事实，不需要证明，直接作为依据' : '定义，是证明的出发点') + '</span></div></div>';
         if (kids.length) html += '<div class="tc-row"><b>它又支撑了</b><div>' + chips(kids, 'down') + '</div></div>';
-        html += '<button type="button" class="btn sm primary tc-go">' + (n.by ? '去看它的证明' : '回到这一页') + M.icon('arrow') + '</button>';
         card.innerHTML = html;
         M.$$('.tchip[data-k]', card).forEach(function (c) { c.addEventListener('click', function () { select(c.getAttribute('data-k')); }); });
         M.$('.tc-go', card).addEventListener('click', function () { M.go(n.go); });

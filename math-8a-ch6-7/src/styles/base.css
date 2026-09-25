@@ -395,8 +395,8 @@ sub, sup { font-size: .68em; line-height: 0; }
 }
 .toc-ch > h3 i { width: .6rem; height: .6rem; border-radius: 3px; background: var(--dot, var(--ink-3)); }
 .toc-sec { margin: .15rem 0 .5rem; }
-.toc-sec > .toc-sec-title {
-  display: flex; gap: .5rem; align-items: baseline; font-weight: 700; font-size: .9rem;
+.toc-sec-title {
+  display: flex; gap: .5rem; align-items: baseline; font-weight: 700; font-size: .9rem; margin-top: .35rem;
   padding: .35rem .6rem; color: var(--ink);
 }
 .toc-sec-title .no { font-family: var(--num); color: var(--dot, var(--accent)); }

@@ -91,7 +91,7 @@
       var arc2 = S('path', { d: M.geo.sectorPath(X2, 30, 0, tdir), fill: 'var(--c7)', opacity: 0 }, gR);
       var eq1 = M.label(gR, X1.x + 42, X1.y - 12, '∠1', { 'font-size': 17, 'class': 't-ink', opacity: 0 });
       var eq2 = M.label(gR, X2.x + 42, X2.y - 12, '∠2', { 'font-size': 17, 'class': 't-ink', opacity: 0 });
-      var par = S('text', { x: 150, y: 296, 'text-anchor': 'middle', 'font-size': 17, 'class': 't-ink', opacity: 0, text: '∠1 = ∠2  ⇒  a ∥ b' }, gR);
+      var par = M.label(gR, 150, 296, '∠1 = ∠2  ⇒  {a} ∥ {b}', { 'text-anchor': 'middle', 'font-size': 17, 'class': 't-ink', opacity: 0 });
       M.label(gR, 296, 97, '{a}', { 'font-size': 18 });
       M.label(gR, 296, 219, '{b}', { 'font-size': 18 });
 

@@ -356,7 +356,8 @@ svg .bg-fill { fill: var(--surface-2); }
 .reveal-btn { align-self: flex-start; }
 .answer { border-left: 0; padding: .6rem .8rem; border-radius: 10px; background: var(--green-tint); color: var(--ink); line-height: 1.7; }
 .answer b.ok { color: var(--green); }
-.flip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .7rem; }
+.flip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr)); gap: .7rem; }
+@media (max-height: 820px) { .flip, .flip-in { min-height: 5.8rem; } }
 .flip { position: relative; min-height: 7.2rem; perspective: 900px; border: 0; padding: 0; background: transparent; text-align: left; }
 .flip-in { position: relative; width: 100%; height: 100%; min-height: 7.2rem; transition: transform .7s var(--ease); transform-style: preserve-3d; }
 .flip.on .flip-in { transform: rotateY(180deg); }
@@ -413,4 +414,6 @@ svg .bg-fill { fill: var(--surface-2); }
   .panel.lab { min-height: 16rem; }
   .fig { min-height: 15rem; }
   .col.scroll { overflow: visible; }
+  .row > .grow { flex-basis: 100%; max-width: none !important; }
+  table.data { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }
