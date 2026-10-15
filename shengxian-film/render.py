@@ -121,9 +121,11 @@ def cmd_sheet(t0, t1, n, cols=6, name='sheet.png', workers=4):
 
 def _segment_job(args):
     seg_id, f0, f1, fps, path, crf = args
+    if os.path.exists(path + '.done'):        # resumable: finished segments are kept
+        return path
     cmd = ['ffmpeg', '-y', '-v', 'error', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{W}x{H}', '-r', str(fps),
            '-i', '-', '-c:v', 'libx264', '-preset', 'slow', '-crf', str(crf), '-pix_fmt', 'yuv420p',
-           '-profile:v', 'high', '-tune', 'grain', '-x264-params', 'keyint=60:min-keyint=30', path]
+           '-profile:v', 'high', '-x264-params', f'keyint={2 * fps}:min-keyint={fps}', path]
     p = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     t_start = time.time()
     for f in range(f0, f1):
@@ -134,7 +136,9 @@ def _segment_job(args):
             el = time.time() - t_start
             print(f'[seg {seg_id}] {f - f0}/{f1 - f0} frames, {el:.0f}s', flush=True)
     p.stdin.close()
-    p.wait()
+    if p.wait() != 0:
+        raise RuntimeError(f'ffmpeg failed on segment {seg_id}')
+    open(path + '.done', 'w').close()
     return path
 
 
@@ -142,7 +146,7 @@ def cmd_video(fps, workers, start, end, crf, name):
     os.makedirs(os.path.join(OUT, 'seg'), exist_ok=True)
     f_start = int(round(start * fps))
     f_end = int(round(min(end, DURATION) * fps))
-    nseg = max(workers * 3, 1)
+    nseg = max(workers * 12, 1)
     bounds = np.linspace(f_start, f_end, nseg + 1).astype(int)
     jobs = []
     for i in range(nseg):

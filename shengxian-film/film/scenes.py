@@ -703,7 +703,7 @@ def act_ancestors(c, arr, t, A):
             d = lin(t, B(75) - 0.04, B(75) + 0.08)
             if d > 0:
                 dx, dy = x0 + 2, ys[1] + ts * 0.8 - ts * 0.84
-                rr = ts * 0.12 * ease_out(d)
+                rr = ts * 0.15 * ease_out(d)
                 drop = skia.Path()
                 drop.moveTo(dx - rr * 0.9, dy - rr * 0.7)
                 drop.cubicTo(dx + rr * 0.3, dy - rr * 1.4, dx + rr * 1.6, dy + rr * 0.2, dx + rr * 0.3, dy + rr * 1.0)
@@ -724,7 +724,7 @@ def act_ancestors(c, arr, t, A):
         # incense smoke in front
         sm = hall * (0.6 + 0.4 * zoom)
         for k, xx in enumerate((W / 2 - 22, W / 2, W / 2 + 22)):
-            E.draw_incense(c, xx, 1000, 480 + 60 * k, sm * 0.9, t, seed=k * 2.1, stick=60)
+            E.draw_incense(c, xx, 1000, 330 + 40 * k, sm * 0.55, t, seed=k * 2.1, stick=60)
         E.draw_censer(c, W / 2, 1010, 120, hall * (1 - 0.0 * zoom))
     # --- pre-drop: 祭 · 如 · 在 (bars 81-83)
     pd = lin(t, B(81), B(83))
@@ -1129,16 +1129,17 @@ def act_return(c, arr, t, A):
     if vis <= 0:
         return
     kick = A.kick(t, 0.4)
-    sx, sy = W / 2, 640
+    sx, sy = W / 2, 700
+    cred = smooth(lin(t, B(122) + 0.2, B(122) + 1.6))
     pulse = math.exp(-(t - B(119)) / 1.2) if t >= B(119) else 0
     # faint horizon of dawn
     radial_glow(c, W / 2, 900, 1300, (0.55, 0.30, 0.20), vis * 0.18 * smooth(lin(t, B(117), B(122))))
     c.drawLine(0, 760, W, 760, paint_stroke(PAL['moon'], vis * 0.12, 1.0))
-    E.draw_stone(c, sx, sy, 130, glow=0.15 + 0.6 * pulse, alpha=vis, lines=0.25 + 0.75 * pulse, t=t)
+    E.draw_stone(c, sx, sy, 130, glow=0.15 + 0.6 * pulse, alpha=vis * (1 - 0.55 * cred), lines=0.25 + 0.75 * pulse, t=t)
     # a thread of incense smoke rising from beside the stone
-    E.draw_incense(c, sx + 150, 700, 260 + 380 * smooth(lin(t, B(119), B(121))), vis, t, seed=9, stick=50, col=PAL['pale'])
+    E.draw_incense(c, sx + 150, 760, 260 + 380 * smooth(lin(t, B(119), B(121))), vis * (1 - 0.7 * cred), t, seed=9, stick=50, col=PAL['pale'])
     # heaven reappears far above, joined by the thread (bar 119+)
-    hv = vis * smooth(lin(t, B(119), B(120) + 0.5))
+    hv = vis * smooth(lin(t, B(119), B(120) + 0.5)) * (1 - cred)
     if hv > 0.003:
         E.draw_heaven(c, sx + 150, 150, 54, hv * 0.6, t, rot=t * 0.02)
         for i in range(30):

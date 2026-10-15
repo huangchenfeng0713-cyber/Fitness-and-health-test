@@ -123,19 +123,19 @@ def draw_credits(c, t, cue):
     rev, out = _env(t, cue['t0'], cue['t1'], 1.2, 2.2)
     if out <= 0:
         return
-    draw_text(c, '圣显', W / 2, 455, size=86, face='serif_sb', col=PAL['pale'], alpha=out, reveal=rev,
+    draw_text(c, '圣显', W / 2, 360, size=86, face='serif_sb', col=PAL['pale'], alpha=out, reveal=rev,
               track=0.5, rise=0, blur_in=10, stagger=0.3, shadow=0.6, glow=0.3, glow_col=PAL['gold'])
     # small cinnabar seal
     sa = out * clamp((t - cue['t0'] - 0.8) / 0.6)
     if sa > 0:
-        x, y, s = W / 2 + 160, 395, 46
+        x, y, s = W / 2 + 160, 300, 46
         c.drawRect(skia.Rect.MakeXYWH(x, y, s, s), paint_fill(PAL['cinnabar'], sa * 0.9))
         f = font('serif_b', 34)
         cw = adv('serif_b', 34, '显')
         c.drawString('显', x + s / 2 - cw / 2, y + s * 0.82, f, paint_fill((0.98, 0.93, 0.85), sa))
     for i, (txt, face, size) in enumerate(CREDITS):
         r = clamp((t - cue['t0'] - 1.2 - i * 0.5) / 1.2)
-        draw_text(c, txt, W / 2, 600 + i * 48, size=size, face=face, col=PAL['moon'], alpha=out * 0.78,
+        draw_text(c, txt, W / 2, 470 + i * 46, size=size, face=face, col=PAL['moon'], alpha=out * 0.78,
                   reveal=r, track=0.08, rise=4, blur_in=3, stagger=0.4, shadow=0.5)
 
 

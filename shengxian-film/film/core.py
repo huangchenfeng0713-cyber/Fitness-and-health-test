@@ -422,7 +422,7 @@ def bloom(img, thresh=0.55, strength=0.9, radius_scale=1.0):
     return img + up * strength
 
 
-def finish(img, frame_idx, grain=0.035, vignette=True, exposure=1.0, lift=0.0):
+def finish(img, frame_idx, grain=0.022, vignette=True, exposure=1.0, lift=0.0):
     """Tonemap, vignette, grain -> uint8 RGB."""
     x = img * exposure
     # soft shoulder tonemap
@@ -431,7 +431,7 @@ def finish(img, frame_idx, grain=0.035, vignette=True, exposure=1.0, lift=0.0):
         x = x + lift * (1 - x)
     if vignette:
         x = x * _vignette()
-    g = _grain_tiles()[frame_idx % 6]
+    g = _grain_tiles()[(frame_idx // 2) % 6]
     g = cv2.resize(g, (W, H), interpolation=cv2.INTER_LINEAR)[..., None]
     lum = x.mean(axis=2, keepdims=True)
     x = x + g * grain * (0.35 + 0.65 * np.sqrt(np.clip(lum, 0, 1)))

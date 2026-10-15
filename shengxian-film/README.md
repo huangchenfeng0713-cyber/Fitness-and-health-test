@@ -58,7 +58,7 @@
 pip install librosa skia-python opencv-python-headless numpy
 # 字体（OFL）：思源宋体 Noto Serif CJK SC、霞鹜文楷 LXGW WenKai、Cormorant Garamond，放到 fonts/
 python3 audio_analysis.py song.wav data/audio_features.npz
-SX_AUDIO=song.m4a python3 render.py video --fps 30 --workers 4
+SX_AUDIO=song.m4a python3 render.py video --fps 60 --workers 4 --crf 18   # 可中断续渲
 python3 render.py sheet 0 254 64      # 全片缩略图检查
 ```
 
