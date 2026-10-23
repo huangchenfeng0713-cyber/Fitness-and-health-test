@@ -122,15 +122,24 @@ TYPE_NAMES = {
     "pat": "拍一拍", "拍一拍": "拍一拍",
     "红包": "红包", "转账": "转账",
 }
-# 文本导出里，非文字消息通常以这些占位符开头
-PLACEHOLDERS = (
-    ("[图片]", "图片"), ("[语音]", "语音"), ("[视频]", "视频"),
-    ("[动画表情]", "表情"), ("[表情]", "表情"), ("[文件]", "文件"),
-    ("[链接]", "链接"), ("[分享]", "链接"), ("[小程序]", "链接"), ("[音乐]", "链接"),
-    ("[位置]", "位置"), ("[名片]", "名片"), ("[红包]", "红包"), ("[微信红包]", "红包"),
-    ("[转账]", "转账"), ("[语音通话]", "通话"), ("[视频通话]", "通话"),
-    ("[聊天记录]", "聊天记录"),
-)
+# 文本导出里，非文字消息以方括号占位符开头，如 [图片]、[语音 0:04]、[文件: a.pdf]、[位置] 地名。
+# 按括号里的第一个词归类；[微笑] 这类微信表情代码不在表里，仍算文字
+PLACEHOLDER_RE = re.compile(r"^\[([^\]\s:：]+)[^\]]*\]")
+PLACEHOLDER_KINDS = {
+    "图片": "图片", "照片": "图片", "Photo": "图片",
+    "语音": "语音", "Audio": "语音",
+    "视频": "视频", "Video": "视频",
+    "动画表情": "表情", "表情": "表情", "Emoji": "表情",
+    "文件": "文件", "File": "文件",
+    "链接": "链接", "分享": "链接", "小程序": "链接", "音乐": "链接", "Link": "链接",
+    "位置": "位置", "实时位置共享": "位置", "Location": "位置", "Real-time": "位置",
+    "名片": "名片", "个人名片": "名片", "视频号名片": "名片", "Contact": "名片", "Channel": "名片",
+    "红包": "红包", "微信红包": "红包", "Red": "红包",
+    "转账": "转账", "Transfer": "转账",
+    "语音通话": "通话", "视频通话": "通话", "视频/语音通话": "通话", "Video/Audio": "通话",
+    "聊天记录": "聊天记录",
+}
+TEXT_PREFIX_KINDS = (("微信转账", "转账"), ("Weixin Transfer", "转账"))
 SYSTEM_SENDERS = {"系统", "系统消息", "system", "sys"}
 NOISE_TYPES = {"系统", "撤回", "拍一拍"}
 RECALL_RE = re.compile(r"^.{0,40}撤回了一条消息(?:\s*重新编辑)?$")
@@ -158,8 +167,11 @@ def classify(raw_type, content: str, sender: str) -> str:
         return base
     text = content.strip()
     if base != "系统":
-        for token, kind in PLACEHOLDERS:
-            if text.startswith(token):
+        m = PLACEHOLDER_RE.match(text)
+        if m and m.group(1) in PLACEHOLDER_KINDS:
+            return PLACEHOLDER_KINDS[m.group(1)]
+        for prefix, kind in TEXT_PREFIX_KINDS:
+            if text.startswith(prefix):
                 return kind
     short = len(text) <= 120 and "\n" not in text
     if short and RECALL_RE.match(text):
@@ -174,8 +186,8 @@ def classify(raw_type, content: str, sender: str) -> str:
 
 
 # 微信在 @某人 后面插入的是 U+2005，另有零宽字符和 BOM 混在文本里
-INVISIBLE = str.maketrans({" ": " ", " ": " ", " ": " ",
-                           "​": None, "﻿": None, "\r": None})
+INVISIBLE = str.maketrans({"\u2005": " ", "\u2006": " ", "\u00a0": " ",
+                           "\u200b": None, "\ufeff": None, "\r": None})
 
 
 def clean_text(text: str) -> str:
@@ -192,6 +204,7 @@ class Message:
     type: str = "文本"
     is_self: Optional[bool] = None
     conversation: str = ""
+    quote: str = ""  # 引用回复时被引用的那条消息
 
 
 @dataclass
@@ -228,23 +241,70 @@ TXT_LAYOUTS = (
     # (名称, 每条消息第一行的正则, 内容是否从下一行开始)
     ("[时间] 名字: 内容", re.compile(rf"^\[(?P<time>{TS})\]\s*{NAME}\s*[:：]\s?(?P<content>.*)$"), False),
     ("时间 名字: 内容", re.compile(rf"^(?P<time>{TS})\s+{NAME}\s*[:：]\s?(?P<content>.*)$"), False),
+    ("名字 (时间):内容", re.compile(rf"^{NAME}\s*[(（](?P<time>{TS})[)）]\s*[:：]\s?(?P<content>.*)$"), False),
     ("时间 名字 / 下一行内容", re.compile(rf"^\[?(?P<time>{TS})\]?\s+{NAME}\s*$"), True),
     ("名字 时间 / 下一行内容", re.compile(rf"^{NAME}\s+[\[(（]?(?P<time>{TS})[\])）]?\s*$"), True),
 )
+TIME_FIRST_INLINE = (0, 1)
+TIME_FIRST_HEADER = 3
+# “名字 (时间):内容”是 WechatExporter（读取 iPhone 备份）的文本导出格式。它的系统提示单独占一行、
+# 没有名字和时间；转发的聊天记录夹在“<< 标题”和“标题 结束 >>”之间；转账消息后面不换行
+WECHAT_EXPORTER = 2
+TITLE_RE = re.compile(r"^(.+?) - (?:微信聊天记录|WeChat Chat History)\s*$")
+FORWARD_START_RE = re.compile(r"^<< .+$")
+FORWARD_END_RE = re.compile(r"^.+ (?:结束|Ends) >>$")
+SYSTEM_PREFIX_RE = re.compile(r"^(?:System Message:|系统消息[:：])\s*")
+QUOTE_SEPARATOR = "\n- - - - - - - - - - - - - - -\n"
 
 
 def detect_layout(lines: Sequence[str]) -> Optional[int]:
     sample = [line for line in lines[:50000] if line.strip()][:5000]
     counts = [sum(1 for line in sample if rx.match(line)) for _, rx, _ in TXT_LAYOUTS]
-    # 单行格式的每一行同样符合“时间 名字”抬头格式，两者条数接近时说明是单行格式
-    inline = 0 if counts[0] >= counts[1] else 1
-    if counts[inline] and counts[inline] >= 0.9 * counts[2] and counts[inline] >= counts[3]:
-        return inline
-    best = 2 if counts[2] >= counts[3] else 3
+    best = max(range(len(counts)), key=lambda i: counts[i])
+    if best == TIME_FIRST_HEADER:
+        # 单行格式的每一行同样符合“时间 名字”抬头格式，两者条数接近时说明是单行格式
+        inline = max(TIME_FIRST_INLINE, key=lambda i: counts[i])
+        if counts[inline] >= 0.9 * counts[best]:
+            best = inline
     return best if counts[best] else None
 
 
-def parse_txt(text: str, tz: timezone, layout: Optional[int] = None) -> Tuple[List[dict], str, int]:
+def is_notice(line: str) -> bool:
+    text = line.strip()
+    return bool(text) and (bool(SYSTEM_PREFIX_RE.match(text)) or classify(None, text, "") in NOISE_TYPES)
+
+
+def split_glued_lines(lines: List[str], rx) -> List[str]:
+    """转账消息末尾没有换行，下一条消息会接在同一行，按已知的发送人名字拆开。"""
+    names = {m["name"].strip() for m in map(rx.match, lines) if m}
+    if not names:
+        return lines
+    alternation = "|".join(map(re.escape, sorted(names, key=len, reverse=True)))
+    glued = re.compile(rf"(?:{alternation})\s*[(（]{TS}[)）]\s*[:：]")
+    out = []
+    for line in lines:
+        while True:
+            m = rx.match(line)
+            if not m or not m["content"].startswith(tuple(p for p, _ in TEXT_PREFIX_KINDS)):
+                break
+            hit = glued.search(line, m.start("content"))
+            if not hit:
+                break
+            out.append(line[:hit.start()])
+            line = line[hit.start():]
+        out.append(line)
+    return out
+
+
+def split_quote(content: str) -> Tuple[str, str]:
+    """WechatExporter 把引用回复写成“「被引用的人：原文」+ 分隔线 + 回复”，拆成 (回复, 引用)。"""
+    if content.startswith("「") and QUOTE_SEPARATOR in content:
+        quote, reply = content.split(QUOTE_SEPARATOR, 1)
+        return reply, quote.strip().strip("「」")
+    return content, ""
+
+
+def parse_txt(text: str, tz: timezone, layout: Optional[int] = None) -> dict:
     lines = text.splitlines()
     if layout is None:
         layout = detect_layout(lines)
@@ -254,23 +314,53 @@ def parse_txt(text: str, tz: timezone, layout: Optional[int] = None) -> Tuple[Li
             "如果这其实是 CSV/JSON，请用 --format 指定"
         )
     name, rx, content_below = TXT_LAYOUTS[layout]
+    exporter = layout == WECHAT_EXPORTER
+    if exporter:
+        lines = split_glued_lines(lines, rx)
+
     records: List[dict] = []
     current: Optional[dict] = None
+    title = ""
     skipped = 0
+    depth = 0  # 转发的聊天记录可能嵌套
     for line in lines:
+        if depth:
+            # 转发记录里的消息不属于这个会话，原样并入转发它的那条消息
+            current["lines"].append(line)
+            if FORWARD_START_RE.match(line):
+                depth += 1
+            elif FORWARD_END_RE.match(line):
+                depth -= 1
+            continue
         m = rx.match(line)
         when = parse_time(m["time"], tz) if m else None
         if when is not None:
-            current = {"time": when, "sender": m["name"].strip(),
+            current = {"time": when, "sender": m["name"].strip(), "type": None,
                        "lines": [] if content_below else [m["content"]]}
             records.append(current)
-        elif current is not None:
+        elif current is None:
+            if not title and not records and TITLE_RE.match(line.strip()):
+                title = TITLE_RE.match(line.strip()).group(1)
+            elif line.strip():
+                skipped += 1  # 第一条消息之前的标题、分隔线等
+        elif exporter and FORWARD_START_RE.match(line):
+            depth = 1
+            current["type"] = "聊天记录"
             current["lines"].append(line)
-        elif line.strip():
-            skipped += 1  # 第一条消息之前的标题、分隔线等
-    rows = [{"time": r["time"], "sender": r["sender"], "content": "\n".join(r["lines"])}
-            for r in records]
-    return rows, name, skipped
+        elif exporter and is_notice(line):
+            # 系统提示没有自己的时间，沿用上一条消息的时间
+            current = {"time": current["time"], "sender": "系统", "type": "系统",
+                       "lines": [SYSTEM_PREFIX_RE.sub("", line.strip())]}
+            records.append(current)
+        else:
+            current["lines"].append(line)
+
+    rows = []
+    for r in records:
+        content, quote = split_quote("\n".join(r["lines"]).strip())
+        rows.append({"time": r["time"], "sender": r["sender"], "content": content,
+                     "quote": quote, "type": r["type"]})
+    return {"rows": rows, "layout": name, "skipped": skipped, "title": title}
 
 
 # ---------------------------------------------------------------- CSV / JSON
@@ -451,12 +541,17 @@ def load_file(path: Path, fmt: str, tz: timezone, overrides: Dict[str, Optional[
     text, encoding = read_text(path)
     fmt = detect_format(path, text) if fmt == "auto" else fmt
     source = Source(path=str(path), format=fmt.upper(), encoding=encoding)
+    title = ""
     if fmt == "txt":
-        records, source.layout, source.skipped = parse_txt(text, tz)
+        parsed = parse_txt(text, tz)
+        records, source.layout, source.skipped, title = (
+            parsed["rows"], parsed["layout"], parsed["skipped"], parsed["title"])
     else:
         rows, fieldnames = read_csv_rows(text) if fmt == "csv" else read_json_rows(text, fmt == "jsonl")
         records, source.columns, source.skipped = parse_table(rows, fieldnames, tz, overrides)
 
+    # WechatExporter 每个会话一个文件夹，文件都叫 index.txt
+    default_chat = title or (path.parent.name if path.stem.lower() == "index" else path.stem)
     messages = []
     for r in records:
         content = clean_text(r["content"])
@@ -476,24 +571,26 @@ def load_file(path: Path, fmt: str, tz: timezone, overrides: Dict[str, Optional[
             continue
         messages.append(Message(
             time=r["time"], sender=sender, content=content, type=kind, is_self=is_self,
-            conversation=chat or r.get("conversation") or path.stem,
+            conversation=chat or r.get("conversation") or default_chat,
+            quote=clean_text(r.get("quote") or ""),
         ))
     source.parsed = len(messages)
     return messages, source
 
 
-def expand_inputs(inputs: Sequence[str], out: Path) -> List[Path]:
+def expand_inputs(inputs: Sequence[str], out: Path) -> List[Tuple[Path, bool]]:
+    """展开输入，返回 (文件, 是否来自目录)。"""
     out = out.resolve()
-    paths: List[Path] = []
+    paths: List[Tuple[Path, bool]] = []
     for item in inputs:
         p = Path(item)
         if p.is_dir():
             # 跳过输出目录，免得把上一次的整理结果当成输入
-            paths.extend(sorted(f for f in p.rglob("*")
-                                if f.is_file() and f.suffix.lower() in SUPPORTED_SUFFIXES
-                                and out not in f.resolve().parents))
+            paths.extend((f, True) for f in sorted(p.rglob("*"))
+                         if f.is_file() and f.suffix.lower() in SUPPORTED_SUFFIXES
+                         and out not in f.resolve().parents)
         elif p.is_file():
-            paths.append(p)
+            paths.append((p, False))
         else:
             raise ParseError(f"找不到输入文件：{item}")
     if not paths:
@@ -586,6 +683,7 @@ def anonymize(messages: List[Message]) -> List[dict]:
         m.conversation = mapping[m.conversation]
         if pattern:
             m.content = pattern.sub(lambda hit: mapping[hit.group()], m.content)
+            m.quote = pattern.sub(lambda hit: mapping[hit.group()], m.quote)
     return [{"原名": name, "代号": alias, "类别": kinds[name]}
             for name, alias in mapping.items() if name != alias]
 
@@ -603,14 +701,15 @@ def mask_pii(messages: List[Message]) -> int:
     for m in messages:
         for rx, label in PII_PATTERNS:
             m.content, n = rx.subn(label, m.content)
-            total += n
+            m.quote, k = rx.subn(label, m.quote)
+            total += n + k
     return total
 
 
 # ---------------------------------------------------------------- 输出
 
 FIELDS = ["id", "conversation", "datetime", "date", "time", "weekday", "hour",
-          "sender", "is_self", "type", "content", "length", "timestamp"]
+          "sender", "is_self", "type", "content", "quote", "length", "timestamp"]
 
 
 def to_record(index: int, m: Message, tz: timezone) -> dict:
@@ -627,6 +726,7 @@ def to_record(index: int, m: Message, tz: timezone) -> dict:
         "is_self": m.is_self,
         "type": m.type,
         "content": m.content,
+        "quote": m.quote,
         "length": len(m.content) if m.type == "文本" else 0,
         "timestamp": int(m.time.replace(tzinfo=tz).timestamp()),
     }
@@ -634,7 +734,9 @@ def to_record(index: int, m: Message, tz: timezone) -> dict:
 
 def display_content(m: Message) -> str:
     if m.type in ("文本", "系统", "撤回", "拍一拍"):
-        return m.content
+        return m.content + (f"  〔引用 {m.quote}〕" if m.quote else "")
+    if m.type == "聊天记录":
+        return f"[聊天记录] {m.content.splitlines()[0] if m.content else ''}"
     if not m.content or m.content.startswith("<") or len(m.content) > 200:
         return f"[{m.type}]"  # CSV 导出里卡片、图片的内容常是 XML 或文件路径
     return m.content if m.content.startswith("[") else f"[{m.type}] {m.content}"
@@ -820,7 +922,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--format", choices=["auto", "txt", "csv", "json", "jsonl"], default="auto",
                    help="输入格式，默认按扩展名和内容自动判断")
     p.add_argument("--me", help="你自己在记录里显示的名字，多个用逗号分隔；用于标记哪些消息是你发的")
-    p.add_argument("--chat", help="会话名；不填时用数据里的会话列，没有就用文件名")
+    p.add_argument("--chat", help="会话名；不填时依次用数据里的会话列、文件开头的标题、文件名")
     p.add_argument("--start", type=parse_day, help="只保留这一天及之后的消息，格式 YYYY-MM-DD")
     p.add_argument("--end", type=parse_day, help="只保留这一天及之前的消息，格式 YYYY-MM-DD")
     p.add_argument("--drop-system", action="store_true", help="去掉系统提示、撤回、拍一拍")
@@ -839,6 +941,21 @@ COL_HELP = {"time": "时间", "sender": "发送人", "content": "消息内容", 
             "type": "消息类型", "chat": "会话名"}
 
 
+def guess_self_hint(messages: List[Message]) -> str:
+    """多个会话里都出现的发送人通常就是你自己，给出提示（不自动采用）。"""
+    senders: Dict[str, set] = {}
+    for m in messages:
+        if m.sender not in ("系统", "对方"):
+            senders.setdefault(m.conversation, set()).add(m.sender)
+    if len(senders) < 2:
+        return ""
+    common = set.intersection(*senders.values())
+    if len(common) != 1:
+        return ""
+    name = common.pop()
+    return f"。所有会话里都出现的发送人只有「{name}」，多半就是你，可以加上 --me \"{name}\" 重新运行"
+
+
 def run(argv: Optional[Sequence[str]] = None) -> int:
     args = build_parser().parse_args(argv)
     tz = timezone(timedelta(hours=args.utc_offset))
@@ -847,12 +964,21 @@ def run(argv: Optional[Sequence[str]] = None) -> int:
                  "is_self": args.col_self, "type": args.col_type, "conversation": args.col_chat}
     log = lambda text: print(text, file=sys.stderr)  # noqa: E731
 
+    notes = []
     try:
         paths = expand_inputs(args.inputs, Path(args.out))
-        per_file, sources = [], []
-        for path in paths:
-            messages, source = load_file(path, args.format, tz, overrides, args.chat,
-                                         me_names[0] if me_names else "我")
+        per_file, sources, unreadable = [], [], []
+        for path, from_dir in paths:
+            try:
+                messages, source = load_file(path, args.format, tz, overrides, args.chat,
+                                             me_names[0] if me_names else "我")
+            except ParseError as exc:
+                if not from_dir:
+                    raise
+                # 目录里常有会话列表之类不含消息的文件，跳过即可
+                log(f"跳过 {path}：{exc}")
+                unreadable.append(f"{path.parent.name}/{path.name}")
+                continue
             per_file.append(messages)
             sources.append(source)
             how = source.layout or "，".join(f"{k}←{v}" for k, v in source.columns.items())
@@ -861,15 +987,21 @@ def run(argv: Optional[Sequence[str]] = None) -> int:
     except ParseError as exc:
         log(f"错误：{exc}")
         return 1
+    if not sources:
+        log("错误：输入目录里没有能识别的聊天记录文件")
+        return 1
+    if unreadable:
+        notes.append(f"跳过了 {len(unreadable)} 个无法识别的文件：{'、'.join(unreadable[:5])}"
+                     + ("等" if len(unreadable) > 5 else ""))
 
     messages, removed = merge(per_file)
     mark_self(messages, me_names)
     messages.sort(key=lambda m: m.time)  # 稳定排序，同一秒内保持原文件里的先后
     messages, filtered = apply_filters(messages, args.start, args.end, args.drop_system, args.text_only)
 
-    notes = []
     if any(m.is_self is None for m in messages):
-        notes.append("有消息无法判断是否为你本人发送（数据里没有对应列，也没有用 --me 指定你的名字），is_self 留空")
+        notes.append("有消息无法判断是否为你本人发送（数据里没有对应列，也没有用 --me 指定你的名字），is_self 留空"
+                     + guess_self_hint(messages))
     elif me_names and not any(m.is_self for m in messages):
         notes.append(f"没有找到 --me 指定的名字（{'、'.join(me_names)}）发送的消息，请核对名字是否与记录中一致")
     unknown_sender = sum(1 for m in messages if m.sender == "对方")

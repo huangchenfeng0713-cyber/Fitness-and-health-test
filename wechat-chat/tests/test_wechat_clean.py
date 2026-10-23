@@ -67,6 +67,12 @@ class ClassifyTest(unittest.TestCase):
         self.assertEqual(wc.classify(None, "[图片]", "a"), "图片")
         self.assertEqual(wc.classify(None, "[动画表情]", "a"), "表情")
         self.assertEqual(wc.classify(1, "[语音]3\"", "a"), "语音")
+        self.assertEqual(wc.classify(None, "[语音 0:04]", "a"), "语音")
+        self.assertEqual(wc.classify(None, "[文件: 体检报告.pdf]", "a"), "文件")
+        self.assertEqual(wc.classify(None, "[位置] 西湖 (30.25,120.15)", "a"), "位置")
+        self.assertEqual(wc.classify(None, "[视频/语音通话]", "a"), "通话")
+        self.assertEqual(wc.classify(None, "[Photo]", "a"), "图片")
+        self.assertEqual(wc.classify(None, "微信转账 转账 ¥20.00", "a"), "转账")
         # 文字里夹带的微信表情代码仍然是文本
         self.assertEqual(wc.classify(None, "[微笑]好的", "a"), "文本")
 
@@ -108,8 +114,9 @@ class TxtLayoutTest(unittest.TestCase):
 
     def test_inline_without_brackets_and_colon_in_content(self):
         text = "2024-01-05 09:03:07 小红：几点？\n2024-01-05 09:04:00 小明: 19:30 老地方\n"
-        rows, layout, _ = wc.parse_txt(text, CST)
-        self.assertEqual(layout, "时间 名字: 内容")
+        parsed = wc.parse_txt(text, CST)
+        rows = parsed["rows"]
+        self.assertEqual(parsed["layout"], "时间 名字: 内容")
         self.assertEqual(rows[1]["sender"], "小明")
         self.assertEqual(rows[1]["content"], "19:30 老地方")
 
@@ -124,6 +131,52 @@ class TxtLayoutTest(unittest.TestCase):
             messages, source = wc.load_file(path, "auto", CST, {}, None, "我")
         self.assertEqual(source.encoding, "gb18030")
         self.assertEqual((messages[0].sender, messages[0].content), ("小红", "早呀"))
+
+
+class WechatExporterTest(unittest.TestCase):
+    """WechatExporter（读取 iPhone 备份）的文本导出：名字 (时间):内容"""
+
+    def test_sample(self):
+        messages, source = load("iPhone导出/小明/小红/index.txt")
+        self.assertEqual(source.layout, "名字 (时间):内容")
+        self.assertEqual(source.skipped, 0)  # 首行“小红 - 微信聊天记录”是会话标题
+        self.assertTrue(all(m.conversation == "小红" for m in messages))
+        self.assertEqual([(m.sender, m.type) for m in messages], [
+            ("小红", "文本"), ("小明", "文本"), ("小红", "图片"), ("系统", "撤回"),
+            ("小明", "文本"), ("系统", "拍一拍"), ("小红", "语音"), ("小明", "聊天记录"),
+            ("小红", "转账"), ("小明", "文本"), ("小红", "表情"),
+        ])
+        self.assertEqual(messages[1].content, "七点\n老地方见")
+        # 系统提示没有时间，沿用上一条
+        self.assertEqual(messages[3].time, messages[2].time)
+        # 引用回复拆成回复内容和引用
+        self.assertEqual((messages[4].content, messages[4].quote), ("七点，别迟到", "小红：今天几点去？"))
+        self.assertEqual(messages[5].content, '"小明" 拍了拍 "小红"')
+        # 转发记录里的消息并入转发的那条，不算这个会话的消息
+        self.assertNotIn("阿杰", {m.sender for m in messages})
+        self.assertIn("阿杰 (2024-03-04 20:00:00):周末爬山", messages[7].content)
+        # 转账后面粘在同一行的下一条消息被拆开
+        self.assertEqual(messages[8].content, "微信转账 转账 ¥20.00")
+        self.assertEqual((messages[9].sender, messages[9].content), ("小明", "收到啦"))
+
+    def test_nested_forward(self):
+        text = ("A (2024-03-05 08:00:00):记录\n<< 外层\nB (2024-03-01 08:00:00):记录\n<< 内层\n"
+                "C (2024-03-01 07:00:00):嗨\n内层 结束 >>\n外层 结束 >>\nA (2024-03-05 08:01:00):看看\n")
+        parsed = wc.parse_txt(text, CST)
+        self.assertEqual([r["sender"] for r in parsed["rows"]], ["A", "A"])
+        self.assertEqual(parsed["rows"][0]["type"], "聊天记录")
+
+    def test_multiline_message_is_not_mistaken_for_notice(self):
+        text = "A (2024-03-05 08:00:00):第一行\n第二行\nB (2024-03-05 08:01:00):好\n"
+        rows = wc.parse_txt(text, CST)["rows"]
+        self.assertEqual(rows[0]["content"], "第一行\n第二行")
+
+    def test_self_hint_across_conversations(self):
+        t = datetime(2024, 3, 1)
+        messages = [wc.Message(t, "小明", "a", conversation="小红"), wc.Message(t, "小红", "b", conversation="小红"),
+                    wc.Message(t, "小明", "c", conversation="阿杰"), wc.Message(t, "阿杰", "d", conversation="阿杰")]
+        self.assertIn('--me "小明"', wc.guess_self_hint(messages))
+        self.assertEqual(wc.guess_self_hint(messages[:2]), "")
 
 
 class TableTest(unittest.TestCase):
@@ -213,12 +266,14 @@ class EndToEndTest(unittest.TestCase):
             jsonl = [json.loads(line) for line in (out / "messages.jsonl").read_text(encoding="utf-8").splitlines()]
             chat = (out / "chat.txt").read_text(encoding="utf-8")
 
-        self.assertEqual(len(rows), 25)
-        self.assertEqual(len(jsonl), 25)
-        self.assertEqual(summary["counts"]["messages"], 25)
+        self.assertEqual(len(rows), 36)
+        self.assertEqual(len(jsonl), 36)
+        self.assertEqual(summary["counts"]["messages"], 36)
         self.assertEqual(rows, sorted(rows, key=lambda r: r["datetime"]))
         self.assertEqual({r["is_self"] for r in rows}, {"0", "1"})
-        self.assertEqual(summary["notes"], [])
+        # 会话列表文件 index.txt 不含消息，跳过但不中止
+        self.assertEqual(summary["notes"], ["跳过了 1 个无法识别的文件：小明/index.txt"])
+        self.assertIn("跳过 ", log)
         self.assertIn("08:16 小明：去，晚上七点\n      练腿日", chat)
         self.assertIn("08:02 小明：[图片]", chat)  # XML 内容在可读文本里显示为占位符
 
@@ -266,6 +321,14 @@ class EndToEndTest(unittest.TestCase):
             summary = json.loads((src / "output" / "summary.json").read_text(encoding="utf-8"))
         self.assertEqual(len(summary["sources"]), 1)
         self.assertEqual(summary["counts"]["messages"], 1)
+
+    def test_unreadable_explicit_file_is_an_error(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "list.txt"
+            path.write_text("只是一些普通文字\n", encoding="utf-8")
+            code, log = run_cli(path, "-o", Path(tmp) / "out")
+        self.assertEqual(code, 1)
+        self.assertIn("没有找到能识别的消息抬头行", log)
 
     def test_bad_input_returns_error(self):
         with tempfile.TemporaryDirectory() as tmp:
