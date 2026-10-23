@@ -1,0 +1,7 @@
+localId,TalkerId,Type,IsSender,CreateTime,StrTime,StrContent,Remark,Sender
+1,wxid_xiaohong,1,0,1709424000,2024-03-03 08:00:00,今天体重多少？,小红,
+2,wxid_xiaohong,1,1,1709424130,2024-03-03 08:02:10,68.4 kg，比上周轻了 0.6,小红,
+3,wxid_xiaohong,3,1,1709424150,2024-03-03 08:02:30,"<img aeskey=""0f1e"" length=""10240"" />",小红,
+4,wxid_xiaohong,34,0,1709424300,2024-03-03 08:05:00,"<voicemsg voicelength=""4200"" />",小红,
+5,wxid_xiaohong,10000,0,1709424360,2024-03-03 08:06:00,你撤回了一条消息,小红,
+6,wxid_xiaohong,1,0,1709424420,2024-03-03 08:07:00,继续加油💪,小红,

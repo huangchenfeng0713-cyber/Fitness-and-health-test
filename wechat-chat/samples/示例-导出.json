@@ -1,0 +1,29 @@
+{
+  "chat": "健身搭子群",
+  "messages": [
+    {
+      "time": 1709524800,
+      "sender": "阿杰",
+      "content": "周末一起去爬山？",
+      "type": "text"
+    },
+    {
+      "time": "2024-03-04T04:01:00Z",
+      "sender": "小明",
+      "content": "@阿杰 好啊",
+      "type": "text"
+    },
+    {
+      "time": 1709524920000,
+      "sender": "小红",
+      "content": "[位置]",
+      "type": "location"
+    },
+    {
+      "time": "2024-03-04 12:03:00",
+      "sender": "系统消息",
+      "content": "\"阿杰\"邀请\"小芳\"加入了群聊",
+      "type": "system"
+    }
+  ]
+}

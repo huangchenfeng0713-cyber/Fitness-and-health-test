@@ -1,3 +1,8 @@
 node_modules/
 .DS_Store
 *.log
+
+# 微信聊天记录：原始导出和整理结果都是私人数据，不进仓库
+wechat-chat/data/
+wechat-chat/output/
+__pycache__/
