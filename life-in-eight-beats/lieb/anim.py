@@ -65,8 +65,9 @@ def antic(u, a=0.12, split=0.28, out=lambda v: ease_out_back(v, 1.2)):
     return -a + (1 + a) * out(v)
 
 
-def hold_then_snap(u, hold=0.45, p=4):
-    """Broadcast-gymnastics: keep the last position, then a fast square move into the beat."""
+def hold_then_snap(u, hold=0.3, p=4):
+    """Broadcast-gymnastics: after arriving, hold ~30 % of the beat, then a fast square move
+    (strong ease-out: most of the way there early) that settles exactly on the next beat."""
     u = clamp(u)
     if u < hold:
         return 0.0
@@ -141,7 +142,7 @@ STYLES = {
                   bounce=0.03, noise=7.0, desync=0.13),
     'silly': Style('silly', lambda u: in_out_back(u, 1.1), settle_amp=0.13, bounce=0.04,
                    noise=3.5, desync=0.08),
-    'drill': Style('drill', hold_then_snap, foot=lambda u: hold_then_snap(u, 0.4, 3), settle_amp=0.05,
+    'drill': Style('drill', hold_then_snap, foot=lambda u: hold_then_snap(u, 0.3, 3), settle_amp=0.05,
                    settle_freq=2.4, settle_decay=0.12, bounce=0.018, bounce_sharp=3.0),
     'military': Style('military', military, foot=military, settle_amp=0.03, settle_freq=3.0,
                       settle_decay=0.08, bounce=0.006, bounce_sharp=4.0, lead=0.06),

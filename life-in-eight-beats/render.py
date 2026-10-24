@@ -65,7 +65,7 @@ def transition_times():
             rows.append((f'{a.key}→{b.key} 后', b.t(0.6)))
             continue
         rows.append((f'{a.key}→{b.key} 前', b.t0 - 0.5 * a.spb))
-        rows.append((f'{a.key}→{b.key} 后', b.t0 + 0.5 * b.spb))
+        rows.append((f'{a.key}→{b.key} 后', b.t0 + 0.6 * b.spb))
     S8 = TL.S['S8']
     rows.append(('S8 快放', S8.t(9.2)))
     rows.append(('S8 咳嗽', TL.t_cough + 0.12))

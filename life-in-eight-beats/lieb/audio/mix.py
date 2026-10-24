@@ -65,7 +65,7 @@ def _stem_fx(name, y):
     return sy.reverb(y, 0.15, 0.8)
 
 
-STEM_GAIN = {'baby': 1.0, 'kid': 0.95, 'broadcast': 1.0, 'instructor': 1.05, 'dj': 0.95, 'office': 0.9,
+STEM_GAIN = {'baby': 1.0, 'kid': 0.95, 'broadcast': 1.12, 'instructor': 1.05, 'dj': 1.15, 'office': 0.9,
              'auntie': 0.9, 'oldman': 1.0, 'oldman_slow': 0.95, 'kungfu': 1.0}
 
 

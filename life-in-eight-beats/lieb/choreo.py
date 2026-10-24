@@ -129,9 +129,9 @@ def gym_moves():
     m.append((10, bent, None))
     m.append((11, stand(fx=(0.2, 0.2), sh=(132, 132), el=(0, 0)), None))
     # kick the left leg out, right arm up (correct pairing: opposite arm)
-    m.append((12, stand(fx=(0.5, 0.08), fy=(0.62, 0), plant=(0, 1), k=(1, 1), sh=(90, 165), el=(0, 0), rot=-4), 'kickL'))
+    m.append((12, stand(fx=(0.5, 0.08), fy=(0.62, 0), plant=(0, 1), k=(1, 1), sh=(90, 142), el=(0, 10), rot=-4), 'kickL'))
     m.append((13, att, None))
-    m.append((14, stand(fx=(0.08, 0.5), fy=(0, 0.62), plant=(1, 0), k=(1, 1), sh=(165, 90), el=(0, 0), rot=4), 'kickR'))
+    m.append((14, stand(fx=(0.08, 0.5), fy=(0, 0.62), plant=(1, 0), k=(1, 1), sh=(142, 90), el=(10, 0), rot=4), 'kickR'))
     m.append((15, att, None))
     # eight 3 — 整理运动: 向右转, march in place → 齐步 → 正步 (side view)
     for i, b in enumerate(range(16, 24)):
@@ -179,6 +179,8 @@ def shunguai(pose, kind):
 
 def s3(tr, crowd=None):
     moves = gym_moves()
+    # the hero is still at attention when the music starts: his late move is a hurried snap
+    tr.at('S3', 0, stand(fx=(0.07, 0.07), sh=(4, 4), el=(0, 0), browTilt=0.55), 'drill')
     for b, pose, kind in moves:
         st = 'drill' if b < 22 else 'military'
         if crowd is not None:

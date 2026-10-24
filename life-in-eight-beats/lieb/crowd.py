@@ -91,7 +91,7 @@ class Auntie:
                                  el=(30, 10) if r else (10, 30), rot=-6 if r else 6, fan=1.0, py=-0.03), 'square')
         # S8: stop, stare, shake heads, leave
         look_at = -self.side * 0.7
-        idle = stand(x=x, fx=(0.15, 0.15), sh=(12, 12), el=(-20, -20), fan=0.9, face=look_at, browTilt=-0.2, brow=0.4)
+        idle = stand(x=x, fx=(0.15, 0.15), sh=(12, 12), el=(-20, -20), fan=0.25, face=look_at, browTilt=-0.2, brow=0.4)
         tr.at('S8', 0.6, idle, 'square')
         for j, b in enumerate((1.0, 1.35, 1.7, 2.05)):
             tr.at('S8', b, F(idle, neck=14 * (-1) ** j, head=6 * (-1) ** j, browTilt=0.6, brow=-0.2), 'silly')
@@ -112,12 +112,12 @@ class Auntie:
             u = min(1.0, (tt - self.t_out0) / (self.t_out1 - self.t_out0))
             u = u * u * (3 - 2 * u) * 0.6 + u * 0.4
             x = self.home + (self.exit - self.home) * u
-            base = stand(x=x, fan=0.9, sh=(10, 10), el=(-20, -20), browTilt=0.6)
+            base = stand(x=x, fan=0.25, sh=(10, 10), el=(-20, -20), browTilt=0.6)
             p = apply_gait(base, self.L, abs(x - self.home), self.side)
             p['x'] = x
             p['shL'] *= 0.5
             p['shR'] *= 0.5
-            p['fan'] = 0.9
+            p['fan'] = 0.25
             return p
         return self.track.eval(tt)
 

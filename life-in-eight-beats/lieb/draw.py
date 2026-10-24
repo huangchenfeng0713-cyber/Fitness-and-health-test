@@ -614,13 +614,13 @@ def _face(ctx, p, r, fo, vis, look, t):
         x = cx + j * ex
         if p['dizzy'] > 0.5:
             ctx.new_path()
-            for k in range(60):
-                a = k / 59 * 4 * math.pi + t * 9 * j
-                rr = r * 0.16 * k / 59
+            for k in range(70):
+                a = k / 69 * 5 * math.pi + t * 9 * j
+                rr = r * 0.25 * k / 69
                 px, py = x + math.cos(a) * rr, ey + math.sin(a) * rr
                 (ctx.move_to if k == 0 else ctx.line_to)(px, py)
             ctx.set_source_rgba(*INK, alpha)
-            ctx.set_line_width(2.6)
+            ctx.set_line_width(3.4)
             ctx.stroke()
         elif p['eye'] < 0.35:
             ctx.new_path()

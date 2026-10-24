@@ -31,32 +31,46 @@ def mouth_on_counts(p, t):
 
 # ------------------------------------------------------------------ world space
 def _puff(ctx, c, r0, u, small):
+    """A ring of smoke bursting outward around the body: the costume swaps inside it,
+    but the pose stays readable (the motion pun must not be hidden)."""
     rnd = random.Random(int(c[0] * 7 + c[1] * 3))
-    n = 9 if not small else 7
-    a = 1 - smooth((u - 0.45) / 0.55)
-    grow = 0.55 + 0.75 * math.sin(min(u, 1) * math.pi * 0.5)
-    for k in range(n):
-        ang = k * 2 * math.pi / n + rnd.uniform(-0.2, 0.2)
-        d = r0 * (0.55 + 0.35 * u) * rnd.uniform(0.8, 1.1)
-        rr = r0 * rnd.uniform(0.38, 0.55) * grow
-        q = (c[0] + math.cos(ang) * d, c[1] + math.sin(ang) * d * 1.15)
+    n = 11 if not small else 8
+    a = 1 - smooth((u - 0.35) / 0.65)
+    ring = r0 * (0.75 + 0.6 * ease_out_u(u))
+    ctx.push_group()
+    for pass_ in (0, 1):
+        for k in range(n):
+            ang = k * 2 * math.pi / n + rnd.uniform(-0.15, 0.15)
+            d = ring * rnd.uniform(0.9, 1.1)
+            rr = r0 * rnd.uniform(0.2, 0.28) * (1.0 - 0.45 * u)
+            q = (c[0] + math.cos(ang) * d, c[1] + math.sin(ang) * d * 1.25)
+            ctx.new_path()
+            ctx.arc(q[0], q[1], rr + (4 if pass_ == 0 else 0), 0, 2 * math.pi)
+            if pass_ == 0:
+                ctx.set_source_rgb(*INK)
+            else:
+                ctx.set_source_rgb(1, 1, 1)
+            ctx.fill()
+    ctx.pop_group_to_source()
+    ctx.paint_with_alpha(a)
+    # a very short white pop in the middle (the actual swap), gone after ~70 ms
+    if u < 0.16:
         ctx.new_path()
-        ctx.arc(q[0], q[1], rr + 4, 0, 2 * math.pi)
-        ctx.set_source_rgba(*INK, 0.85 * a)
+        ctx.arc(c[0], c[1], r0 * (0.5 + 1.2 * u), 0, 2 * math.pi)
+        ctx.set_source_rgba(1, 1, 1, 0.75 * (1 - u / 0.16))
         ctx.fill()
-    for k in range(n):
-        ang = k * 2 * math.pi / n + rnd.uniform(-0.2, 0.2)
-        d = r0 * (0.55 + 0.35 * u) * rnd.uniform(0.8, 1.1)
-        rr = r0 * rnd.uniform(0.38, 0.55) * grow
-        q = (c[0] + math.cos(ang) * d, c[1] + math.sin(ang) * d * 1.15)
-        ctx.new_path()
-        ctx.arc(q[0], q[1], rr, 0, 2 * math.pi)
-        ctx.set_source_rgba(1, 1, 1, a)
-        ctx.fill()
-    ctx.new_path()
-    ctx.arc(c[0], c[1], r0 * 0.75 * grow, 0, 2 * math.pi)
-    ctx.set_source_rgba(1, 1, 1, a)
-    ctx.fill()
+    # little speed ticks
+    for k in range(6):
+        ang = k * math.pi / 3 + 0.4
+        r1, r2 = ring * 1.25, ring * (1.4 + 0.2 * u)
+        stroke_line(ctx, [(c[0] + math.cos(ang) * r1, c[1] + math.sin(ang) * r1 * 1.25),
+                          (c[0] + math.cos(ang) * r2, c[1] + math.sin(ang) * r2 * 1.25)],
+                    5, INK, outline=False, alpha=0.7 * a)
+
+
+def ease_out_u(u):
+    u = max(0.0, min(1.0, u))
+    return 1 - (1 - u) ** 3
 
 
 def _star(ctx, c, r, col, rot_=0.0, a=1.0):
@@ -93,8 +107,8 @@ def world_effects(ctx, t, rig, cam):
     # costume puffs
     for q in TL.find('puff'):
         small = q.data.get('small', False)
-        dur = 0.32 if small else 0.5
-        dt = t - q.t + (0.06 if not small else 0.03)
+        dur = 0.3 if small else 0.42
+        dt = t - q.t + 0.04
         if 0 <= dt < dur:
             _puff(ctx, body_c, size * (0.55 if small else 0.72), dt / dur, small)
     # S2 twinkle sparkles at the hands
@@ -210,10 +224,11 @@ def _osd(ctx, s, txt, a):
     ctx.set_font_size(54 * s)
     ctx.move_to(1560 * s, 120 * s)
     ctx.text_path(txt)
-    ctx.set_source_rgba(0, 0, 0, 0.5 * a)
-    ctx.set_line_width(6 * s)
+    ctx.set_source_rgba(1, 1, 1, 0.9 * a)
+    ctx.set_line_width(10 * s)
+    ctx.set_line_join(cairo.LINE_JOIN_ROUND)
     ctx.stroke_preserve()
-    ctx.set_source_rgba(1, 1, 1, a)
+    ctx.set_source_rgba(0.12, 0.13, 0.18, a)
     ctx.fill()
     ctx.restore()
 
