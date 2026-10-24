@@ -1,0 +1,142 @@
+{
+ "baby": {
+  "voice": "zh-CN-YunxiaNeural",
+  "rate": "-5%",
+  "pitch": "+30Hz",
+  "texts": [
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八",
+   "咿",
+   "呀"
+  ]
+ },
+ "baby_final": {
+  "voice": "zh-CN-YunxiaNeural",
+  "rate": "+0%",
+  "pitch": "+45Hz",
+  "texts": [
+   "八！"
+  ]
+ },
+ "kid": {
+  "voice": "zh-CN-YunxiaNeural",
+  "rate": "+8%",
+  "pitch": "+8Hz",
+  "texts": [
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八"
+  ]
+ },
+ "broadcast": {
+  "voice": "zh-CN-YunyangNeural",
+  "rate": "+0%",
+  "pitch": "+0Hz",
+  "texts": [
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八"
+  ]
+ },
+ "instructor": {
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+20%",
+  "pitch": "-4Hz",
+  "texts": [
+   "一！",
+   "二！",
+   "三！",
+   "四！",
+   "五！",
+   "六！",
+   "七！",
+   "八！"
+  ]
+ },
+ "dj": {
+  "voice": "zh-CN-YunxiNeural",
+  "rate": "+0%",
+  "pitch": "-6Hz",
+  "texts": [
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八"
+  ]
+ },
+ "office": {
+  "voice": "zh-CN-YunxiNeural",
+  "rate": "-25%",
+  "pitch": "-14Hz",
+  "texts": [
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八",
+   "唉……"
+  ]
+ },
+ "auntie": {
+  "voice": "zh-CN-liaoning-XiaobeiNeural",
+  "rate": "+12%",
+  "pitch": "+0Hz",
+  "texts": [
+   "一！",
+   "二！",
+   "三！",
+   "四！",
+   "五！",
+   "六！",
+   "七！",
+   "八！"
+  ]
+ },
+ "oldman": {
+  "voice": "zh-CN-YunxiNeural",
+  "rate": "-30%",
+  "pitch": "-22Hz",
+  "texts": [
+   "一",
+   "二",
+   "三",
+   "四",
+   "五",
+   "六",
+   "七",
+   "八"
+  ]
+ },
+ "kungfu": {
+  "voice": "zh-CN-YunjianNeural",
+  "rate": "+15%",
+  "pitch": "+0Hz",
+  "texts": [
+   "嘿！",
+   "哈！"
+  ]
+ }
+}
