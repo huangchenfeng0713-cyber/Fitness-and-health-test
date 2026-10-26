@@ -1,0 +1,11 @@
+# source media is fetched with tools/fetch_sources.py, not committed
+src/mk/
+src/nasa/
+src/ia/
+src/img/
+src/music/*.mp3
+fonts/
+# build outputs
+shots/
+out/
+__pycache__/
