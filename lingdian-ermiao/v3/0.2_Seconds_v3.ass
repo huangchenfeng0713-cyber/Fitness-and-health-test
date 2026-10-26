@@ -1,0 +1,73 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Sub,Cormorant Garamond SemiBold,44,&H00F5F5F5,&H000000FF,&H50000000,&H80000000,0,0,0,0,100,100,0.5,0,1,1.2,1,2,160,160,20,1
+Style: Title,Cinzel,132,&H00F4F4F4,&H000000FF,&H00000000,&H64000000,1,0,0,0,100,100,22,0,1,0,3,5,0,0,0,1
+Style: TitleZh,Noto Serif SC,50,&H00D8D8D8,&H000000FF,&H00000000,&H64000000,0,0,0,0,100,100,30,0,1,0,2,5,0,0,0,1
+Style: Cred,Cormorant Garamond SemiBold,36,&H00D8D8D8,&H000000FF,&H00000000,&H00000000,0,0,0,0,100,100,1,0,1,0,0,8,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:01.10,0:00:04.57,Sub,,0,0,0,,{\fad(120,150)}Let me show you how long a human life really lasts.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}让我告诉你，人的一生究竟有多长。
+Dialogue: 0,0:00:13.47,0:00:14.58,Sub,,0,0,0,,{\fad(120,150)}This is Earth.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}这是地球。
+Dialogue: 0,0:00:14.54,0:00:17.44,Sub,,0,0,0,,{\fad(120,150)}Every story you have ever heard happened here.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}你听过的每一个故事，都发生在这里。
+Dialogue: 0,0:00:18.14,0:00:23.14,Sub,,0,0,0,,{\fad(120,150)}From the space station, four hundred kilometers up, it looks enormous.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}从四百公里高的空间站望去，它无比巨大。
+Dialogue: 0,0:00:23.14,0:00:25.30,Sub,,0,0,0,,{\fad(120,150)}Blue. Perfectly calm.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}湛蓝，宁静。
+Dialogue: 0,0:00:25.90,0:00:27.33,Sub,,0,0,0,,{\fad(120,150)}But let's keep going.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}但我们再飞远一点。
+Dialogue: 0,0:00:28.53,0:00:36.93,Sub,,0,0,0,,{\fad(120,150)}In 1990, from six billion kilometers away, Voyager 1 turned its camera toward home one last time.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}1990年，旅行者一号在六十亿公里外，最后一次把镜头转向家园。
+Dialogue: 0,0:00:37.13,0:00:39.70,Sub,,0,0,0,,{\fad(120,150)}Earth was smaller than a single pixel.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}地球，比一个像素还小。
+Dialogue: 0,0:00:40.80,0:00:44.39,Sub,,0,0,0,,{\fad(120,150)}Our galaxy holds hundreds of billions of stars.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}银河系里有数千亿颗恒星。
+Dialogue: 0,0:00:44.39,0:00:48.58,Sub,,0,0,0,,{\fad(120,150)}And beyond it, there are hundreds of billions of galaxies.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}而在它之外，还有数千亿个星系。
+Dialogue: 0,0:00:49.38,0:00:52.33,Sub,,0,0,0,,{\fad(120,150)}At this scale, we are not even dust.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}在这样的尺度里，我们连尘埃都算不上。
+Dialogue: 0,0:00:54.43,0:00:58.51,Sub,,0,0,0,,{\fad(120,150)}The universe is about thirteen point eight billion years old.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}宇宙已经存在了大约138亿年。
+Dialogue: 0,0:00:59.11,0:01:04.07,Sub,,0,0,0,,{\fad(120,150)}Imagine squeezing all of that time into a single calendar year.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}想象一下，把这所有的时间压缩进一年的日历。
+Dialogue: 0,0:01:04.77,0:01:08.90,Sub,,0,0,0,,{\fad(120,150)}The Big Bang happens at midnight, on January the first.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}1月1日零点，宇宙大爆炸。
+Dialogue: 0,0:01:09.60,0:01:12.63,Sub,,0,0,0,,{\fad(120,150)}Earth doesn't form until early September.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}直到九月初，地球才形成。
+Dialogue: 0,0:01:13.53,0:01:17.95,Sub,,0,0,0,,{\fad(120,150)}Dinosaurs show up around Christmas, and they're gone by the thirtieth.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}恐龙在圣诞节前后登场，到30号就退场了。
+Dialogue: 0,0:01:19.55,0:01:25.30,Sub,,0,0,0,,{\fad(120,150)}Modern humans appear on December thirty-first, at about eleven forty-eight p.m.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}现代人类直到12月31日晚上11点48分才出现。
+Dialogue: 0,0:01:26.40,0:01:30.72,Sub,,0,0,0,,{\fad(120,150)}All of written history fits inside the final twelve seconds.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}有文字记载的全部历史，只占最后12秒。
+Dialogue: 0,0:01:32.02,0:01:37.01,Sub,,0,0,0,,{\fad(120,150)}And your entire life, eighty years, lasts about a fifth of a second.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}而你的一生，八十年，大约只有五分之一秒。
+Dialogue: 0,0:01:40.81,0:01:45.35,Sub,,0,0,0,,{\fad(120,150)}Around a hundred and seventeen billion people have lived on this planet.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}地球上曾经活过大约1170亿人。
+Dialogue: 0,0:01:46.15,0:01:49.36,Sub,,0,0,0,,{\fad(120,150)}Every one of them lay awake at night, worrying.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}他们每一个人，都曾在夜里辗转难眠。
+Dialogue: 0,0:01:49.32,0:01:54.65,Sub,,0,0,0,,{\fad(120,150)}About an exam. A debt. A broken heart. What the neighbors might say.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}为一场考试、一笔债、一段心碎、邻居的闲话。
+Dialogue: 0,0:01:55.75,0:01:57.65,Sub,,0,0,0,,{\fad(120,150)}Those worries are gone now.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}那些烦恼早已消散。
+Dialogue: 0,0:01:57.85,0:02:00.12,Sub,,0,0,0,,{\fad(120,150)}So are almost all of their names.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}他们的名字，也几乎都被遗忘。
+Dialogue: 0,0:02:01.32,0:02:02.75,Sub,,0,0,0,,{\fad(120,150)}Ours will be too.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}我们的，也会一样。
+Dialogue: 0,0:02:03.15,0:02:08.21,Sub,,0,0,0,,{\fad(120,150)}A hundred years from now, no one will remember what kept you up last night.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}一百年后，没有人会记得，昨晚是什么让你无法入睡。
+Dialogue: 0,0:02:10.51,0:02:12.10,Sub,,0,0,0,,{\fad(120,150)}That might sound bleak.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}这听起来也许有些悲凉。
+Dialogue: 0,0:02:13.80,0:02:15.28,Sub,,0,0,0,,{\fad(120,150)}But turn it around.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}但换个角度想。
+Dialogue: 0,0:02:15.88,0:02:21.83,Sub,,0,0,0,,{\fad(120,150)}If the universe expects nothing from you, you don't have to carry the weight of the universe.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}如果宇宙对你别无所求，你也就不必背负整个宇宙的重量。
+Dialogue: 0,0:02:22.53,0:02:31.19,Sub,,0,0,0,,{\fad(120,150)}If everything will be forgotten, then your embarrassments, your failures, the way people look at you, matter far less than you think.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}如果一切终将被遗忘，那你的尴尬、你的失败、别人看你的眼光，都远没有你想的那么重要。
+Dialogue: 0,0:02:31.99,0:02:34.24,Sub,,0,0,0,,{\fad(120,150)}Being small isn't a tragedy.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}渺小不是悲剧。
+Dialogue: 0,0:02:34.54,0:02:36.42,Sub,,0,0,0,,{\fad(120,150)}Being small is freedom.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}渺小，是自由。
+Dialogue: 0,0:02:38.22,0:02:41.73,Sub,,0,0,0,,{\fad(120,150)}A human life is roughly four thousand weeks.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}人的一生，大约只有四千个星期。
+Dialogue: 0,0:02:43.13,0:02:44.88,Sub,,0,0,0,,{\fad(120,150)}So watch the sun come up.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}所以，去看一次日出。
+Dialogue: 0,0:02:44.98,0:02:47.50,Sub,,0,0,0,,{\fad(120,150)}Not for a photo. Just to watch it.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}不为拍照，只为看着它升起。
+Dialogue: 0,0:02:48.40,0:02:51.65,Sub,,0,0,0,,{\fad(120,150)}Cook something slowly, and taste every bite.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}慢慢做一顿饭，品尝每一口。
+Dialogue: 0,0:02:52.35,0:02:56.71,Sub,,0,0,0,,{\fad(120,150)}Have one more drink with an old friend, and lose track of time.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}和老朋友再喝一杯，聊到忘了时间。
+Dialogue: 0,0:02:57.61,0:03:00.06,Sub,,0,0,0,,{\fad(120,150)}Call the person you've been meaning to call.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}打给那个你一直想打的人。
+Dialogue: 0,0:03:00.06,0:03:02.39,Sub,,0,0,0,,{\fad(120,150)}Say the thing you've been meaning to say.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}说出那句一直想说的话。
+Dialogue: 0,0:03:03.09,0:03:05.33,Sub,,0,0,0,,{\fad(120,150)}Hug your parents while you still can.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}趁还来得及，抱抱你的父母。
+Dialogue: 0,0:03:06.63,0:03:08.78,Sub,,0,0,0,,{\fad(120,150)}Take the road you've never taken.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}走一条没走过的路。
+Dialogue: 0,0:03:08.74,0:03:11.77,Sub,,0,0,0,,{\fad(120,150)}Get caught in the rain. Swim in the sea.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}淋一场雨，去海里游一次泳。
+Dialogue: 0,0:03:12.47,0:03:14.65,Sub,,0,0,0,,{\fad(120,150)}Love, even if it hurts.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}去爱，哪怕会受伤。
+Dialogue: 0,0:03:14.65,0:03:16.86,Sub,,0,0,0,,{\fad(120,150)}Try, even if you fail.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}去尝试，哪怕会失败。
+Dialogue: 0,0:03:17.56,0:03:21.94,Sub,,0,0,0,,{\fad(120,150)}And when the music plays, dance like no one is keeping score.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}音乐响起时，就尽情跳舞，别管有没有人打分。
+Dialogue: 0,0:03:53.82,0:04:00.34,Sub,,0,0,0,,{\fad(120,150)}The carbon, the oxygen, the iron in your body were forged inside ancient stars.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}你身体里的碳、氧和铁，都是在远古恒星中锻造出来的。
+Dialogue: 0,0:04:01.04,0:04:05.64,Sub,,0,0,0,,{\fad(120,150)}It took thirteen point eight billion years of dust and starlight...\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}宇宙用了138亿年的尘埃与星光……
+Dialogue: 0,0:04:05.60,0:04:10.92,Sub,,0,0,0,,{\fad(120,150)}to make someone who can laugh, and cry, and look up at the sky and wonder.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}……才造就了一个会笑、会哭、会仰望星空、心生好奇的你。
+Dialogue: 0,0:04:11.92,0:04:14.38,Sub,,0,0,0,,{\fad(120,150)}This fifth of a second is on loan.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}这五分之一秒，是宇宙借给你的。
+Dialogue: 0,0:04:15.78,0:04:17.59,Sub,,0,0,0,,{\fad(120,150)}We are insignificant.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}我们微不足道。
+Dialogue: 0,0:04:18.29,0:04:20.33,Sub,,0,0,0,,{\fad(120,150)}And that is exactly why...\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}而正因如此——
+Dialogue: 0,0:04:20.63,0:04:23.99,Sub,,0,0,0,,{\fad(120,150)}Every second is worth living to the fullest.\N{\fnNoto Serif SC\fs34\c&HC8D4DC&}每一秒，都值得尽情去活。
+Dialogue: 2,0:00:05.43,0:00:12.57,Title,,0,0,0,,{\pos(960,505)\fad(0,1300)\fscx118\fscy118\t(0,2600,0.5,\fscx100\fscy100)}0.2 SECONDS
+Dialogue: 2,0:00:06.03,0:00:12.57,TitleZh,,0,0,0,,{\pos(960,628)\fad(700,1300)}零点二秒
+Dialogue: 2,0:04:27.39,0:04:32.39,Title,,0,0,0,,{\pos(960,505)\fad(0,1200)\fscx112\fscy112\t(0,2200,0.5,\fscx100\fscy100)}0.2 SECONDS
+Dialogue: 2,0:04:27.99,0:04:32.39,TitleZh,,0,0,0,,{\pos(960,628)\fad(700,1200)}零点二秒
+Dialogue: 1,0:04:33.39,0:04:52.58,Cred,,0,0,0,,{\move(960,960,960,-1080,0,19200)\fad(800,800)\clip(0,140,1920,940)}{\fnCinzel\fs46}0.2 SECONDS\N{\fnNoto Serif SC\fs32}零点二秒\N\N{\fnCinzel\fs30}NARRATION\NAI voice — Microsoft Edge neural voice “Andrew”\N\N{\fnCinzel\fs30}MUSIC\N“Tempting Secrets”, “Americana”, “Thaxted” (arr. after Holst)\NKevin MacLeod (incompetech.com)\NLicensed under Creative Commons: By Attribution 4.0\N\N{\fnCinzel\fs30}FOOTAGE\NInternational Space Station 4K Earth views — NASA / JSC\NArtemis I Orion camera — NASA\NPale Blue Dot Revisited — NASA / JPL-Caltech\NWebb’s First Deep Field — NASA, ESA, CSA, STScI\NAmateur films 1939–1952 — Prelinger Archives (public domain)\NStock footage & sound effects — Mixkit\N\N{\fnCinzel\fs30}FACTS\NUniverse ≈ 13.8 billion years old\N≈ 117 billion people ever born — Population Reference Bureau estimate\N\N{\fnCinzel\fs30}TYPE\NCinzel · Cormorant Garamond · Noto Serif SC (SIL OFL)
