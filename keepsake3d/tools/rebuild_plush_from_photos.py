@@ -55,7 +55,7 @@ def normals(p,f):
 
 # A signed 2D outline distance with a thin stuffed cross-section. The profile
 # narrows down the legs instead of appending spherical feet to a broad hem.
-step=.00048
+step=.00036
 xs=np.arange(-.027,.027+step,step)
 ys=np.arange(-.003,.104+step,step)
 zs=np.arange(-.011,.012+step,step)
@@ -164,7 +164,7 @@ def projected_photo(photo,px,py,which):
     c*= (1+(gain-1)*(1-ink*.8))[:,:,None]
     return np.clip(c,0,1),ink
 
-size=2048
+size=3072
 vv,uu=np.mgrid[:size,:size//2]
 u=(uu+.5)/size;v=(vv+.5)/size
 y=(.98214286-v)*.112;x=(u-.25)*.12
@@ -217,7 +217,7 @@ def accessor(a,kind):
     if kind!='SCALAR':ac.update(min=a.min(0).tolist(),max=a.max(0).tolist())
     doc['accessors'].append(ac);return len(doc['accessors'])-1
 def image(im,mime='image/jpeg'):
-    buf=io.BytesIO();im.save(buf,'PNG' if mime=='image/png' else 'JPEG',quality=94,subsampling=0)
+    buf=io.BytesIO();im.save(buf,'PNG' if mime=='image/png' else 'JPEG',quality=98,subsampling=0)
     doc['images'].append({'bufferView':view(buf.getvalue()),'mimeType':mime})
     doc['textures'].append({'source':len(doc['images'])-1,'sampler':0});return len(doc['textures'])-1
 image(atlas_im)

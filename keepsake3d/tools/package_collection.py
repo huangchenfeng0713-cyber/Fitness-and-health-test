@@ -7,7 +7,9 @@ DEST=(ROOT.parent/'3D收藏').resolve()
 OUTPUT=ROOT/'dev/qa-output'
 assert DEST.is_relative_to(ROOT.parent.resolve())
 appearance_only='--appearance-only' in sys.argv
+interaction='--interaction' in sys.argv
 reports=['offline-plush-report.json'] if appearance_only else ['report.json','export-report.json','offline-desktop.json','offline-mobile.json','readback-report.json']
+if interaction: reports=['offline-plush-report.json','report.json','offline-desktop.json','offline-mobile.json','readback-report.json']
 for name in reports:
     data=json.loads((OUTPUT/name).read_text(encoding='utf-8'))
     assert not data.get('errors') and all(c['pass'] for c in data['checks']),name+' failed'
@@ -30,6 +32,9 @@ shutil.copy2(ROOT/'收藏使用说明.txt',DEST/'使用说明.txt')
 shutil.copy2(OUTPUT/('model-review-sheet.jpg' if appearance_only else 'offline-scene-desktop.jpg'),DEST/'预览.jpg')
 shutil.copy2(OUTPUT/('model-review-front.jpg' if appearance_only else 'plush-detail.jpg'),DEST/'毛绒细节.jpg')
 extra=[]
+if interaction:
+    for source,target in [('mobile.jpg','手机预览.jpg'),('mobile-menu.jpg','手机菜单.jpg')]:
+        shutil.copy2(OUTPUT/source,DEST/target);extra.append(DEST/target)
 if appearance_only:
     for source,target in [('model-review-side.jpg','毛绒侧面.jpg'),('model-review-back.jpg','毛绒背面.jpg')]:
         shutil.copy2(OUTPUT/source,DEST/target);extra.append(DEST/target)
@@ -37,9 +42,16 @@ licenses=[]
 for name,path in [('three.js (MIT)',ROOT/'node_modules/three/LICENSE'),('Rapier (Apache-2.0)',ROOT/'node_modules/@dimforge/rapier3d-compat/LICENSE')]:
     licenses.append(name+'\n\n'+path.read_text(encoding='utf-8'))
 (DEST/'第三方许可.txt').write_text('\n\n'.join(licenses),encoding='utf-8')
-report=json.loads((OUTPUT/('offline-plush-report.json' if appearance_only else 'report.json')).read_text(encoding='utf-8'))
+report=json.loads((OUTPUT/('offline-plush-report.json' if appearance_only and not interaction else 'report.json')).read_text(encoding='utf-8'))
 text='珍藏小物 · 验证记录\n\n'
-if appearance_only:
+if interaction:
+    offline=json.loads((OUTPUT/'offline-plush-report.json').read_text(encoding='utf-8'))
+    text+=f'本轮 {len(offline["checks"])} 项 Node 模型与物理检查、{len(report["checks"])} 项浏览器交互检查通过。\n'
+    text+='单指拖拽、双指接续、连续轻点、防弹飞、落桌静止、冰箱贴三个角度弯曲落桌、磁吸与取下均重新检查。\n'
+    text+='390×844 手机布局与桌面离线检查通过；菜单默认收起，顶部按钮至少 44 像素，触摸取消与双指视角路由通过检查。\n'
+    text+='四份 GLB 已重新导出、检查几何和内嵌贴图，并在浏览器重新载入；离线 HTML 禁止外部请求仍可加载。\n'
+    text+='关闭台灯与柜灯后画布为全黑。毛绒预览图为离线模型渲染，手机预览为实际浏览器渲染。\n'
+elif appearance_only:
     text+=f'本轮照片轮廓与布料修订：{len(report["checks"])} 项模型与物理检查通过，运行环境为 Node。\n'
     text+='包含头部／细腿厚度、缝线绑定、布标根部连接、下半身拉拽后布标连接、正面布饰、双指 2 mm 限幅与复原、取下和落桌停止。\n'
     text+='细毛面朝向与表面法线一致，独立毛绒模型已导出并由 GLTFLoader 重新读回，贴图和数值有效。\n'

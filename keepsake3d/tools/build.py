@@ -26,7 +26,7 @@ for dp, dn, fn in os.walk(adir):
             im = Image.open(p)
             has_alpha = im.mode in ('RGBA', 'LA') and im.getextrema()[-1][0] < 255
             buf = io.BytesIO()
-            im.convert('RGBA' if has_alpha else 'RGB').save(buf, 'WEBP', quality=90, method=6)
+            im.convert('RGBA' if has_alpha else 'RGB').save(buf, 'WEBP', lossless=True, quality=100, method=6)
             data, mime = buf.getvalue(), 'image/webp'
         elif ext == 'glb':
             data, mime = open(p, 'rb').read(), 'model/gltf-binary'

@@ -32,6 +32,10 @@ export async function verifyHands(a, {THREE, check, step, snap}) {
   a.view('magnet');await step(90);
   for(const name of ['magnet','card']) {
     const b=m.debug.bodies[name];
+    if(name==='card') {
+      b.rb.setTranslation({x:-.05,y:.004,z:.10},true);b.rb.setRotation(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2),true);
+      b.rb.setLinvel({x:0,y:0,z:0},true);b.rb.setAngvel({x:0,y:0,z:0},true);await step(120);
+    }
     const point=(x,y)=>b.root.localToWorld(new THREE.Vector3(x,y,name==='magnet'?.003:.0007));
     const y=name==='magnet'?-.009:.040;
     q1=screen(point(-.014,y));q2=screen(point(.014,y));
@@ -39,7 +43,7 @@ export async function verifyHands(a, {THREE, check, step, snap}) {
     check(name+' second touch',m.pointerDown(inf(q2,52)),{point:q2,firstHit:m.debug.gesture.hit?.target,kind:m.debug.gesture.kind,position:b.root.position.toArray(),quaternion:b.root.quaternion.toArray()});
     for(let i=1;i<=22;i++){m.pointerMove(inf({x:q1.x+7*i/22,y:q1.y},51));m.pointerMove(inf({x:q2.x-7*i/22,y:q2.y},52));await step(2);}
     check(name+' bend bounded',Math.abs(b.bend.k)>1e-3&&Math.abs(b.bend.k)<=b.bend.kMax*1.151,{curvature:b.bend.k,limit:b.bend.kMax});
-    m.pointerUp(inf(q2,52));m.pointerUp(inf(q1,51));await step(180);
+    m.pointerUp(inf(q2,52));check(name+' remaining finger keeps holding',m.debug.gesture.kind==='move'&&m.debug.hold.body===b);m.pointerUp(inf(q1,51));await step(180);
     check(name+' bend springs back',Math.abs(b.bend.k)<1e-3,{curvature:b.bend.k});time+=1;
   }
   a.view('all');await step(90);
@@ -66,4 +70,18 @@ export async function verifyHands(a, {THREE, check, step, snap}) {
   for(let i=1;i<=70;i++){m.pointerMove(inf({x:start.x+(dest.x-start.x)*i/70,y:start.y+(dest.y-start.y)*i/70},51));await step(3);}
   m.pointerUp(inf(dest,51));await step(300);
   check('magnet detaches and rests',!m.debug.state.magnetOnFridge&&b.root.position.y<.03,{position:b.root.position.toArray(),stage:m.stage});
+  // Regression: inspect the same bent surface that the vertex shader renders.
+  const verts=[];
+  b.root.updateWorldMatrix(true,true);
+  const inverse=b.root.matrixWorld.clone().invert();
+  b.root.traverse(o=>{if(o.isMesh&&o.material.visible!==false){const pa=o.geometry.attributes.position,mat=inverse.clone().multiply(o.matrixWorld);for(let i=0;i<pa.count;i++)verts.push(new THREE.Vector3().fromBufferAttribute(pa,i).applyMatrix4(mat));}});
+  function lowest(){let lo=Infinity;const bd=b.bend,k=bd.k,v=new THREE.Vector3();for(const p of verts){v.copy(p);if(Math.abs(k)>1e-4){const px=-bd.D.y,py=bd.D.x,dx=p.x-bd.C.x,dy=p.y-bd.C.y,u=dx*px+dy*py,z=p.z-bd.C.z,along=dx*bd.D.x+dy*bd.D.y,R=1/k,h=(R-z)*Math.sin(u*k);v.set(bd.C.x+bd.D.x*along+px*h,bd.C.y+bd.D.y*along+py*h,bd.C.z+R-(R-z)*Math.cos(u*k));}v.applyMatrix4(b.root.matrixWorld);lo=Math.min(lo,v.y);}return lo;}
+  for(const [i,angles]of [[-Math.PI/2,0,0],[Math.PI/2,.4,.2],[.3,.5,1.1]].entries()){
+    b.rb.setTranslation({x:.30,y:.11,z:.02},true);b.rb.setRotation(new THREE.Quaternion().setFromEuler(new THREE.Euler(...angles)),true);b.rb.setLinvel({x:.02,y:-1,z:0},true);b.rb.setAngvel({x:.1,y:.2,z:0},true);
+    b.bend.active=true;b.bend.target=b.bend.kMax*(i===1?-1:1);let min=Infinity;
+    for(let j=0;j<120;j++){await step(1);min=Math.min(min,lowest());}
+    check('bent magnet clears table '+i,min>-.0002,{minY:min});
+    b.bend.active=false;await step(300);check('magnet sleeps after rotated drop '+i,b.rb.isSleeping(),{v:b.rb.linvel(),w:b.rb.angvel(),minY:lowest(),p:b.root.position.toArray(),k:b.bend.k});
+  }
+
 }

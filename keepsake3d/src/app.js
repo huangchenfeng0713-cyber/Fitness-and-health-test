@@ -29,7 +29,7 @@ const small = Math.min(innerWidth, innerHeight) < 820;
 const quality = coarse && small ? 'low' : 'high';
 
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, quality === 'low' ? 1.6 : 2));
+renderer.setPixelRatio(Math.min(devicePixelRatio, 3));
 renderer.setSize(innerWidth, innerHeight, false);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.NeutralToneMapping;
@@ -150,7 +150,7 @@ function woodTexture() {
     }
   }
   const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8;
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy());
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   return t;
 }
@@ -196,6 +196,12 @@ applyCabLights();
 
 // ---------- hint / UI ----------
 const hintEl = $('#hint');
+function closeObjectMenu() { $('#bottom').hidden = true; $('#btnMenu').setAttribute('aria-expanded', 'false'); }
+$('#btnMenu').addEventListener('click', () => {
+  const open = $('#bottom').hidden; $('#bottom').hidden = !open;
+  $('#btnMenu').setAttribute('aria-expanded', String(open));
+  $('#lampPanel').hidden = true; $('#info').hidden = true;
+});
 const touchUI = matchMedia('(pointer: coarse)').matches;
 const hints = { plush: '', magnet: '', all: touchUI ? '直接用手指碰它们。拖空白处转视角，双指在空白处缩放。' : '直接用鼠标碰它们。拖空白处转视角，滚轮缩放。' };
 let view = 'plush';
@@ -216,7 +222,7 @@ async function loadPlush() {
   for (const m of meshes) {
     m.castShadow = true; m.receiveShadow = true;
     const map = m.material.map;
-    if (map) { map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 8; }
+    if (map) { map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy()); }
     m.updateMatrixWorld(true);
     m.geometry.applyMatrix4(m.matrixWorld);   // bake node transforms, the engine works in the rest frame
     m.position.set(0, 0, 0); m.rotation.set(0, 0, 0); m.scale.set(1, 1, 1); m.updateMatrix();
@@ -233,7 +239,7 @@ async function loadPlush() {
   const fur = createFur(body, { shells: quality === 'low' ? 8 : 16, maskMap: maskTex, seam });
   const tl = new THREE.TextureLoader();
   const [tf, tb] = await Promise.all([tl.loadAsync(ASSETS + 'tex/tag_front.png'), tl.loadAsync(ASSETS + 'tex/tag_back.png')]);
-  for (const t of [tf, tb]) { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; }
+  for (const t of [tf, tb]) { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(16, renderer.capabilities.getMaxAnisotropy()); }
   let api = null;
   try {
     const mod = await import('./plush_engine.js');
@@ -294,24 +300,24 @@ function flyTo(v, instant = false) {
   if (instant) { controls.target.copy(f.target); camera.position.copy(toPos); controls.update(); return; }
   tween = { t: 0, dur: 0.9, fromT: controls.target.clone(), toT: f.target, fromP: camera.position.clone(), toP: toPos };
 }
-function setView(v) {
+function setView(v, moveCamera = true) {
   view = v;
   document.querySelectorAll('#views button').forEach((b) => b.classList.toggle('on', b.dataset.view === v));
   $('#magtools').hidden = v !== 'magnet';
   atFridge = false; $('#btnFridge span').textContent = '看铁板';
   if (v === 'plush' && !hints.plush) hints.plush = plushIntro;
   showHint();
-  flyTo(v);
+  if (moveCamera) flyTo(v);
   lamp.aimGoal.copy(framingFor(v).target);
 }
-document.querySelectorAll('#views button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+document.querySelectorAll('#views button').forEach((b) => b.addEventListener('click', () => { setView(b.dataset.view); closeObjectMenu(); }));
 // lamp controls
 $('#lampOn').addEventListener('click', () => { lamp.on = !lamp.on; applyLamp(); });
 $('#cabOn').addEventListener('click', () => { cabOn = !cabOn; applyCabLights(); });
 $('#lampLevel').addEventListener('input', (e) => { lamp.level = +e.target.value / 100; if (!lamp.on) lamp.on = true; applyLamp(); });
 document.querySelectorAll('[data-lamp-color]').forEach((b) => b.addEventListener('click', () => { lamp.color = b.dataset.lampColor; applyLamp(); }));
 document.querySelectorAll('[data-lamp-spot]').forEach((b) => b.addEventListener('click', () => { lamp.spot = +b.dataset.lampSpot; placeLamp(); applyLamp(); }));
-$('#btnLamp').addEventListener('click', () => { $('#lampPanel').hidden = !$('#lampPanel').hidden; $('#info').hidden = true; });
+$('#btnLamp').addEventListener('click', () => { closeObjectMenu(); $('#lampPanel').hidden = !$('#lampPanel').hidden; $('#info').hidden = true; });
 $('#btnRepack').addEventListener('click', () => { modules.magnet?.reset(); if (atFridge) toggleFridge(); });
 let atFridge = false;
 function toggleFridge() {
@@ -325,7 +331,8 @@ function toggleFridge() {
   tween = { t: 0, dur: 0.9, fromT: controls.target.clone(), toT: f.target.clone(), fromP: camera.position.clone(), toP: toPos };
 }
 $('#btnFridge').addEventListener('click', toggleFridge);
-$('#btnInfo').addEventListener('click', () => { $('#info').hidden = !$('#info').hidden; $('#lampPanel').hidden = true; });
+$('#btnInfo').addEventListener('click', () => { closeObjectMenu(); $('#info').hidden = !$('#info').hidden; $('#lampPanel').hidden = true; });
+$('#btnCenter').addEventListener('click', () => { flyTo(view); closeObjectMenu(); });
 
 const dims = [
   ['毛绒挂件（头顶到脚）', '≈ 100 mm'], ['· 头部 宽 × 高 × 厚', '≈ 45.5 × 44.8 × 16.5 mm'], ['· 身体 宽 × 厚', '≈ 24.5 × 8.8 mm'],
@@ -408,6 +415,7 @@ $('#btnExport').addEventListener('click', async () => {
 const ndc = new THREE.Vector2();
 const captured = new Map();                 // pointerId -> module
 const pointerState = new Map();             // pointerId -> {clientX, clientY, raycaster}
+const cameraPointers = new Set(), ignoredPointers = new Set();
 let lastDown = { t: 0, x: 0, y: 0 };
 function rayFor(x, y, rc = new THREE.Raycaster()) {
   const r = canvas.getBoundingClientRect();
@@ -438,8 +446,11 @@ function hitsLamp(rc) {
 }
 window.addEventListener('pointerdown', (e) => {
   if (e.target !== canvas) return;
+  closeObjectMenu(); $('#lampPanel').hidden = true; $('#info').hidden = true;
+  // A gesture belongs to either the camera or an object until all fingers lift.
+  if (cameraPointers.size) { cameraPointers.add(e.pointerId); return; }
   const now = performance.now();
-  const dbl = e.button === 0 && now - lastDown.t < 320 && Math.hypot(e.clientX - lastDown.x, e.clientY - lastDown.y) < 24;
+  const dbl = !captured.size && e.button === 0 && now - lastDown.t < 320 && Math.hypot(e.clientX - lastDown.x, e.clientY - lastDown.y) < 24;
   if (e.button === 0) lastDown = { t: now, x: e.clientX, y: e.clientY };
   const inf = info(e, { dblclick: dbl });
   pointerState.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY, raycaster: inf.raycaster });
@@ -449,17 +460,24 @@ window.addEventListener('pointerdown', (e) => {
     try { took = m.pointerDown(inf); } catch (err) { console.error(err); }
     if (took) {
       captured.set(e.pointerId, m);
+      tween = null; // keep the ray plane fixed for the entire gesture
+      // Flush residual orbit inertia without shifting the gesture's camera.
+      const pose = camera.position.clone(), look = controls.target.clone();
+      controls.enableDamping = false; controls.update();
+      camera.position.copy(pose); controls.target.copy(look); controls.update();
       controls.enabled = false;
       e.stopPropagation();
       try { canvas.setPointerCapture?.(e.pointerId); } catch (_) { /* synthetic pointers */ }
       // touching an object in the overview focuses it
-      if (view === 'all') setView(m === modules.plush ? 'plush' : 'magnet');
+      if (view === 'all') setView(m === modules.plush ? 'plush' : 'magnet', false);
       return;
     }
   }
   pointerState.delete(e.pointerId);
+  if (captured.size) { ignoredPointers.add(e.pointerId); e.stopPropagation(); return; }
   // the lamp itself: tap the base / switch / shade to toggle it
-  if (e.button === 0 && hitsLamp(inf.raycaster)) { lamp.on = !lamp.on; applyLamp(); e.stopPropagation(); }
+  if (e.button === 0 && hitsLamp(inf.raycaster)) { lamp.on = !lamp.on; applyLamp(); ignoredPointers.add(e.pointerId); e.stopPropagation(); }
+  else cameraPointers.add(e.pointerId);
 }, { capture: true });
 canvas.addEventListener('wheel', (e) => {
   const inf = info(e, { pointerId: -1, pointerType: 'mouse' });
@@ -470,6 +488,7 @@ canvas.addEventListener('wheel', (e) => {
   }
 }, { capture: true, passive: false });
 window.addEventListener('pointermove', (e) => {
+  if (ignoredPointers.has(e.pointerId)) { e.stopPropagation(); return; }
   const m = captured.get(e.pointerId);
   if (m) {
     e.stopPropagation();
@@ -490,21 +509,33 @@ window.addEventListener('pointermove', (e) => {
   canvas.style.cursor = cursor;
 }, { capture: true });
 function up(e) {
+  cameraPointers.delete(e.pointerId);
+  if (ignoredPointers.delete(e.pointerId)) { e.stopPropagation(); return; }
   const m = captured.get(e.pointerId);
   if (!m) return;
   e.stopPropagation();
-  const inf = info(e, { captured: true });
+  const inf = info(e, { captured: true, cancelled: e.type === 'pointercancel' });
   inf.pointers = pointersOf(m);          // still includes the lifted pointer
   captured.delete(e.pointerId);
   pointerState.delete(e.pointerId);
   try { m.pointerUp(inf); } catch (err) { console.error(err); }
-  if (!captured.size) controls.enabled = true;
+  if (!captured.size) { controls.enabled = true; controls.enableDamping = true; }
 }
 window.addEventListener('pointerup', up, { capture: true });
 window.addEventListener('pointercancel', up, { capture: true });
+canvas.addEventListener('lostpointercapture', (e) => {
+  if (captured.has(e.pointerId)) up({ ...pointerState.get(e.pointerId), pointerId:e.pointerId, type:'pointercancel', stopPropagation(){} });
+});
+function cancelTouches() {
+  for (const [id,s] of [...pointerState]) up({ ...s, pointerId:id, type:'pointercancel', stopPropagation(){} });
+  cameraPointers.clear(); ignoredPointers.clear(); controls.enabled = true; controls.enableDamping = true;
+}
+addEventListener('blur', cancelTouches);
+document.addEventListener('visibilitychange', () => { if (document.hidden) cancelTouches(); });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
 addEventListener('resize', () => {
+  cancelTouches();
   camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight, false);
 });

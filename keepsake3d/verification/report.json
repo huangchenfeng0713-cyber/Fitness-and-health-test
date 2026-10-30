@@ -1,0 +1,810 @@
+{
+  "checks": [
+    {
+      "name": "both modules load",
+      "pass": true,
+      "detail": [
+        "magnet",
+        "plush"
+      ]
+    },
+    {
+      "name": "plush finite",
+      "pass": true
+    },
+    {
+      "name": "plush responds",
+      "pass": true,
+      "detail": {
+        "delta": -0.0009563653742118566
+      }
+    },
+    {
+      "name": "plush settles",
+      "pass": true,
+      "detail": {
+        "speed": 0,
+        "sleeping": true
+      }
+    },
+    {
+      "name": "visible flap",
+      "pass": true,
+      "detail": {
+        "x": 679.2002026240384,
+        "y": 457.867598198963,
+        "target": [
+          0.14,
+          0.004,
+          -0.01
+        ],
+        "focus": [
+          0.14,
+          0.004,
+          -0.01
+        ],
+        "distance": 0.36
+      }
+    },
+    {
+      "name": "hit flap",
+      "pass": true,
+      "detail": {
+        "x": 679.2002026240384,
+        "y": 457.867598198963
+      }
+    },
+    {
+      "name": "unpack flapOpen",
+      "pass": true,
+      "detail": {
+        "stage": "flapOpen",
+        "bodies": {
+          "bag": {
+            "state": "rest",
+            "p": [
+              0.13999927043914795,
+              -0.00007456867024302483,
+              -0.00999993272125721
+            ],
+            "mass": 0.04197629168629646
+          },
+          "card": {
+            "state": "rest",
+            "p": [
+              0,
+              -0.0625,
+              0.000044999999999999996
+            ]
+          },
+          "blister": {
+            "state": "rest",
+            "p": [
+              0.0022166666666666654,
+              0.0415,
+              0.00045000000000000004
+            ]
+          },
+          "magnet": {
+            "state": "rest",
+            "p": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "visible card",
+      "pass": true,
+      "detail": {
+        "x": 571.7372387073046,
+        "y": 408.14950016866607,
+        "target": [
+          0.14,
+          0.004,
+          -0.01
+        ],
+        "focus": [
+          0.14,
+          0.004,
+          -0.01
+        ],
+        "distance": 0.36
+      }
+    },
+    {
+      "name": "hit card",
+      "pass": true,
+      "detail": {
+        "x": 571.7372387073046,
+        "y": 408.14950016866607
+      }
+    },
+    {
+      "name": "unpack cardOut",
+      "pass": true,
+      "detail": {
+        "stage": "cardOut",
+        "bodies": {
+          "bag": {
+            "state": "rest",
+            "p": [
+              0.13999927043914795,
+              0.00002892584598157555,
+              -0.009999934583902359
+            ],
+            "mass": 0.005622480064630508
+          },
+          "card": {
+            "state": "rest",
+            "p": [
+              0.1399936079978943,
+              -0.0002626595087349415,
+              0.15900254249572754
+            ],
+            "mass": 0.036353807896375656
+          },
+          "blister": {
+            "state": "rest",
+            "p": [
+              0.0022166666666666654,
+              0.0415,
+              0.00045000000000000004
+            ]
+          },
+          "magnet": {
+            "state": "rest",
+            "p": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "visible cardTop",
+      "pass": true,
+      "detail": {
+        "x": 562.9888881944404,
+        "y": 302.6767748366615,
+        "target": [
+          0.165,
+          0.004,
+          0.08
+        ],
+        "focus": [
+          0.165,
+          0.004,
+          0.08
+        ],
+        "distance": 0.6
+      }
+    },
+    {
+      "name": "hit cardTop",
+      "pass": true,
+      "detail": {
+        "x": 562.9888881944404,
+        "y": 302.6767748366615
+      }
+    },
+    {
+      "name": "unpack cardOpen",
+      "pass": true,
+      "detail": {
+        "stage": "cardOpen",
+        "bodies": {
+          "bag": {
+            "state": "rest",
+            "p": [
+              0.13999927043914795,
+              0.000029221773729659617,
+              -0.009999934583902359
+            ],
+            "mass": 0.005622480064630508
+          },
+          "card": {
+            "state": "rest",
+            "p": [
+              0.13999974727630615,
+              -0.00001581443939357996,
+              0.15900357067584991
+            ],
+            "mass": 0.03658759221434593
+          },
+          "blister": {
+            "state": "rest",
+            "p": [
+              0.0022166666666665826,
+              0.041499999999999995,
+              -0.00012499999999999995
+            ]
+          },
+          "magnet": {
+            "state": "rest",
+            "p": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "visible blister",
+      "pass": true,
+      "detail": {
+        "x": 591.5282548735825,
+        "y": 411.44237669941214,
+        "target": [
+          0.165,
+          0.004,
+          0.08
+        ],
+        "focus": [
+          0.165,
+          0.004,
+          0.08
+        ],
+        "distance": 0.6
+      }
+    },
+    {
+      "name": "hit blister",
+      "pass": true,
+      "detail": {
+        "x": 591.5282548735825,
+        "y": 411.44237669941214
+      }
+    },
+    {
+      "name": "unpack blisterFree",
+      "pass": true,
+      "detail": {
+        "stage": "blisterFree",
+        "bodies": {
+          "bag": {
+            "state": "rest",
+            "p": [
+              0.13999927043914795,
+              0.000029221773729659617,
+              -0.009999934583902359
+            ],
+            "mass": 0.005622480064630508
+          },
+          "card": {
+            "state": "rest",
+            "p": [
+              0.13999974727630615,
+              0.000031143048545345664,
+              0.15900342166423798
+            ],
+            "mass": 0.0056108166463673115
+          },
+          "blister": {
+            "state": "rest",
+            "p": [
+              0.28424346446990967,
+              -0.000002700253389775753,
+              0.1590062379837036
+            ],
+            "mass": 0.030976779758930206
+          },
+          "magnet": {
+            "state": "rest",
+            "p": [
+              0,
+              0,
+              0
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "visible magnet",
+      "pass": true,
+      "detail": {
+        "x": 840.0333808057468,
+        "y": 435.46437974816763,
+        "target": [
+          0.165,
+          0.004,
+          0.08
+        ],
+        "focus": [
+          0.165,
+          0.004,
+          0.08
+        ],
+        "distance": 0.6
+      }
+    },
+    {
+      "name": "hit magnet",
+      "pass": true,
+      "detail": {
+        "x": 840.0333808057468,
+        "y": 435.46437974816763
+      }
+    },
+    {
+      "name": "unpack magnetFree",
+      "pass": true,
+      "detail": {
+        "stage": "magnetFree",
+        "bodies": {
+          "bag": {
+            "state": "rest",
+            "p": [
+              0.13999927043914795,
+              0.000029221773729659617,
+              -0.009999934583902359
+            ],
+            "mass": 0.005622480064630508
+          },
+          "card": {
+            "state": "rest",
+            "p": [
+              0.13999974727630615,
+              0.000031143223168328404,
+              0.15900342166423798
+            ],
+            "mass": 0.0056108166463673115
+          },
+          "blister": {
+            "state": "rest",
+            "p": [
+              0.35810616612434387,
+              0.00003085914067924023,
+              0.15900661051273346
+            ],
+            "mass": 0.004153611604124308
+          },
+          "magnet": {
+            "state": "rest",
+            "p": [
+              0.28424349427223206,
+              0.00015146915393415838,
+              0.159006267786026
+            ],
+            "mass": 0.026823164895176888
+          }
+        }
+      }
+    },
+    {
+      "name": "grab magnet",
+      "pass": true
+    },
+    {
+      "name": "rigid body settles on table",
+      "pass": true,
+      "detail": {
+        "bag": {
+          "state": "rest",
+          "p": [
+            0.13999927043914795,
+            0.000029221773729659617,
+            -0.009999934583902359
+          ],
+          "mass": 0.005622480064630508
+        },
+        "card": {
+          "state": "dyn",
+          "p": [
+            0.14040255546569824,
+            -0.010308388620615005,
+            0.15987886488437653
+          ],
+          "mass": 0.0056108166463673115
+        },
+        "blister": {
+          "state": "rest",
+          "p": [
+            0.35810619592666626,
+            0.000030303519451990724,
+            0.15900659561157227
+          ],
+          "mass": 0.004153611604124308
+        },
+        "magnet": {
+          "state": "rest",
+          "p": [
+            0.1535499393939972,
+            0.0002312021388206631,
+            0.13855622708797455
+          ],
+          "mass": 0.026823164895176888
+        }
+      }
+    },
+    {
+      "name": "plush first touch",
+      "pass": true
+    },
+    {
+      "name": "plush second touch",
+      "pass": true
+    },
+    {
+      "name": "plush two-finger deformation bounded",
+      "pass": true,
+      "detail": {
+        "deformation": 0.0019340601824664352,
+        "kind": "two"
+      }
+    },
+    {
+      "name": "plush recovers shape",
+      "pass": true,
+      "detail": {
+        "deformation": 0
+      }
+    },
+    {
+      "name": "plush stays on hook after gentle pinch",
+      "pass": true
+    },
+    {
+      "name": "plush hold to lift",
+      "pass": true
+    },
+    {
+      "name": "lift removes plush from hook",
+      "pass": true,
+      "detail": {
+        "hooked": false,
+        "core": [
+          0.04231621334344601,
+          0.34709854544352703,
+          -0.21013568847636396
+        ]
+      }
+    },
+    {
+      "name": "plush table collision",
+      "pass": true,
+      "detail": {
+        "minY": -0.0001214728438132381,
+        "coreY": 0.008742799438896496
+      }
+    },
+    {
+      "name": "plush landing damped",
+      "pass": true
+    },
+    {
+      "name": "magnet first touch",
+      "pass": true,
+      "detail": {
+        "point": {
+          "x": 583.6454035626425,
+          "y": 395.78469318556614
+        },
+        "flipped": false
+      }
+    },
+    {
+      "name": "magnet second touch",
+      "pass": true,
+      "detail": {
+        "point": {
+          "x": 631.7771872350896,
+          "y": 406.8772676572904
+        },
+        "firstHit": "magnet",
+        "kind": "bend2",
+        "position": [
+          0.1535499393939972,
+          0.0002312021388206631,
+          0.13855622708797455
+        ],
+        "quaternion": [
+          -0.7019171118736267,
+          -0.09595775604248047,
+          -0.09312780201435089,
+          0.6995939612388611
+        ]
+      }
+    },
+    {
+      "name": "magnet bend bounded",
+      "pass": true,
+      "detail": {
+        "curvature": 1.0305004139075458,
+        "limit": 1.0318314682628706
+      }
+    },
+    {
+      "name": "magnet remaining finger keeps holding",
+      "pass": true
+    },
+    {
+      "name": "magnet bend springs back",
+      "pass": true,
+      "detail": {
+        "curvature": 0
+      }
+    },
+    {
+      "name": "card first touch",
+      "pass": true,
+      "detail": {
+        "point": {
+          "x": 259.74674918907624,
+          "y": 283.7472708306818
+        },
+        "flipped": false
+      }
+    },
+    {
+      "name": "card second touch",
+      "pass": true,
+      "detail": {
+        "point": {
+          "x": 305.31124072375707,
+          "y": 283.7471960208817
+        },
+        "firstHit": "card",
+        "kind": "bend2",
+        "position": [
+          -0.050000593066215515,
+          0.00003119198663625866,
+          0.09999988228082657
+        ],
+        "quaternion": [
+          -0.7071035504341125,
+          0.0000014662472267445992,
+          6.847558893241512e-7,
+          0.7071101069450378
+        ]
+      }
+    },
+    {
+      "name": "card bend bounded",
+      "pass": true,
+      "detail": {
+        "curvature": 14.320981177305157,
+        "limit": 14.321053092188029
+      }
+    },
+    {
+      "name": "card remaining finger keeps holding",
+      "pass": true
+    },
+    {
+      "name": "card bend springs back",
+      "pass": true,
+      "detail": {
+        "curvature": 0
+      }
+    },
+    {
+      "name": "magnet grab for panel",
+      "pass": true
+    },
+    {
+      "name": "magnet attaches to steel",
+      "pass": true,
+      "detail": {
+        "stage": "onFridge",
+        "position": [
+          0.2760046124458313,
+          0.24540044367313385,
+          -0.26695987582206726
+        ],
+        "surface": [
+          0.27549999999999997,
+          0.2925,
+          -0.267
+        ],
+        "hold": "surface"
+      }
+    },
+    {
+      "name": "grab attached magnet",
+      "pass": true
+    },
+    {
+      "name": "slide on steel",
+      "pass": true,
+      "detail": {
+        "position": [
+          0.295091837644577,
+          0.2126571387052536,
+          -0.2669960558414459
+        ],
+        "previousX": 0.2760046124458313
+      }
+    },
+    {
+      "name": "grab magnet to detach",
+      "pass": true
+    },
+    {
+      "name": "magnet detaches and rests",
+      "pass": true,
+      "detail": {
+        "position": [
+          0.2611773908138275,
+          0.001210806774906814,
+          0.14688611030578613
+        ],
+        "stage": "magnetFree"
+      }
+    },
+    {
+      "name": "bent magnet clears table 0",
+      "pass": true,
+      "detail": {
+        "minY": 0.00014998891506768616
+      }
+    },
+    {
+      "name": "magnet sleeps after rotated drop 0",
+      "pass": true,
+      "detail": {
+        "v": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "w": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "minY": 0.00017454535424525673,
+        "p": [
+          0.3016716241836548,
+          0.0013441601768136024,
+          0.020672574639320374
+        ],
+        "k": 0
+      }
+    },
+    {
+      "name": "bent magnet clears table 1",
+      "pass": true,
+      "detail": {
+        "minY": 0.00015005039217711033
+      }
+    },
+    {
+      "name": "magnet sleeps after rotated drop 1",
+      "pass": true,
+      "detail": {
+        "v": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "w": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "minY": 0.0001915152075814006,
+        "p": [
+          0.30468639731407166,
+          0.004795686341822147,
+          0.019379522651433945
+        ],
+        "k": 0
+      }
+    },
+    {
+      "name": "bent magnet clears table 2",
+      "pass": true,
+      "detail": {
+        "minY": 0.0001707389077982976
+      }
+    },
+    {
+      "name": "magnet sleeps after rotated drop 2",
+      "pass": true,
+      "detail": {
+        "v": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "w": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "minY": 0.0002316952607575272,
+        "p": [
+          0.39947137236595154,
+          0.006709137000143528,
+          0.22538302838802338
+        ],
+        "k": 0
+      }
+    },
+    {
+      "name": "bag finite",
+      "pass": true
+    },
+    {
+      "name": "card finite",
+      "pass": true
+    },
+    {
+      "name": "blister finite",
+      "pass": true
+    },
+    {
+      "name": "magnet finite",
+      "pass": true
+    },
+    {
+      "name": "repack",
+      "pass": true,
+      "detail": {
+        "bag": {
+          "state": "rest",
+          "p": [
+            0.13999927043914795,
+            -0.0000744630815461278,
+            -0.009999933652579784
+          ],
+          "mass": 0.04197629168629646
+        },
+        "card": {
+          "state": "rest",
+          "p": [
+            0,
+            -0.0625,
+            0.000044999999999999996
+          ]
+        },
+        "blister": {
+          "state": "rest",
+          "p": [
+            0.0022166666666666654,
+            0.0415,
+            0.00045000000000000004
+          ]
+        },
+        "magnet": {
+          "state": "rest",
+          "p": [
+            0,
+            0,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "name": "export plush",
+      "pass": true
+    },
+    {
+      "name": "export plush body with fibres",
+      "pass": true
+    },
+    {
+      "name": "export packaged magnet",
+      "pass": true
+    },
+    {
+      "name": "export magnet body",
+      "pass": true
+    },
+    {
+      "name": "lights off",
+      "pass": true
+    }
+  ],
+  "errors": []
+}

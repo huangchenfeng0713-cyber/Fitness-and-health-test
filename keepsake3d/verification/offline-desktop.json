@@ -1,0 +1,95 @@
+{
+  "mode": "desktop",
+  "checks": [
+    {
+      "name": "offline modules load",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "native touch moves the plush",
+      "pass": true
+    },
+    {
+      "name": "native touch routing",
+      "pass": true,
+      "detail": {
+        "resets": 0
+      }
+    },
+    {
+      "name": "controls start collapsed and leave bottom clear",
+      "pass": true
+    },
+    {
+      "name": "touch targets at least 44 pixels",
+      "pass": true
+    },
+    {
+      "name": "cancelled touch releases without a fling",
+      "pass": true
+    },
+    {
+      "name": "background pinch does not capture object",
+      "pass": true
+    },
+    {
+      "name": "two touch events capture the same plush",
+      "pass": true
+    },
+    {
+      "name": "native pinch stays within sewn envelope",
+      "pass": true
+    },
+    {
+      "name": "one remaining finger continues holding",
+      "pass": true
+    },
+    {
+      "name": "last finger restores camera",
+      "pass": true
+    },
+    {
+      "name": "menu expands at top",
+      "pass": true
+    },
+    {
+      "name": "view selection collapses menu",
+      "pass": true
+    },
+    {
+      "name": "lamp panel opens",
+      "pass": true
+    },
+    {
+      "name": "lamp controls select",
+      "pass": true
+    },
+    {
+      "name": "complete darkness when off",
+      "pass": true,
+      "detail": {
+        "max": 0
+      }
+    },
+    {
+      "name": "no network dependencies",
+      "pass": true,
+      "detail": {
+        "blocked": [],
+        "resources": 0
+      }
+    },
+    {
+      "name": "no runtime errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": [],
+  "viewport": [
+    1280,
+    612
+  ],
+  "fibres": 42000
+}

@@ -1,32 +1,32 @@
 {
-  "method": "Node geometry, soft-body physics and standard GLB export; browser unavailable",
+  "method": "Node geometry, soft-body physics and standard GLB export",
   "checks": [
     {
       "name": "seam binding matches rebuilt photo-traced mesh",
       "pass": true,
       "detail": {
-        "vertices": 46634
+        "vertices": 82484
       }
     },
     {
       "name": "side-photo head depth is below 17 mm",
       "pass": true,
       "detail": {
-        "depth": 0.016484702471643686
+        "depth": 0.0164882130920887
       }
     },
     {
       "name": "slim lower legs stay below 6.5 mm depth",
       "pass": true,
       "detail": {
-        "depth": 0.005967101315036416
+        "depth": 0.005960407201200724
       }
     },
     {
       "name": "all label roots are buried within the side seam",
       "pass": true,
       "detail": {
-        "maxDistance": 0.0006813084777796857
+        "maxDistance": 0.0006741451723868746
       }
     },
     {
@@ -57,6 +57,45 @@
       "pass": true
     },
     {
+      "name": "light tap hits 0",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 1",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 2",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 3",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 4",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 5",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 6",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 7",
+      "pass": true
+    },
+    {
+      "name": "repeated taps do not launch toy",
+      "pass": true,
+      "detail": {
+        "maxSpeed": 0.014172040559058335
+      }
+    },
+    {
       "name": "first finger hits shortened head",
       "pass": true
     },
@@ -68,21 +107,21 @@
       "name": "two-finger deformation stays within 2 mm sewn envelope",
       "pass": true,
       "detail": {
-        "deformation": 0.0015763807541937587
+        "deformation": 0.0014393482535217873
       }
     },
     {
       "name": "sewn label stays attached during two-finger interaction",
       "pass": true,
       "detail": {
-        "maxDistance": 0.0006813084777796857
+        "maxDistance": 0.0006741451723868746
       }
     },
     {
       "name": "dense filling settles without rubber-like wobble",
       "pass": true,
       "detail": {
-        "deformation": 2.8965685849678713e-9
+        "deformation": 0
       }
     },
     {
@@ -93,14 +132,14 @@
       "name": "label root stays sewn under lower-body pull",
       "pass": true,
       "detail": {
-        "maxDistance": 0.0006830475659170547
+        "maxDistance": 0.0006754027748727417
       }
     },
     {
       "name": "large drag cannot stretch the cloth envelope",
       "pass": true,
       "detail": {
-        "deformation": 0.0012396177827565696
+        "deformation": 0.001241373907291814
       }
     },
     {
@@ -115,11 +154,22 @@
       "name": "new lower body collides with table",
       "pass": true,
       "detail": {
-        "minY": 0.0006000000559187261
+        "minY": -0.00011486060552143209
       }
     },
     {
       "name": "landing stays weakly elastic and settles",
+      "pass": true
+    },
+    {
+      "name": "dropped toy enters sleep",
+      "pass": true,
+      "detail": {
+        "speed": 0
+      }
+    },
+    {
+      "name": "sleeping toy stays still for five seconds",
       "pass": true
     },
     {
@@ -133,7 +183,7 @@
       "name": "export plush-body.glb",
       "pass": true,
       "detail": {
-        "bytes": 15512668
+        "bytes": 18582816
       }
     },
     {
@@ -141,9 +191,9 @@
       "pass": true,
       "detail": {
         "size": [
-          0.045854486525058746,
-          0.1172995485831052,
-          0.01702634710818529
+          0.04585897736251354,
+          0.11715541800367646,
+          0.01699862629175186
         ]
       }
     },
@@ -151,7 +201,7 @@
       "name": "export plush-chain-tag.glb",
       "pass": true,
       "detail": {
-        "bytes": 16935504
+        "bytes": 20005652
       }
     },
     {
@@ -159,19 +209,19 @@
       "pass": true,
       "detail": {
         "size": [
-          0.05824016491274103,
-          0.18155428945162286,
-          0.04753599889947285
+          0.0582403911436417,
+          0.1814102789676899,
+          0.047530695455904895
         ]
       }
     }
   ],
   "errors": [],
   "sourceHashes": {
-    "assets/plush.glb": "49e398714412a64325def6a1268a4b252a1ba8eaf06416b181fd655bc2ddb932",
-    "assets/plush_meta.json": "a943ffb7f3ab7d64f045550bd7b8af8eb90cac418e5c44ec4ef5d7c029661ffe",
-    "assets/tex/plush_masks.png": "1960e01ee00e19165073d403238c083b1e10ed473d8b805a44380849a1a6a46c",
+    "assets/plush.glb": "d143f11179489b60b245b1462e7a658e533ab421019f8c924de2fb691c055dcc",
+    "assets/plush_meta.json": "fefc73a233cd1a9b58151cbb70696df35d7c36247db413868451e63f309487f6",
+    "assets/tex/plush_masks.png": "0b2b010313100a03e956f0e61276a15d14a33c35ecfdbd8bca65e8e89c0a6d39",
     "src/fur_strands.js": "beeee0249c32379761ce194865a0fa56acb684e0fbc466aa83fb840fe48802a1",
-    "src/plush_engine.js": "2a70fb6892ad6f511e8469e85f75beda317f3bdcdd7a74891df046ef2f3261d8"
+    "src/plush_engine.js": "8612ca48e8087e2cc5e5f29538b0d11204e77921e170468f49968ee1d4cfd0d3"
   }
 }

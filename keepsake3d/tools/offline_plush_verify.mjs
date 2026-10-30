@@ -19,7 +19,7 @@ globalThis.FileReader=class{
  readAsDataURL(blob){blob.arrayBuffer().then(v=>{this.result=`data:${blob.type};base64,${Buffer.from(v).toString('base64')}`;this.onloadend?.();});}
 };
 const ROOT=path.resolve(import.meta.dirname,'..'),OUT=path.join(ROOT,'dev/qa-output');
-const report={method:'Node geometry, soft-body physics and standard GLB export; browser unavailable',checks:[],errors:[],sourceHashes:{}};
+const report={method:'Node geometry, soft-body physics and standard GLB export',checks:[],errors:[],sourceHashes:{}};
 const check=(name,pass,detail)=>{report.checks.push({name,pass,detail});if(!pass)throw Error(name+': '+JSON.stringify(detail));console.log('PASS',name);};
 const readGLB=async file=>{const b=await fs.readFile(file);return new GLTFLoader().parseAsync(b.buffer.slice(b.byteOffset,b.byteOffset+b.byteLength),'');};
 async function texture(file){const im=await loadImage(file),c=new Canvas(im.width,im.height);c.getContext('2d').drawImage(im,0,0);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
@@ -89,6 +89,14 @@ try{
  let time=100;
  const inf=(s,id)=>{const rc=new THREE.Raycaster();rc.setFromCamera(new THREE.Vector2(s.x/640-1,1-s.y/400),camera);return{raycaster:rc,clientX:s.x,clientY:s.y,pointerId:id,pointerType:'touch',button:0,time:time+=1/60};};
  let a=screen(-.010,.078,.017),b=screen(.010,.078,.017);
+ let maxTapSpeed=0;
+ for(let i=0;i<8;i++){
+   const tap=screen(.008,.073,.010);check('light tap hits '+i,p.pointerDown(inf(tap,61)));
+   p.pointerUp(inf(tap,61));
+   for(let j=0;j<20;j++){step(1);maxTapSpeed=Math.max(maxTapSpeed,Math.hypot(p._debug.core.vx,p._debug.core.vy,p._debug.core.vz));}
+ }
+ check('repeated taps do not launch toy',maxTapSpeed<.1&&p.hooked,{maxSpeed:maxTapSpeed});
+ step(180);a=screen(-.010,.078,.017);b=screen(.010,.078,.017);
  check('first finger hits shortened head',p.pointerDown(inf(a,51)));
  check('second finger hits shortened head',p.pointerDown(inf(b,52)));
  for(let i=1;i<=24;i++){p.pointerMove(inf({x:a.x+12*i/24,y:a.y-9*i/24},51));p.pointerMove(inf({x:b.x-12*i/24,y:b.y+9*i/24},52));step(2);}
@@ -113,6 +121,9 @@ try{
  let minY=Infinity;const pa=body.geometry.attributes.position,v=new THREE.Vector3();for(let i=0;i<pa.count;i++){v.fromBufferAttribute(pa,i).applyMatrix4(body.matrixWorld);minY=Math.min(minY,v.y);}
  check('new lower body collides with table',minY>-.003&&minY<.01,{minY});
  check('landing stays weakly elastic and settles',Math.hypot(p._debug.core.vx,p._debug.core.vy,p._debug.core.vz)<.02);
+ check('dropped toy enters sleep',p.isSleeping,{speed:Math.hypot(p._debug.core.vx,p._debug.core.vy,p._debug.core.vz)});
+ const settled=[p._debug.core.x,p._debug.core.y,p._debug.core.z];step(300);
+ check('sleeping toy stays still for five seconds',Math.hypot(p._debug.core.x-settled[0],p._debug.core.y-settled[1],p._debug.core.z-settled[2])<.00001);
  p.reset();step(120);
  for(const [part,name]of[['body','plush-body.glb'],[null,'plush-chain-tag.glb']]){
   const bytes=await exportPlush(p,fur,part);await fs.writeFile(path.join(OUT,name),bytes);check('export '+name,bytes.length>100000,{bytes:bytes.length});

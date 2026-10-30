@@ -1,0 +1,27 @@
+{
+  "checks": "38 Node / 62 browser / 18 mobile / 18 desktop / 4 GLB readback",
+  "sourceHashes": {
+    "src/app.js": "2c043a4f3a13db4ce856a22b1a1afbda091a8dff7f8a3072131ac8449f0eb751",
+    "src/cabinet.js": "f2326d2ce1093eabf1fbf6b5c106872185196f40d726050afce5e7c1155657ca",
+    "src/fur.js": "3ca62a986f2061937b33c7cf80b7ff013a66d483ecede97ef8227dcd567d366c",
+    "src/fur_strands.js": "beeee0249c32379761ce194865a0fa56acb684e0fbc466aa83fb840fe48802a1",
+    "src/magnet_scene.js": "2f3dcd773579135a51c4af43fe2cf503c8efe93165999fd7a1cdbf65e5666777",
+    "src/plush_engine.js": "8612ca48e8087e2cc5e5f29538b0d11204e77921e170468f49968ee1d4cfd0d3",
+    "assets/magnet_spec.json": "ed371a609a4cb20aa685a6f490275cd27c130325039f51c154ff1b669d8610a8",
+    "assets/plush.glb": "d143f11179489b60b245b1462e7a658e533ab421019f8c924de2fb691c055dcc",
+    "assets/plush_meta.json": "fefc73a233cd1a9b58151cbb70696df35d7c36247db413868451e63f309487f6",
+    "assets/tex/bag_header_front.png": "273bd2702145814279c37a18c46b9dcd4ba7b88736b6426876ef7c226533a3cf",
+    "assets/tex/card_back.png": "3bdfb70a2ed3c1432df7f818c3d1c54db254b9407166371e7a88d104ebdedd70",
+    "assets/tex/card_front.png": "250b17e64b8dcdc7bd5e88c3ff37fe912af43d07bad766af66546c8ea8f1d730",
+    "assets/tex/card_inside_back.png": "bafd1e8c31a46c5179f2ee0ad3193b56ddbae4bc06b746b9f69bd26875b64272",
+    "assets/tex/card_inside_front.png": "c91fcc40fa0e43412107dddd8bd11a17230b6bbed1aa668d06206e63b6ccf059",
+    "assets/tex/magnet_back.png": "d923dd687f6099fe0a61f6d9677d94a631f7528bdf8ddf651a89588ed7359de4",
+    "assets/tex/magnet_front.png": "dc9ee4652cf02d96b635197b6ebab31154f6b6dd0b47b07558e154971dd1f589",
+    "assets/tex/plush_masks.png": "0b2b010313100a03e956f0e61276a15d14a33c35ecfdbd8bca65e8e89c0a6d39",
+    "assets/tex/plush_pile_normal.png": "402a53701b19f7c15d891ac69f91b61ef91e9a6649cea8fd791462f7ad7a08fe",
+    "assets/tex/tag_back.png": "e5e7d2ec2e78dbd9898d8532d8cc9e17ca7fe5314f0011bdad3ecd53fa10126f",
+    "assets/tex/tag_front.png": "a7049c7696db687b3255002dfc4260100659cf58ad01892d77cc2e00be05124e",
+    "dist/keepsake.html": "6dac9876210a3d44fdb90f11eb3b9e1fc6a90d50f0c4fcf9f0789a322dfee176",
+    "index.html": "e495566418ca22524cd827c2ebd007716aa523c1d30d1801f1afbfa5ccae2dc1"
+  }
+}

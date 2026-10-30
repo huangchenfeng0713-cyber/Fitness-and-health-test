@@ -61,10 +61,10 @@ export function plushDefaults(quality = 'high') {
     hookWire: 0.0015, hookArm: 0.0018, eyeRadius: 0.005, armBack: 0.032, armSide: 0.052, postRadius: 0.006,
     baseRadius: 0.034, baseHeight: 0.014, hangClearance: 0.10,
     // ---- interaction ----
-    grabFreq: 5.0, grabZeta: 0.95, grabMaxForce: 1.2,
+    grabFreq: 4.0, grabZeta: 1.15, grabMaxForce: 0.45,
     grabSigma: 0.0075, maxStretch: 0.0020, stretchGain: 0.22,
     tagGrabStiffness: 160, tagGrabMaxForce: 0.12, maxReach: 0.32, rehangRadius: 0.04,
-    flickGain: 0.55, flickMaxSpeed: 0.9, pokeSpeed: 0.3, jiggleGain: 0.035,
+    flickGain: 0.22, flickMaxSpeed: 0.12, pokeSpeed: 0.03, jiggleGain: 0.035,
     pressGrabTime: 0.18, flickTime: 0.28, dragThresholdPx: 6,
     squeezeDepth: 0.075, squeezeRise: 0.28, fingerRadius: 0.0068, showFingers: false,
     petDrag: 0.10, petPress: 0.006, petSway: 0.012, petSigma: 0.008,
@@ -967,7 +967,7 @@ export async function createPlush(ctx, opts = {}) {
   let grabTag = null;          // { l:[3] local point, lambda, target state }
   const furStrokes = [];
   let furStrokeVersion = 0;
-  let sleeping = false, calm = 0, acc = 0, offHook = 0;
+  let sleeping = false, calm = 0, floorCalm = 0, acc = 0, offHook = 0;
   const stats = { ms: 0, mechMs: 0, fleshMs: 0, skinMs: 0, steps: 0, particles: nP, cells: nCells, verts: soft.reduce((a, s) => a + s.n, 0),
     tris: soft.reduce((a, s) => a + s.nTri, 0), sleeping: false, fleshActive: false, fleshDev: 0, fleshRelV: 0, fleshResets: 0, mechResets: 0,
     beads: N, activeCells: 0 };
@@ -2069,7 +2069,7 @@ export async function createPlush(ctx, opts = {}) {
       if (!g) continue;
       g.ramp = Math.min(1, g.ramp + h / 0.08);
       const dx = g.tx - g.sx, dy = g.ty - g.sy, dz = g.tz - g.sz;
-      const maxStep = (gi >= 0 ? 2.5 : 1.0) * h, k = 1 - Math.exp(-h / 0.02);   // beads/tag: slow enough never to tunnel through the eye wire
+      const maxStep = (gi >= 0 ? 0.40 : 0.30) * h, k = 1 - Math.exp(-h / 0.05);
       let mx = dx * k, my = dy * k, mz = dz * k; const ml = Math.hypot(mx, my, mz);
       if (ml > maxStep) { mx *= maxStep / ml; my *= maxStep / ml; mz *= maxStep / ml; }
       g.sx += mx; g.sy += my; g.sz += mz;
@@ -2079,7 +2079,7 @@ export async function createPlush(ctx, opts = {}) {
   }
   function releaseBead() { if (grabBead) { bim[grabBead.i] = grabBead.im; grabBead = null; } }
   function excite() { lastExcite = simTime; wake(); }
-  function wake() { if (sleeping) { sleeping = false; acc = 0; } calm = 0; }
+  function wake() { if (sleeping) { sleeping = false; acc = 0; } calm = 0; floorCalm = 0; }
   function ensureFlesh() { if (!fleshActive) { fleshToRest(); fleshActive = true; } }
   function addPlushGrab(X, W, local = true) {
     const g = { b: [X.x - com0.x, X.y - com0.y, X.z - com0.z], weights: local ? gaussianWeights(X, P.grabSigma) : null };
@@ -2220,7 +2220,10 @@ export async function createPlush(ctx, opts = {}) {
       applyFlick(g.hit, cameraDir().clone().multiplyScalar(P.pokeSpeed / P.flickGain));   // tap = poke along the view
     } else if (g.kind === 'grab' || g.kind === 'pet') {
       plushGrabs.length = 0; lastPet = null;
-      if (quick && !cancelled) { const v = swipeVelocity(g); if (v.length() > (g.kind === 'pet' ? 0.3 : 0.02)) applyFlick(g.hit, v); }   // a fast swipe = flick
+      // A grab already carries momentum; adding a second release impulse caused launches.
+      if (g.kind === 'pet' && quick && !cancelled) { const v = swipeVelocity(g); if (v.length() > 0.45) applyFlick(g.hit, v); }
+      const speed = Math.hypot(core.vx, core.vy, core.vz);
+      if (speed > .25) { const k = .25 / speed; core.vx *= k; core.vy *= k; core.vz *= k; }
       excite();
     } else if (g.kind === 'two' || g.kind === 'rsq') {
       endSqueeze(); plushGrabs.length = 0; excite();
@@ -2393,6 +2396,7 @@ export async function createPlush(ctx, opts = {}) {
     },
     pointerUp(info) {
       const g = gesture; if (!g) return;
+      if (info.cancelled) { endGesture(info, true); return; }
       if (g.f2 && (info.pointerId === g.f2.id || info.pointerId === g.pointerId)) {
         // one of two fingers lifted: let go of the pinch, the remaining finger keeps holding its spot
         endSqueeze();
@@ -2448,8 +2452,12 @@ export async function createPlush(ctx, opts = {}) {
         const busy = gesture || squeeze || (fleshActive && stats.fleshRelV > 2e-3) || maxB > 4e-6 || Math.hypot(core.vx, core.vy, core.vz) > 1.5e-3 || Math.hypot(core.wx, core.wy, core.wz) > 0.03
           || Math.hypot(tag.vx, tag.vy, tag.vz) > 3e-3 || Math.hypot(tag.wx, tag.wy, tag.wz) > 0.08;
         calm = busy ? 0 : calm + dt;
-        if (calm > 1.0) {   // everything at rest: stop simulating until the next interaction
+        // A supported toy may rest even if lightweight beads retain solver noise.
+        const grounded = !hooked && floorContact && tagFloor && !gesture && !squeeze && !grabTag && !grabBead && !plushGrabs.length;
+        floorCalm = grounded && Math.hypot(core.vx, core.vy, core.vz) < .025 && Math.hypot(core.wx, core.wy, core.wz) < .8 ? floorCalm + dt : 0;
+        if (calm > 1.0 || floorCalm > 1.2) {
           sleeping = true;
+          fleshToRest(); fleshActive = false; acc = 0;
           bv.fill(0); core.vx = core.vy = core.vz = core.wx = core.wy = core.wz = 0; tag.vx = tag.vy = tag.vz = tag.wx = tag.wy = tag.wz = 0;
           snapshotPrev(); syncVisuals(1);
         }

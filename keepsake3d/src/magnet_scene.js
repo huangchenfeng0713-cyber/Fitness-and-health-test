@@ -513,10 +513,19 @@ export async function createMagnetScene(ctx, opts = {}) {
     const { verts, idx } = triangulate(outer, holes);
     const base = gb.p.length / 3, nz = up ? 1 : -1;
     for (const v of verts) { const uv = uvFn ? uvFn(v[0], v[1]) : [0, 0]; gb.vert(v[0], v[1], z, 0, 0, nz, uv[0], uv[1]); }
-    for (let k = 0; k < idx.length; k += 3) {
-      if (up) gb.tri(base + idx[k], base + idx[k + 1], base + idx[k + 2]);
-      else gb.tri(base + idx[k], base + idx[k + 2], base + idx[k + 1]);
-    }
+    const midpoints = new Map();
+    const mid = (a,b) => {
+      const key = a < b ? a+':'+b : b+':'+a;
+      if (midpoints.has(key)) return midpoints.get(key);
+      const x=(gb.p[a*3]+gb.p[b*3])/2,y=(gb.p[a*3+1]+gb.p[b*3+1])/2;
+      const uv=uvFn?uvFn(x,y):[0,0]; const m=gb.vert(x,y,z,0,0,nz,uv[0],uv[1]);midpoints.set(key,m);return m;
+    };
+    const split = (a,b,c,n) => {
+      if (!n) { up?gb.tri(a,b,c):gb.tri(a,c,b); return; }
+      const ab=mid(a,b),bc=mid(b,c),ca=mid(c,a);
+      split(a,ab,ca,n-1);split(ab,b,bc,n-1);split(ca,bc,c,n-1);split(ab,bc,ca,n-1);
+    };
+    for (let k=0;k<idx.length;k+=3) split(base+idx[k],base+idx[k+1],base+idx[k+2],lowQ?1:2);
   }
   /** vertical wall along a CCW ring; isHole → faces into the hole */
   function addWall(gb, ring, z0, z1, isHole, sharpCos = 0.75) {
@@ -1585,7 +1594,7 @@ export async function createMagnetScene(ctx, opts = {}) {
   // grabbing: a soft, gravity-compensated spring at the grabbed point (not the centre), so an
   // item held by an edge pivots and hangs, can be tipped over, slid, flipped and thrown
   const HOLD = { body: null, local: new THREE.Vector3(), target: new THREE.Vector3(), raw: new THREE.Vector3(), grabH: 0, planeY: 0, mode: 'free' };
-  const HOLD_W = 30, HOLD_Z = 0.9, HOLD_AMAX = 160;
+  const HOLD_W = 20, HOLD_Z = 1.1, HOLD_AMAX = 35;
   function beginHold(b, point) {
     if (!b || !b.rb || b.state === 'anim') return;
     if (HOLD.body && HOLD.body !== b) releaseHold(false);
@@ -1606,7 +1615,7 @@ export async function createMagnetScene(ctx, opts = {}) {
     if (!b || !b.rb) return;
     b.state = 'dyn';
     b.rb.setAngularDamping(0.45); b.rb.setLinearDamping(0.12);
-    const v = b.rb.linvel(), sp = Math.hypot(v.x, v.y, v.z), cap = throwIt ? 1.4 : 0.05;
+    const v = b.rb.linvel(), sp = Math.hypot(v.x, v.y, v.z), cap = throwIt ? 0.35 : 0.05;
     if (sp > cap) b.rb.setLinvel({ x: v.x * cap / sp, y: v.y * cap / sp, z: v.z * cap / sp }, true);
     emit('drop', b.name);
   }
@@ -1646,9 +1655,10 @@ export async function createMagnetScene(ctx, opts = {}) {
     const com = rb.worldCom(), lv = rb.linvel(), av = rb.angvel();
     _v3.set(_v1.x - com.x, _v1.y - com.y, _v1.z - com.z);
     _v4.set(av.x, av.y, av.z).cross(_v3); _v4.x += lv.x; _v4.y += lv.y; _v4.z += lv.z; // its velocity
-    _v2.copy(HOLD.target).sub(_v1).multiplyScalar(HOLD_W * HOLD_W).addScaledVector(_v4, -2 * HOLD_Z * HOLD_W);
+    const freq=HOLD.mode==='surface'?35:HOLD_W;
+    _v2.copy(HOLD.target).sub(_v1).multiplyScalar(freq * freq).addScaledVector(_v4, -2 * HOLD_Z * freq);
     _v2.y += 9.81; // carry the weight at the grabbed point: it still pivots there
-    const a = _v2.length(); if (a > HOLD_AMAX) _v2.multiplyScalar(HOLD_AMAX / a);
+    const a = _v2.length(),limit=HOLD.mode==='surface'?60:HOLD_AMAX; if (a > limit) _v2.multiplyScalar(limit / a);
     _phV.x = _v2.x * m * h; _phV.y = _v2.y * m * h; _phV.z = _v2.z * m * h;
     _phP.x = _v1.x; _phP.y = _v1.y; _phP.z = _v1.z;
     rb.applyImpulseAtPoint(_phV, _phP, true);
@@ -1705,6 +1715,50 @@ export async function createMagnetScene(ctx, opts = {}) {
     S.magnetOnFridge = stuck;
   }
 
+  // The shader bends the visible magnet, while Rapier hulls remain rigid.
+  // Project that same deformed surface against the tabletop after each CCD step.
+  const contactSamples = [];
+  for (const [x,y] of resampleClosed(outline, .6*MM)) for(const z of [0,zArt]) contactSamples.push([x,y,z]);
+  for(let x=ob.minX;x<=ob.maxX;x+=.003) for(let y=ob.minY;y<=ob.maxY;y+=.003) if(sdfAt(x,y)<0) contactSamples.push([x,y,0],[x,y,zArt]);
+  const tableContact = PH.boxes.find(b=>b.support && Math.abs(b.max.y)<.001);
+  let magnetContactCalm = 0;
+  function resolveMagnetTable() {
+    const b=magnet,rb=b.rb,box=tableContact;
+    if(!b.loose || !rb || !box || ['anim','flip','reset'].includes(b.state)) { magnetContactCalm=0; return; }
+    if(rb.isSleeping() && !b.bend.active && Math.abs(b.bend.k)<1e-4) return;
+    const t=rb.translation(); if(t.y > .08) { magnetContactCalm=0; return; }
+    const r=rb.rotation(),bd=b.bend,k=bd.k;
+    _q1.set(r.x,r.y,r.z,r.w); let lift=0,clearance=Infinity;
+    for(const [x,y,z] of contactSamples) {
+      _v1.set(x,y,z);
+      if(Math.abs(k)>1e-4) {
+        const px=-bd.D.y,py=bd.D.x,dx=x-bd.C.x,dy=y-bd.C.y;
+        const u=dx*px+dy*py,a=dx*bd.D.x+dy*bd.D.y,R=1/k,bz=z-bd.C.z;
+        const w=(R-bz)*Math.sin(u*k);
+        _v1.set(bd.C.x+bd.D.x*a+px*w,bd.C.y+bd.D.y*a+py*w,bd.C.z+R-(R-bz)*Math.cos(u*k));
+      }
+      _v1.applyQuaternion(_q1).add(t);
+      if(_v1.x>=box.min.x && _v1.x<=box.max.x && _v1.z>=box.min.z && _v1.z<=box.max.z) { clearance=Math.min(clearance,_v1.y-box.max.y); lift=Math.max(lift,box.max.y+.00015-_v1.y); }
+    }
+    if(lift>1e-6) {
+      rb.setTranslation({x:t.x,y:t.y+lift,z:t.z},false);
+      const v=rb.linvel();if(v.y<0) rb.setLinvel({x:v.x,y:0,z:v.z},false);
+    }
+    // Contact projection also needs tangential friction: otherwise a thin, tilted
+    // edge keeps rocking in the tiny gap above its rigid collision hull.
+    if(HOLD.body!==b && !bd.active && clearance<.0004) {
+      const v=rb.linvel(),w=rb.angvel();
+      if(Math.hypot(v.x,v.y,v.z)<.05) {
+        const linear=Math.exp(-6*PH.h),angular=Math.exp(-10*PH.h);
+        rb.setLinvel({x:v.x*linear,y:v.y,z:v.z*linear},false);
+        rb.setAngvel({x:w.x*angular,y:w.y*angular,z:w.z*angular},false);
+      }
+    }
+    const v=rb.linvel(),w=rb.angvel();
+    const still=HOLD.body!==b && !bd.active && Math.abs(k)<1e-4 && clearance<.0004 && Math.hypot(v.x,v.y,v.z)<.008 && Math.hypot(w.x,w.y,w.z)<.18;
+    magnetContactCalm=still?magnetContactCalm+PH.h:0;
+    if(magnetContactCalm>.6) rb.sleep();
+  }
   function physicsStep(dt) {
     updateExclusions();
     PH.acc = Math.min(PH.acc + dt, 0.05);
@@ -1713,6 +1767,7 @@ export async function createMagnetScene(ctx, opts = {}) {
       applyHold(PH.h);
       applyMagnetism(PH.h);
       PH.world.step();
+      resolveMagnetTable();
       PH.acc -= PH.h; n++;
     }
     for (let i = 0; i < BODIES.length; i++) {
@@ -2197,6 +2252,7 @@ export async function createMagnetScene(ctx, opts = {}) {
   function updateBend() {
     const b = G.body; if (!b || !b.bend.active) return;
     if (G.kind === 'bend2') {
+      if(HOLD.body===b) { rayToGroup(); updateHoldTarget(); }
       let i = 0;
       for (const r of bendRays.values()) { if (!rayToArt(b, r, i === 0 ? _v3 : _v4)) return; i++; }
       const d = Math.hypot(_v4.x - _v3.x, _v4.y - _v3.y);
@@ -2230,10 +2286,11 @@ export async function createMagnetScene(ctx, opts = {}) {
       const b = G.hit && G.hit.flipBody;
       if (!hit2 || hit2.flipBody !== b || !bendable(b)) return false;
       // finish whatever the first finger was doing, gently
-      if (G.started) { updateGesture(); endGesture(); }
+      if (G.started) { updateGesture(); if(G.kind==='move') releaseHold(false); else endGesture(); }
       if (b.state === 'drag') { b.state = 'fall'; b.vy = 0; }
       pendingTap = null;
       if (!beginTwoFingerBend(b, G.id, G.rayW, info.pointerId, info.raycaster.ray)) return false;
+      if(rayToArt(b,G.rayW,_v3)) { _v3.applyMatrix4(b.root.matrix); beginHold(b,_v3); HOLD.raw.copy(HOLD.target); }
       G.kind = 'bend2'; G.body = b; G.started = true; G.id2 = info.pointerId;
       return true;
     }
@@ -2280,13 +2337,21 @@ export async function createMagnetScene(ctx, opts = {}) {
   }
   function pointerUp(info) {
     if (!G.active) return;
+    if (info.cancelled) {
+      pendingTap = null; endBend();
+      if (G.started && G.kind !== 'move') endGesture();
+      releaseHold(false); G.active = false; G.started = false; G.kind = ''; setCursor(''); return;
+    }
     if (G.kind === 'bend2') {
       if (!bendRays.has(info.pointerId) && info.pointerId !== G.id && info.pointerId !== G.id2) return;
-      // first finger up ends the bend (it springs back); the gesture ends with the last finger
-      endBend();
-      bendRays.delete(info.pointerId);
+      // Keep the remaining finger's contact, so bending can flow directly into dragging.
       const other = info.pointerId === G.id ? G.id2 : G.id;
-      G.kind = 'consumed'; G.id = other; G.id2 = -1;
+      const remainingRay = bendRays.get(other)?.clone(), b=G.body;
+      endBend();
+      G.id = other; G.id2 = -1;
+      if(remainingRay && rayToArt(b,remainingRay,_v3)) {
+        G.rayW.copy(remainingRay); _v3.applyMatrix4(b.root.matrix); beginHold(b,_v3); HOLD.raw.copy(HOLD.target); G.started=true;
+      } else { releaseHold(false); G.kind='consumed'; }
       return;
     }
     if (info.pointerId !== undefined && info.pointerId !== G.id) return;

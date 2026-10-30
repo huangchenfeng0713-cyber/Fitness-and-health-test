@@ -11,7 +11,10 @@
   }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden;
     font: 14px/1.45 -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif; -webkit-tap-highlight-color: transparent; }
-  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; -webkit-touch-callout:none; user-select:none; }
+  *, *::before, *::after { box-sizing: border-box; }
+  button { touch-action: manipulation; }
+  #lampLevel { min-height: 44px; }
   .ui { position: fixed; z-index: 2; pointer-events: none; }
   .ui > * { pointer-events: auto; }
   .panel { background: var(--card); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
@@ -25,7 +28,9 @@
     backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
   .iconbtn:hover { border-color: var(--accent); }
   .iconbtn svg { width: 18px; height: 18px; }
-  #bottom { left: 50%; transform: translateX(-50%); bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 10px; width: min(560px, calc(100vw - 32px)); }
+  #bottom { right: 12px; top: calc(max(14px, env(safe-area-inset-top)) + 58px); display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: min(340px, calc(100vw - 24px)); max-height: calc(100dvh - 100px); overflow-y: auto; }
+  #bottom[hidden] { display: none; }
+  .iconbtn, .seg button { min-height: 44px; min-width: 44px; }
   #hint { padding: 8px 14px; text-align: center; color: var(--ink); min-height: 21px; max-width: 100%; transition: opacity .3s; }
   .seg { display: flex; padding: 4px; gap: 4px; }
   .seg button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 10px; cursor: pointer; font: inherit; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
@@ -49,7 +54,14 @@
   #loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 5; background: var(--bg); transition: opacity .6s; }
   #loading div { color: var(--muted); letter-spacing: .1em; }
   #loading.done { opacity: 0; pointer-events: none; }
-  @media (max-width: 520px) { #title small { display: none; } .seg button span.long { display: none; } #info { top: auto; bottom: 170px; } }
+  @media (max-width: 520px) {
+    #top { left: 10px; right: 10px; gap: 6px; }
+    #title { padding: 8px; font-size: 12px; }
+    #title small, #btnLamp > span, #btnExport > span { display: none; }
+    .iconbtn { padding: 0 10px; }
+    #info { top: calc(max(14px, env(safe-area-inset-top)) + 58px); max-height: calc(100dvh - 120px); }
+    #hint { font-size: 12px; text-align: left; }
+  }
 </style>
 <script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
 </head>
@@ -59,6 +71,7 @@
 <div id="top" class="ui">
   <div id="title" class="panel">珍藏小物<small>毛绒挂件 · 晴空塔冰箱贴</small></div>
   <div class="spacer"></div>
+  <button class="iconbtn" id="btnMenu" aria-controls="bottom" aria-expanded="false" aria-label="展开物件与操作说明">菜单</button>
   <button class="iconbtn" id="btnLamp" title="台灯" aria-label="台灯">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l3 7H6z"/><path d="M12 10v8M8 21h8"/></svg><span>台灯</span>
   </button>
@@ -80,8 +93,9 @@
   <table id="dims"></table>
   <p>尺寸按照片中的身份证约 85.6 × 54 mm 估算，并参考不同角度修正透视。毛绒轮廓、厚度和材料弹性仍有估计误差，不等同于实物扫描或实测。贴图来自你的照片；身份证信息未用于模型。</p>
 </div>
-<div id="bottom" class="ui">
+<div id="bottom" class="ui" hidden>
   <div id="hint" class="panel" aria-live="polite"></div>
+  <div class="panel" style="padding:10px 14px;font-size:12px;color:var(--muted)">单指轻触／按住拖动物件；两指在同一物件上轻捏或弯折。空白处单指转动视角、双指缩放和移动。<button id="btnCenter" class="iconbtn" style="margin-top:8px;width:100%;justify-content:center">物件居中</button></div>
   <div id="views" class="seg panel" role="tablist" aria-label="切换物件">
     <button data-view="plush" class="on" role="tab"><span>毛绒挂件</span></button>
     <button data-view="all" role="tab"><span>全部</span></button>
