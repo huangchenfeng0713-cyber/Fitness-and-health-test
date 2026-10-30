@@ -57,7 +57,7 @@ text+='触摸与物理测试为程序模拟；实际触感、精密尺寸与所�
 (DEST/'验证记录.txt').write_text(text,encoding='utf-8')
 with zipfile.ZipFile(DEST/'工程源码.zip','w',zipfile.ZIP_DEFLATED,compresslevel=7) as z:
     allowed_tools={'build.py','devserver.py','validate_glb.py','render_plush_review.py','offline_plush_verify.mjs','test.mjs','rebuild_plush_from_photos.py','package_collection.py'}
-    allowed_dev={'check.html','export.html','readback.html','offline-check.html','appearance.html','qa-server.py'}
+    allowed_dev={'check.html','check.js','verify-hands.js','export.html','readback.html','offline-check.html','offline-check.js','appearance.html','qa-server.py'}
     for folder in ['src','assets','tools','dev']:
         for p in (ROOT/folder).rglob('*'):
             if not p.is_file() or '.before-' in p.name or '__pycache__' in p.parts:continue
