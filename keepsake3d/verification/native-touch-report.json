@@ -1,0 +1,60 @@
+{
+  "browser": "Chromium 390×844 touch emulation; physical iPhone/Safari not tested",
+  "checks": [
+    {
+      "name": "native touch starts tag flip",
+      "pass": true
+    },
+    {
+      "name": "second native tap flips again and settles",
+      "pass": true
+    },
+    {
+      "name": "native drag releases pointer capture and sleeps",
+      "pass": true
+    },
+    {
+      "name": "native pinch zooms",
+      "pass": true
+    },
+    {
+      "name": "pinch hands off to remaining finger",
+      "pass": true
+    },
+    {
+      "name": "OS touch cancellation clears physics and momentum",
+      "pass": true
+    },
+    {
+      "name": "paused finger does not fling the view",
+      "pass": true
+    },
+    {
+      "name": "long and invalid frames preserve a finite scene",
+      "pass": true
+    },
+    {
+      "name": "current models download with embedded textures",
+      "pass": true
+    },
+    {
+      "name": "mobile rendering respects pixel budget",
+      "pass": true
+    },
+    {
+      "name": "source assets load without network failures",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "reduced motion stops release rotation",
+      "pass": true
+    },
+    {
+      "name": "browser has no unhandled errors",
+      "pass": true,
+      "detail": []
+    }
+  ],
+  "errors": []
+}

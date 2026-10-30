@@ -1,3 +1,5 @@
+import {verifyExhibitPhysics,verifyResponsiveTagFraming} from './verify-exhibit-physics.js';
+import {verifyMagnetTextures} from './verify-magnet-textures.js';
 // Development regression harness. Input is dispatched in the fixture, never the browser driver.
 const query=new URLSearchParams(location.search),offline=query.has('offline'),desktop=query.has('desktop');
 const frame=document.querySelector('iframe'),out=document.querySelector('pre');
@@ -9,12 +11,12 @@ const delay=ms=>new Promise(r=>setTimeout(r,ms));
 async function waitFor(fn){for(let i=0;i<300;i++){if(fn())return;await delay(100);}throw Error('Timed out waiting for application');}
 try{
  report.sourceHashes={};
- for(const file of ['index.html','src/app.js','src/exhibit_objects.js','src/magnet_scene.js',...(offline?['dist/keepsake.html']:[])]){const bytes=await fetch('../'+file).then(r=>r.arrayBuffer());report.sourceHashes[file]=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');}
+ for(const file of ['index.html','src/app.js','src/exhibit_objects.js','src/magnet_scene.js','src/exhibit_motion.js','src/plush_engine.js','dev/verify-exhibit-physics.js','dev/verify-magnet-textures.js','assets/magnet_spec.json','assets/tex/magnet_front.png','assets/tex/magnet_back.png',...(offline?['dist/keepsake.html']:[])]){const bytes=await fetch('../'+file).then(r=>r.arrayBuffer());report.sourceHashes[file]=[...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');}
  if(offline){let html=await fetch('../dist/keepsake.html').then(r=>r.text());html=html.replace('<head>','<head><meta http-equiv="Content-Security-Policy" content="default-src data: blob: \'unsafe-inline\' \'unsafe-eval\'; connect-src data: blob:;">');frame.srcdoc=html;}else frame.src='../index.html';
  await waitFor(()=>frame.contentWindow?.__app);
  const w=frame.contentWindow,d=w.document,a=w.__app,c=d.querySelector('#c');a.renderer.setAnimationLoop(null);
  w.addEventListener('error',e=>report.errors.push(e.message));w.addEventListener('unhandledrejection',e=>report.errors.push(String(e.reason)));
- const step=(n=1)=>a.step(n),state=()=>a.state();
+ const step=(n=1)=>a.step(n,1/60,false),state=()=>a.state();
  const event=(type,id,x,y)=>c.dispatchEvent(new w.PointerEvent(type,{bubbles:true,cancelable:true,pointerId:id,pointerType:'touch',isPrimary:id===1,button:0,buttons:type==='pointerup'?0:1,clientX:x,clientY:y}));
  function hit(bodyOnly=false){for(let y=120;y<w.innerHeight-150;y+=12)for(let x=50;x<w.innerWidth-40;x+=12){const h=a.pick(x,y);if(h&&(!bodyOnly||h.object===a.items.plush.body))return{x,y,h};}throw Error('No visible hit target');}
  function tap(p=hit()){event('pointerdown',1,p.x,p.y);step(3);event('pointerup',1,p.x,p.y);step(60);}
@@ -42,11 +44,16 @@ try{
  tap();check('magnet picked up',state().held);
  for(const stage of ['flapOpen','cardOut','cardOpen','blisterFree','magnetFree']){tap();step(180);check('normal unpacking: '+stage,state().stage===stage&&!state().busy,state());check(stage+' stays visible and centered',!!hit()&&a.items.magnet.slot.position.clone().add(a.items.magnet.center).length()<.0001);}
  const bodies=a.items.magnet.api.debug.bodies;
+ const cardTextures=new Set();bodies.card.root.traverse(o=>{for(const m of o.material?(Array.isArray(o.material)?o.material:[o.material]):[])if(m.map)cardTextures.add(m.map);});
+ check('packaging card has all four textured faces',[...cardTextures].length>=4&&[...cardTextures].every(t=>t.image?.width>0&&t.image?.height>0),{textures:cardTextures.size});
  check('empty packaging leaves the display',!bodies.bag.root.visible&&!bodies.card.root.visible&&!bodies.blister.root.visible&&bodies.magnet.root.visible);
  const mh=hit();event('pointerdown',1,mh.x,mh.y);step(80);check('magnet bend is limited',Math.abs(bodies.magnet.bend.k)>0&&Math.abs(bodies.magnet.bend.k)<=bodies.magnet.bend.kMax,bodies.magnet.bend);event('pointerup',1,mh.x,mh.y);step(240);check('magnet bend returns',Math.abs(bodies.magnet.bend.k)<.0001,bodies.magnet.bend.k);
+ verifyMagnetTextures({a,check});
  d.querySelector('#openDetails').click();d.querySelector('#repack').click();step(100);check('packaging can be restored',state().stage==='sealed'&&!state().held);
  for(const [width,height]of [[320,568],[390,844],[844,390]]){frame.style.width=width+'px';frame.style.height=height+'px';await delay(150);step(10);const top=d.querySelector('.topbar').getBoundingClientRect();check('controls fit '+width+'×'+height,top.left>=0&&top.right<=width&&d.documentElement.scrollWidth<=width);check('touch targets at least 44px '+width,[...d.querySelectorAll('.topbar button')].filter(b=>!b.hidden).every(b=>b.getBoundingClientRect().height>=44&&b.getBoundingClientRect().width>=44));}
  frame.style.width=(desktop?1280:390)+'px';frame.style.height=(desktop?720:844)+'px';await delay(150);a.select('plush');a.front(true);step(20);
+ await verifyExhibitPhysics({a,w,check,step,event});
+ await verifyResponsiveTagFraming({a,w,frame,check,step,event,waitFor});
  check('all view transforms remain finite',[...state().quaternion,state().distance].every(Number.isFinite));
  if(offline)check('offline page has no remote resources',w.performance.getEntriesByType('resource').every(r=>!/^https?:/.test(r.name)));
  if(query.has('export')){await a.saveGLB('magnet','exhibit-magnet.glb');await a.saveGLB('plush','exhibit-plush.glb');check('model downloads exported',true);}

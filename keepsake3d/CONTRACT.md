@@ -1,16 +1,20 @@
 # Current exhibition contract
 
 The current entry point is `src/app.js`, with adapters in `src/exhibit_objects.js`.
-One object is visible at a time. Presentation units are metres; there is no floor, cabinet, lamp or gravity integration in the active shell.
+One object is visible at a time. Presentation units are metres; there is no floor, cabinet or lamp. Display rotation acts as an orbit around the suspended scene; gravity remains Y-down in that scene.
 
-- Tap: bring the object closer; tap a held magnet to advance one normal unpacking stage.
-- One pointer drag: rotate the display pivot. Two pointers: zoom and twist. Long press: bounded material response.
+- Tap: bring the object closer; tap a held magnet to advance one normal unpacking stage. Tap the plush paper tag to lift and turn it about the hole-to-centre axis, exposing the opposite textured face.
+- One pointer drag on the body/background: rotate the display pivot. Release velocity is in radians/second with analytically integrated exponential drag. There is no idle sine-wave motion. Two pointers: zoom and twist. Long press: bounded material response.
+- Drag the tag or chain directly: constrain the grabbed point with the existing mechanism solver, then release to gravity. The apex bead is fixed; the remaining 33 beads have length, bend, self-contact and body-contact constraints. The mechanism runs at 480 Hz with bounded catch-up, then sleeps.
+- Exhibition plush simulation skips lattice re-skinning and invisible room collisions. Its original 20 g body, 0.9 g tag and bead masses remain in use. Turning the view nudges the mechanism; reduced-motion mode suppresses that nudge and rotational coast.
+- Automatic tag turns and released motion update the framing bounds. Pan follows those bounds without lag, outward fitting is immediate, and inward restoration is damped. Direct grabs retain pointer control. The full tag stays visible at 320/390/430 portrait widths without reducing the model below 85% of its resting display scale.
 - All gestures are cancelled on modal opening, selection, blur, visibility loss, and resize.
 - Plush surface displacement is limited to 0.45 mm and returns with exponential damping. Geometry and stitched attachments share the same local displacement.
 - Magnet exhibition mode preserves nested packaging and animation but skips rigid-body stepping. Its active root controls framing and hit testing; empty containers become invisible.
 - `createExhibitObjects(ctx)` returns `{plush,magnet}`, each with root, alignment, boundsRoot, stage, busy, update, touch, release, advance and reset.
 - `visibleBounds` excludes fur, hidden proxies and zero-scale instances. Export excludes display helpers and converts custom transparent film to a portable physical material.
-- `dev/exhibit-check.html` is the current interaction test; the older contract below documents the retained legacy engines only.
+- Magnet back UVs use the calibrated projective transform in `magnet_spec.json`; the two photographed concave cuts must remain open. Required photo failures must never silently produce a plain fallback material.
+- `dev/exhibit-check.html` plus `dev/verify-exhibit-physics.js` and `dev/verify-magnet-textures.js` is the current interaction test; the older contract below documents the retained legacy engines only.
 
 ---
 

@@ -9,14 +9,14 @@ const light=new THREE.DirectionalLight(0xfffaf2,1.6);light.position.set(.3,.5,.6
 const camera=new THREE.PerspectiveCamera(30,1280/720,.001,20),out=document.querySelector('pre'),report={checks:[],errors:[]};
 const post=(name,body)=>fetch('http://127.0.0.1:8876/save?name='+name,{method:'POST',body});
 try{
-for(const [name,dir] of [['exhibit-plush',[.25,.05,1]],['exhibit-magnet',[0,.9,.4]]]){
+for(const [name,dir] of [['exhibit-plush',[.25,.05,1]],['exhibit-magnet',[0,.9,.4]],['magnet',[0,0,-1]]]){
 const gltf=await new GLTFLoader().loadAsync('./qa-output/'+name+'.glb');scene.add(gltf.scene);
 const box=new THREE.Box3().setFromObject(gltf.scene),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
 if(![...size.toArray(),...center.toArray()].every(Number.isFinite)||size.length()<=0)throw Error('Invalid bounds '+name);
-camera.position.copy(center).add(new THREE.Vector3(...dir).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2.3));camera.lookAt(center);camera.updateMatrixWorld();
+camera.position.copy(center).add(new THREE.Vector3(...dir).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2.3));camera.lookAt(center);camera.updateMatrixWorld();light.position.copy(camera.position);
 await renderer.compileAsync(scene,camera);renderer.render(scene,camera);
 await post('readback-'+name+'.jpg',renderer.domElement.toDataURL('image/jpeg',.92));
-let meshes=0;gltf.scene.traverse(o=>{if(o.isMesh)meshes++;});report.checks.push({name,pass:true,meshes,size_m:size.toArray()});out.textContent=JSON.stringify(report,null,2);
+let meshes=0;gltf.scene.traverse(o=>{if(o.isMesh)meshes++;});let mapped=0;gltf.scene.traverse(o=>{for(const m of o.material?(Array.isArray(o.material)?o.material:[o.material]):[])if(m.map){if(!(m.map.image?.width>1&&m.map.image?.height>1))throw Error('Missing decoded texture '+name);mapped++;}});if(!mapped)throw Error('No textured materials '+name);report.checks.push({name,pass:true,meshes,mapped,size_m:size.toArray()});out.textContent=JSON.stringify(report,null,2);
 scene.remove(gltf.scene);gltf.scene.traverse(o=>{if(o.isMesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){m.map?.dispose();m.dispose();}}});
 }
 }catch(e){report.errors.push(e.stack||String(e));}

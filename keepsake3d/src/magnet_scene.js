@@ -373,10 +373,7 @@ export async function createMagnetScene(ctx, opts = {}) {
       t.anisotropy = maxAniso;
       return track(t);
     } catch (err) {
-      console.warn('[magnet_scene] could not load texture', rel, err);
-      const t = new THREE.DataTexture(new Uint8Array([232, 232, 232, 255]), 1, 1);
-      t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true;
-      return track(t);
+      throw new Error('magnet_scene: required photo failed to load: ' + rel, { cause: err });
     }
   }
   const specRes = await fetch(assetsBase + 'magnet_spec.json');
@@ -472,7 +469,17 @@ export async function createMagnetScene(ctx, opts = {}) {
   const fcx = SM.front_texture.center_px[0], fcy = SM.front_texture.center_px[1];
   const bcx = SM.back_texture.center_px[0], bcy = SM.back_texture.center_px[1];
   const uvMagFront = (x, y) => [(fcx + (x / MM) * fppm) / fW, 1 - (fcy - (y / MM) * fppm) / fH];
-  const uvMagBack = (x, y) => [(bcx - (x / MM) * bppm) / bW, 1 - (bcy - (y / MM) * bppm) / bH];
+  // The two photographs have different camera poses. Register the back photo
+  // projectively; a mirrored copy of front UVs samples the photo background at
+  // the tower, star and cloud edges. Keep the original full-resolution image.
+  const backH = SM.back_texture.homography_from_mirrored_front_px;
+  const uvMagBack = (x, y) => {
+    const u = bcx - (x / MM) * bppm, v = bcy - (y / MM) * bppm;
+    if (!backH) return [u / bW, 1 - v / bH];
+    const w = backH[6] * u + backH[7] * v + backH[8];
+    return [(backH[0] * u + backH[1] * v + backH[2]) / (w * bW),
+      1 - (backH[3] * u + backH[4] * v + backH[5]) / (w * bH)];
+  };
 
   // ==========================================================================
   // geometry builder

@@ -55,7 +55,7 @@
       "pass": true,
       "detail": {
         "pressure": 0.7499916033863682,
-        "depth": 0.00033708530245741837
+        "depth": 0.0003374784639058439
       }
     },
     {
@@ -104,6 +104,14 @@
           0,
           1
         ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 18.864666666666878,
         "pointers": 0,
         "pressure": 0,
         "visible": [
@@ -136,6 +144,14 @@
           0,
           1
         ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 22.914666666666648,
         "pointers": 0,
         "pressure": 0,
         "visible": [
@@ -168,6 +184,14 @@
           0,
           1
         ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 26.964666666666417,
         "pointers": 0,
         "pressure": 0,
         "visible": [
@@ -200,6 +224,14 @@
           0,
           1
         ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 31.014666666666187,
         "pointers": 0,
         "pressure": 0,
         "visible": [
@@ -224,14 +256,22 @@
         "stage": "magnetFree",
         "busy": false,
         "zoom": 1,
-        "distance": 0.12457221595870974,
-        "targetDistance": 0.12457221595866173,
+        "distance": 0.12456358930263127,
+        "targetDistance": 0.12456358930258324,
         "quaternion": [
           0,
           0,
           0,
           1
         ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 35.06466666666596,
         "pointers": 0,
         "pressure": 0,
         "visible": [
@@ -248,6 +288,13 @@
       "pass": true
     },
     {
+      "name": "packaging card has all four textured faces",
+      "pass": true,
+      "detail": {
+        "textures": 4
+      }
+    },
+    {
       "name": "empty packaging leaves the display",
       "pass": true
     },
@@ -255,9 +302,9 @@
       "name": "magnet bend is limited",
       "pass": true,
       "detail": {
-        "k": 0.3364820323329706,
+        "k": 0.3364596856134072,
         "kv": 0,
-        "target": 0.3364820325283892,
+        "target": 0.33645968580881286,
         "active": true,
         "C": {
           "x": 0,
@@ -269,7 +316,7 @@
           "y": -1,
           "z": 0
         },
-        "kMax": 1.035329330856582,
+        "kMax": 1.035260571719424,
         "art": null
       }
     },
@@ -277,6 +324,59 @@
       "name": "magnet bend returns",
       "pass": true,
       "detail": 0
+    },
+    {
+      "name": "magnet has distinct original front and back photos",
+      "pass": true
+    },
+    {
+      "name": "front UVs cover valid image pixels",
+      "pass": true
+    },
+    {
+      "name": "front normals face outward",
+      "pass": true
+    },
+    {
+      "name": "front triangles have no inverted or stretched UV islands",
+      "pass": true,
+      "detail": {
+        "folded": 0,
+        "areaScaleRatio": 1.0743232014599318,
+        "precisionLimited": 32
+      }
+    },
+    {
+      "name": "front silhouette preserves the photographed tower-star notch",
+      "pass": true
+    },
+    {
+      "name": "back UVs cover valid image pixels",
+      "pass": true
+    },
+    {
+      "name": "back normals face outward",
+      "pass": true
+    },
+    {
+      "name": "back triangles have no inverted or stretched UV islands",
+      "pass": true,
+      "detail": {
+        "folded": 0,
+        "areaScaleRatio": 1.1889045535326832,
+        "precisionLimited": 16
+      }
+    },
+    {
+      "name": "back silhouette preserves the photographed tower-star notch",
+      "pass": true
+    },
+    {
+      "name": "back photo includes opaque detailed lettering instead of a fallback",
+      "pass": true,
+      "detail": {
+        "contrast": 254
+      }
     },
     {
       "name": "packaging can be restored",
@@ -307,6 +407,173 @@
       "pass": true
     },
     {
+      "name": "paper tag front and back textures are complete",
+      "pass": true
+    },
+    {
+      "name": "tap starts an independent card turn 0",
+      "pass": true
+    },
+    {
+      "name": "touch turns to alternate textured face 0",
+      "pass": true,
+      "detail": {
+        "dot": -0.9943124712187577
+      }
+    },
+    {
+      "name": "tap starts an independent card turn 1",
+      "pass": true
+    },
+    {
+      "name": "touch turns to alternate textured face 1",
+      "pass": true,
+      "detail": {
+        "dot": 0.9979817308298722
+      }
+    },
+    {
+      "name": "tap starts an independent card turn 2",
+      "pass": true
+    },
+    {
+      "name": "touch turns to alternate textured face 2",
+      "pass": true,
+      "detail": {
+        "dot": -0.9962893064185837
+      }
+    },
+    {
+      "name": "tap starts an independent card turn 3",
+      "pass": true
+    },
+    {
+      "name": "touch turns to alternate textured face 3",
+      "pass": true,
+      "detail": {
+        "dot": 0.9980447653905168
+      }
+    },
+    {
+      "name": "touch drags paper tag without rotating the view",
+      "pass": true
+    },
+    {
+      "name": "paper tag settles after release",
+      "pass": true
+    },
+    {
+      "name": "chain has a visible touch target",
+      "pass": true
+    },
+    {
+      "name": "drag deforms the actual bead chain",
+      "pass": true
+    },
+    {
+      "name": "chain falls back under gravity and settles",
+      "pass": true
+    },
+    {
+      "name": "settled beads remain exactly stationary",
+      "pass": true
+    },
+    {
+      "name": "second finger releases the paper tag for pinch",
+      "pass": true
+    },
+    {
+      "name": "cancel clears all fingers and momentum",
+      "pass": true
+    },
+    {
+      "name": "blur releases the physics grab",
+      "pass": true
+    },
+    {
+      "name": "interactive mechanism never uses emergency reset",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "complete automatic tag turn stays inside 320px viewport",
+      "pass": true,
+      "detail": {
+        "left": 46.73625630862617,
+        "right": 296.8471859810404,
+        "top": 109.54325237877188,
+        "bottom": 464.1498453245089,
+        "maxDistance": 0.4793946193916905
+      }
+    },
+    {
+      "name": "responsive framing preserves model size at 320px",
+      "pass": true,
+      "detail": {
+        "smallestScale": 0.9065884902162368
+      }
+    },
+    {
+      "name": "tag settles and original framing returns at 320px",
+      "pass": true,
+      "detail": {
+        "initial": 0.43461364421210014,
+        "final": 0.4346114087403116
+      }
+    },
+    {
+      "name": "complete automatic tag turn stays inside 390px viewport",
+      "pass": true,
+      "detail": {
+        "left": 80.71126521281928,
+        "right": 346.01803085425854,
+        "top": 90.99457597007672,
+        "bottom": 464.14984532380606,
+        "maxDistance": 0.4384596813545095
+      }
+    },
+    {
+      "name": "responsive framing preserves model size at 390px",
+      "pass": true,
+      "detail": {
+        "smallestScale": 0.9912282991892709
+      }
+    },
+    {
+      "name": "tag settles and original framing returns at 390px",
+      "pass": true,
+      "detail": {
+        "initial": 0.43461364421210014,
+        "final": 0.4346114087400955
+      }
+    },
+    {
+      "name": "complete automatic tag turn stays inside 430px viewport",
+      "pass": true,
+      "detail": {
+        "left": 100.71126521281926,
+        "right": 366.01803085425865,
+        "top": 90.99457597007672,
+        "bottom": 464.14984532380606,
+        "maxDistance": 0.4384596813545095
+      }
+    },
+    {
+      "name": "responsive framing preserves model size at 430px",
+      "pass": true,
+      "detail": {
+        "smallestScale": 0.9912282991892709
+      }
+    },
+    {
+      "name": "tag settles and original framing returns at 430px",
+      "pass": true,
+      "detail": {
+        "initial": 0.43461364421210014,
+        "final": 0.4346114087402264
+      }
+    },
+    {
       "name": "all view transforms remain finite",
       "pass": true
     },
@@ -317,10 +584,17 @@
   ],
   "errors": [],
   "sourceHashes": {
-    "index.html": "506c4f3433e3924f242ea76740a812f0b289cc72219730a0b5bdffde87ccddf2",
-    "src/app.js": "56a2dfdae6cf8f74ca1dd049e5cab00f70ef66ba0a77f5615a2683da88ee2a6b",
-    "src/exhibit_objects.js": "697da1a851a1a02b830714678ac90dc7230204403b720842e453b6918fe079e6",
-    "src/magnet_scene.js": "b5f9b0567956604c8a2ff6746eebf2fdc5423d1762cb9b46154082ee919e11f3",
-    "dist/keepsake.html": "f4b5004ab3ae09da5986fd95968932fbefa61adb0c3b16f4abf36801179ffd56"
+    "index.html": "e27a8eeb92d3519dbca8d9a9dd532038fa6dc0935e437048e3337e59009f400c",
+    "src/app.js": "1a9aa5ce5d13123399871e287e973b5c980e895fca40224d3bbb93cc31e12e83",
+    "src/exhibit_objects.js": "a997706fbcd9675be4673cb1eb682742f36c7e50c7675b31541e4c2bab6fd29b",
+    "src/magnet_scene.js": "ca9bcd66d7cc5fdafae9aed273887aee225c8721e47d624a0ac549f90bf3a58a",
+    "src/exhibit_motion.js": "45c267df7020df139a4ee32921d4c0417df4cb362c3356d4290291724802fa8b",
+    "src/plush_engine.js": "2367c911057375711396c977e737fc5430e72678d24fe8640652e8d9ca99475e",
+    "dev/verify-exhibit-physics.js": "a22548b0f5c7a2789d06499c26f9b24688f1c823e03fd0c6e374a5c992dadacf",
+    "dev/verify-magnet-textures.js": "4bd3a47ee48df14e811e9876955e0a6a3c6f1a07741b7b88e1fc3b161ab1e445",
+    "assets/magnet_spec.json": "ed54d68059d46efb29bd327f751320d6c0c15711555a67b8ce07cecbafa65a45",
+    "assets/tex/magnet_front.png": "dc9ee4652cf02d96b635197b6ebab31154f6b6dd0b47b07558e154971dd1f589",
+    "assets/tex/magnet_back.png": "d923dd687f6099fe0a61f6d9677d94a631f7528bdf8ddf651a89588ed7359de4",
+    "dist/keepsake.html": "b2f0dbee5aac4da193294414e7af2368538025d01c58c5c7daaa1c91013f3ab8"
   }
 }

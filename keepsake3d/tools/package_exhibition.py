@@ -1,4 +1,4 @@
-"""Package the verified floating exhibition; retain the original standalone GLBs."""
+"""Package the verified exhibition and current standalone GLBs."""
 from pathlib import Path
 import hashlib,json,shutil,zipfile
 from validate_glb import validate
@@ -7,11 +7,16 @@ DEST=ROOT.parent/'3D收藏'; OUTPUT=ROOT/'dev/qa-output'
 reports=[]
 for name in ['exhibit-offline-mobile.json','exhibit-offline-desktop.json']:
     report=json.loads((OUTPUT/name).read_text(encoding='utf-8'))
-    assert len(report['checks'])>=40 and all(c['pass'] for c in report['checks']) and not report['errors'],name
+    assert len(report['checks'])>=70 and all(c['pass'] for c in report['checks']) and not report['errors'],name
     for file,digest in report['sourceHashes'].items():
         assert hashlib.sha256((ROOT/file).read_bytes()).hexdigest()==digest,'stale report: '+file
     reports.append(report)
 models=DEST/'模型'
+models.mkdir(parents=True,exist_ok=True)
+mapping={'plush-body.glb':'毛绒挂件_本体.glb','plush-chain-tag.glb':'毛绒挂件_含珠链吊牌.glb','magnet.glb':'冰箱贴_本体.glb','magnet-packaged.glb':'冰箱贴_含完整包装.glb'}
+for source,target in mapping.items():
+    validate(ROOT/'models'/source)
+    shutil.copy2(ROOT/'models'/source,models/target)
 for file in models.glob('*.glb'):validate(file)
 assert len(list(models.glob('*.glb')))==4
 shutil.copy2(ROOT/'dist/keepsake.html',DEST/'珍藏小物.html')
@@ -24,11 +29,11 @@ text+='包含单件显示、真实模型缩略图、点选拿近、单指旋转�
 text+='320×568、390×844、844×390 控件边界和至少 44 像素触控区检查通过。说明文字不拦截触摸，拿近后底部说明隐去。\n'
 text+='离线测试拒绝 HTTP/HTTPS 请求，使用与交付文件相同的内嵌资产。报告包含 HTML 及主模块 SHA-256。\n'
 text+='四份原有独立 GLB 的几何和内嵌贴图重新校验；新下载功能另作导出与读回检查。\n'
-text+='本轮保留照片建模的原始几何，改变展示、灯光和手势；不再提供桌面、台灯、重力落桌和磁吸操作。\n'
+text+='本轮保留毛绒照片几何，修复磁贴背面 UV 与两个轮廓凹口；提供珠链重力和碰撞、吊牌翻面与拖动、按秒衰减的旋转惯性；不提供落桌或磁吸操作。\n'
 text+='触摸测试为浏览器程序模拟，未逐台实测手机硬件。尺寸和材料反应为照片估算。\n'
 (DEST/'验证记录.txt').write_text(text,encoding='utf-8')
-allowed_tools={'build.py','devserver.py','validate_glb.py','render_plush_review.py','offline_plush_verify.mjs','test.mjs','rebuild_plush_from_photos.py','package_collection.py','package_exhibition.py'}
-allowed_dev={'exhibit-check.html','exhibit-check.js','exhibit-readback.html','qa-server.py','readback.html','appearance.html'}
+allowed_tools={'build.py','verify_embedded_assets.py','devserver.py','validate_glb.py','render_plush_review.py','offline_plush_verify.mjs','test.mjs','exhibit_physics_verify.mjs','rebuild_plush_from_photos.py','package_collection.py','package_exhibition.py'}
+allowed_dev={'exhibit-check.html','exhibit-check.js','verify-exhibit-physics.js','verify-magnet-textures.js','native-touch.py','exhibit-readback.html','qa-server.py','readback.html','appearance.html'}
 with zipfile.ZipFile(DEST/'工程源码.zip','w',zipfile.ZIP_DEFLATED,compresslevel=7) as z:
     for folder in ['src','assets','tools','dev']:
         for p in (ROOT/folder).rglob('*'):

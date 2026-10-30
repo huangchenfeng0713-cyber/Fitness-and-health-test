@@ -36,13 +36,15 @@ export async function createExhibitObjects(ctx) {
     const fur=createFur(body,{shells:quality==='low'?8:16,maskMap:mask,seam});
     const api=await createPlush(ctx,{softMeshes:meshes,attachPoint:new THREE.Vector3(...meta.attach_point_m),
       tagTextures:{front:tf,back:tb},tagSize:{w:.0373,h:.0486,t:.00035},tagHole:{x:.0054,y:.0075,d:.0032},
-      hookPosition:new THREE.Vector3(0,.21,0),origin:new THREE.Vector3(0,0,0),mount:'wall',wallZ:-.09,quality});
+      hookPosition:new THREE.Vector3(0,.21,0),origin:new THREE.Vector3(0,0,0),mount:'wall',wallZ:-.09,quality,
+      exhibition:true,params:{fleshHz:120,mechSubsteps:4,mechIters:3,tagLinDamp:2.4,tagAngDamp:4,chainDamp:2.8}});
     for(let i=0;i<150;i++)api.update(1/60,i/60);
     api.hook.stand.visible=false;
     body.parent.add(fur.group);
     const rest=meshes.map(m=>({mesh:m,p:m.geometry.attributes.position.array.slice(),n:m.geometry.attributes.normal.array.slice()}));
     let contact=null,pressure=0,target=0,changed=false;
-    const point=new THREE.Vector3(),normal=new THREE.Vector3();
+    const point=new THREE.Vector3(),normal=new THREE.Vector3(),gravity=new THREE.Vector3();
+    const worldQ=new THREE.Quaternion();
     function touch(hit,strength=1){
       if(hit?.object!==body) return false;
       contact=body.worldToLocal(hit.point.clone());
@@ -50,6 +52,7 @@ export async function createExhibitObjects(ctx) {
     }
     function release(){target=0;}
     function update(dt){
+      api.update(dt);
       const before=pressure;pressure+= (target-pressure)*(1-Math.exp(-dt*(target?18:9)));
       if(pressure<.0005&&!target)pressure=0;
       if(contact && (pressure!==before || changed)) {
@@ -66,12 +69,23 @@ export async function createExhibitObjects(ctx) {
         changed=pressure!==0;
         if(pressure)fur.stroke(contact,point.set(.4,.9,.1),pressure*.18);
       }
-      fur.update(dt,new THREE.Vector3(0,-1,0));
+      // Display rotation is an orbit around the suspended scene. Fur follows the
+      // same gravity as the chain, expressed in the deforming body frame.
+      api.group.getWorldQuaternion(worldQ);
+      gravity.set(0,-1,0).applyQuaternion(worldQ);
+      body.getWorldQuaternion(worldQ).invert();
+      fur.update(dt,gravity.applyQuaternion(worldQ));
     }
     return {id:'plush',root:api.group,alignment:new THREE.Quaternion(),api,body,fur,touch,release,update,
-      get boundsRoot(){return api.group;},get busy(){return false;},get stage(){return 'plush';},
-      get pressure(){return pressure;},advance(){return false;},reset(){target=0;pressure=0;for(const s of rest){s.mesh.geometry.attributes.position.array.set(s.p);s.mesh.geometry.attributes.position.needsUpdate=true;}},
-      title:'毛绒挂件',material:'短绒织物 · 珠链 · 纸质吊牌',details:'约 100 mm 高。保留原照片中的不对称轮廓、交叉缝线和缝入身体的布标。短绒与较实的填充物只产生轻微压痕。'};
+      get boundsRoot(){return api.group;},get busy(){return !api.isSleeping;},get grabbed(){return api.isGrabbed;},get stage(){return 'plush';},
+      get pressure(){return pressure;},advance(){return false;},
+      interactionKind(hit){return hit?.object===api.tagMesh?'tag':[api.chain.beads,api.chain.links,api.chain.clasp].includes(hit?.object)?'chain':null;},
+      beginDrag(info){return api.pointerDown(info);},moveDrag(info){api.pointerMove(info);},endDrag(info){api.pointerUp(info);},
+      flipTag(){return api.turnTag();},cancel(){api.cancelInteraction();release();},
+      nudge(x,y){api.nudge(point.set(x*.075,-Math.abs(y)*.012,-y*.07));},
+      resetMotion(){api.reset();},
+      reset(){api.reset();target=0;pressure=0;for(const s of rest){s.mesh.geometry.attributes.position.array.set(s.p);s.mesh.geometry.attributes.position.needsUpdate=true;}},
+      title:'毛绒挂件',material:'短绒织物 · 珠链 · 纸质吊牌',details:'约 100 mm 高。保留原照片中的不对称轮廓、交叉缝线和缝入身体的布标。短绒与较实的填充物只产生轻微压痕。轻点吊牌翻看另一面，拖动吊牌或珠链，松手后自然垂落。'};
   }
   async function magnet(){
     const api=await createMagnetScene({...ctx,assetsBase:ASSETS},{origin:new THREE.Vector3(0,0,0),quality,exhibition:true,animateReset:false,fridge:{enabled:false},area:{minX:-.5,maxX:.5,minZ:-.5,maxZ:.5},tunables:{shadowOpacity:0}});

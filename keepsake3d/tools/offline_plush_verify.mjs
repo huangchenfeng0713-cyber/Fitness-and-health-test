@@ -124,6 +124,9 @@ try{
  check('dropped toy enters sleep',p.isSleeping,{speed:Math.hypot(p._debug.core.vx,p._debug.core.vy,p._debug.core.vz)});
  const settled=[p._debug.core.x,p._debug.core.y,p._debug.core.z];step(300);
  check('sleeping toy stays still for five seconds',Math.hypot(p._debug.core.x-settled[0],p._debug.core.y-settled[1],p._debug.core.z-settled[2])<.00001);
+ const {verifyExhibitionPhysics,verifyExhibitMotion}=await import('./exhibit_physics_verify.mjs');
+ verifyExhibitMotion(check);
+ await verifyExhibitionPhysics({createPlush,meshes,meta,tf,tb,check});
  p.reset();step(120);
  for(const [part,name]of[['body','plush-body.glb'],[null,'plush-chain-tag.glb']]){
   const bytes=await exportPlush(p,fur,part);await fs.writeFile(path.join(OUT,name),bytes);check('export '+name,bytes.length>100000,{bytes:bytes.length});

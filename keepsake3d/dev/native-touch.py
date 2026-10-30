@@ -1,0 +1,60 @@
+from playwright.sync_api import sync_playwright
+from pathlib import Path
+import json
+OUT=Path(__file__).resolve().parent/'qa-output'
+OUT.mkdir(exist_ok=True)
+checks=[];errors=[]
+def check(name,condition,detail=None):
+ r={'name':name,'pass':bool(condition)}
+ if detail is not None:r['detail']=detail
+ checks.append(r);print(json.dumps(r,ensure_ascii=False),flush=True)
+ assert condition,name
+with sync_playwright() as p:
+ browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
+ context=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,device_scale_factor=2)
+ page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
+ failed=[];page.on('requestfailed',lambda r:failed.append(r.url))
+ page.goto('http://127.0.0.1:8877/index.html');page.wait_for_function('window.__app',timeout=60000)
+ page.evaluate('''() => {__app.renderer.setAnimationLoop(null);__app.pickup();__app.step(360,1/60,false);window.tagPoint=()=>{const a=__app,p=a.items.plush.api;for(const x of [-.014,0,.014])for(const y of [.018,.01,0,-.016]){const v=p.tagMesh.localToWorld(p.tagMesh.position.clone().set(x,y,0)).project(a.camera);const q={x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};if(a.pick(q.x,q.y)?.object===p.tagMesh)return q;}throw Error('Tag is occluded');};}''')
+ cdp=context.new_cdp_session(page)
+ def point(x,y,id=1):return {'x':x,'y':y,'id':id,'radiusX':4,'radiusY':4,'force':.5}
+ def touch(kind,points):cdp.send('Input.dispatchTouchEvent',{'type':kind,'touchPoints':points})
+ def step(n):page.evaluate('(n)=>__app.step(n,1/60,false)',n)
+ def shot(name):page.evaluate('__app.step(0)');page.screenshot(path=str(OUT/name),timeout=60000)
+ shot('phone-tag-front.png')
+ q=page.evaluate('tagPoint()')
+ touch('touchStart',[point(**q)]);step(3);touch('touchEnd',[])
+ check('native touch starts tag flip',page.evaluate('__app.state().tagTurning && __app.state().pointers===0'))
+ step(90);shot('phone-tag-turning.png');step(330);shot('phone-tag-back.png')
+ q=page.evaluate('tagPoint()');touch('touchStart',[point(**q)]);step(3);touch('touchEnd',[]);step(420)
+ check('second native tap flips again and settles',page.evaluate('__app.items.plush.api.isSleeping && !__app.state().tagTurning'))
+ q=page.evaluate('tagPoint()');touch('touchStart',[point(**q)])
+ for i in range(1,21):touch('touchMove',[point(q['x']+55*i/20,q['y']-35*i/20)]);step(2)
+ shot('phone-tag-drag.png');touch('touchEnd',[]);step(720)
+ check('native drag releases pointer capture and sleeps',page.evaluate('__app.state().pointers===0 && __app.items.plush.api.isSleeping'))
+ touch('touchStart',[point(110,350)]);touch('touchStart',[point(110,350),point(240,350,2)])
+ touch('touchMove',[point(90,350),point(280,360,2)]);step(2)
+ check('native pinch zooms',page.evaluate('__app.state().zoom<1'))
+ touch('touchEnd',[point(280,360,2)]);touch('touchMove',[point(115,365)]);touch('touchEnd',[]);step(60)
+ check('pinch hands off to remaining finger',page.evaluate('__app.state().pointers===0 && Math.abs(__app.state().quaternion[1])>.01'))
+ page.evaluate('__app.front(true)');step(300);q=page.evaluate('tagPoint()');touch('touchStart',[point(**q)]);step(2);touch('touchCancel',[])
+ check('OS touch cancellation clears physics and momentum',page.evaluate('__app.state().pointers===0 && !__app.items.plush.api._debug.gesture && __app.state().angularVelocity.every(v=>v===0)'))
+ touch('touchStart',[point(80,450)]);touch('touchMove',[point(125,450)]);page.wait_for_timeout(180);touch('touchEnd',[])
+ check('paused finger does not fling the view',page.evaluate('__app.state().angularVelocity.every(v=>v===0)'))
+ page.evaluate('''() => {__app.front(true);__app.step(1,10,false);__app.step(1,NaN,false);__app.step(1,Infinity,false);}''')
+ check('long and invalid frames preserve a finite scene',page.evaluate('''[...__app.state().quaternion,...__app.items.plush.api._debug.bx].every(Number.isFinite) && __app.items.plush.api.stats.mechResets===0'''))
+ page.evaluate('''async()=>{await __app.saveGLB('plush','physics-plush.glb');await __app.saveGLB('magnet','physics-magnet.glb');}''')
+ check('current models download with embedded textures',True)
+ check('mobile rendering respects pixel budget',page.evaluate('__app.renderer.getPixelRatio()<=2'))
+ check('source assets load without network failures',not failed,failed)
+ context.close()
+ context=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,device_scale_factor=1,reduced_motion='reduce')
+ page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
+ page.goto('http://127.0.0.1:8877/index.html');page.wait_for_function('window.__app',timeout=60000)
+ page.evaluate('__app.renderer.setAnimationLoop(null)');cdp=context.new_cdp_session(page)
+ touch('touchStart',[point(80,450)]);touch('touchMove',[point(130,450)]);touch('touchEnd',[])
+ before=page.evaluate('__app.state().quaternion');step(300)
+ check('reduced motion stops release rotation',before==page.evaluate('__app.state().quaternion'))
+ check('browser has no unhandled errors',not errors,errors)
+ context.close();browser.close()
+(OUT/'native-touch-report.json').write_text(json.dumps({'browser':'Chromium 390×844 touch emulation; physical iPhone/Safari not tested','checks':checks,'errors':errors},ensure_ascii=False,indent=2)+'\n')

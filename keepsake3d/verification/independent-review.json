@@ -1,0 +1,590 @@
+{
+  "status": "accepted_with_documented_limitations",
+  "review_role": "independent visual and interaction review; no implementation edits, commit, push, deploy or Library upload",
+  "environment": "Linux Chromium headless with software WebGL; 390x844 DPR2 interrupted baseline, remaining native reviews DPR1; iPhone/Safari hardware not tested",
+  "method": "Actual CDP touch and browser mouse events with normal animation; no __app.step, turnTag, camera assignment or paused animation; __app/debug read only for targeting and observations.",
+  "confirmed": {
+    "baseline_320": {
+      "frames": 245,
+      "outside_frames": 33,
+      "max_right": 376.5342281610074,
+      "max_right_overflow": 56.53422816100738,
+      "trusted_native_events": true,
+      "count_events": 6,
+      "final_sleeping": true,
+      "first_outside": {
+        "wall": 43373.40000000037,
+        "elapsed": 34.32120000000019,
+        "phase": "first-turn",
+        "state": {
+          "current": "plush",
+          "held": true,
+          "stage": "plush",
+          "busy": false,
+          "zoom": 1,
+          "distance": 0.434413277839141,
+          "targetDistance": 0.4344132272447661,
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "angularVelocity": [
+            0,
+            0,
+            0
+          ],
+          "tagTurning": true,
+          "physicsSleeping": false,
+          "time": 3.497999999999996,
+          "pointers": 0,
+          "pressure": 0,
+          "visible": [
+            "plush"
+          ],
+          "viewport": [
+            320,
+            844
+          ]
+        },
+        "tagBounds": {
+          "minX": 141.56329148226365,
+          "maxX": 334.14393396790854,
+          "minY": 235.17788394021102,
+          "maxY": 350.7448810843382
+        },
+        "tagQuaternion": [
+          -0.5965499272362382,
+          0.705148727642815,
+          0.3121771968172902,
+          0.222348496746564
+        ],
+        "tagPosition": [
+          0.020113943283172838,
+          0.1556289309380928,
+          -0.01465418967779788
+        ],
+        "vel": [
+          0.16259495620489284,
+          0.19819161471188895,
+          -0.04830700293435991,
+          7.063879787495431,
+          -3.5119347906033305,
+          8.152852783299744
+        ],
+        "resets": 0,
+        "gesture": null
+      },
+      "last_outside": {
+        "wall": 56528.5,
+        "elapsed": 47.47629999999982,
+        "phase": "first-turn",
+        "state": {
+          "current": "plush",
+          "held": true,
+          "stage": "plush",
+          "busy": false,
+          "zoom": 1,
+          "distance": 0.43441322724545794,
+          "targetDistance": 0.4344132272447661,
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "angularVelocity": [
+            0,
+            0,
+            0
+          ],
+          "tagTurning": false,
+          "physicsSleeping": false,
+          "time": 5.09799999999999,
+          "pointers": 0,
+          "pressure": 0,
+          "visible": [
+            "plush"
+          ],
+          "viewport": [
+            320,
+            844
+          ]
+        },
+        "tagBounds": {
+          "minX": 140.04931626312418,
+          "maxX": 336.6889154174808,
+          "minY": 130.98317154495223,
+          "maxY": 328.38104958229786
+        },
+        "tagQuaternion": [
+          -0.26816826896911294,
+          -0.04368507370312458,
+          -0.3682252499486549,
+          -0.8891499081448035
+        ],
+        "tagPosition": [
+          0.02097338885422818,
+          0.17254553385327395,
+          -0.007997999248257738
+        ],
+        "vel": [
+          -0.22308606158467414,
+          -0.4512099002972336,
+          0.0806821352026256,
+          -0.33093694930026396,
+          -1.758287371795273,
+          -3.124041418003589
+        ],
+        "resets": 0,
+        "gesture": null
+      }
+    },
+    "fixed_390": {
+      "recorded_frames": 550,
+      "flip_frames": 474,
+      "bounds": {
+        "min_x": 86.15795479843007,
+        "max_x": 342.47124925195783,
+        "min_y": 95.23468552379101,
+        "max_y": 460.6137185080413
+      },
+      "all_within_view": true,
+      "all_input_trusted": true,
+      "final_state": {
+        "current": "plush",
+        "held": true,
+        "stage": "plush",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.43441005489606366,
+        "targetDistance": 0.43441005254656145,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 27.548000000000258,
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "plush"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      },
+      "minimum_relative_scale_estimate": 0.9910574638125731
+    },
+    "magnet_390": {
+      "stages": [
+        "flapOpen",
+        "cardOut",
+        "cardOpen",
+        "blisterFree",
+        "magnetFree"
+      ],
+      "all_stage_checks_passed": true,
+      "native_pointer_events": 78,
+      "all_pointer_events_trusted": true,
+      "final_state": {
+        "current": "magnet",
+        "held": true,
+        "stage": "magnetFree",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.2328962702352281,
+        "targetDistance": 0.23289627023522808,
+        "quaternion": [
+          0,
+          0.9721998984918494,
+          0,
+          -0.2341524233751121
+        ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 31.098000000000308,
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "magnet"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      },
+      "visual_review": {
+        "back_text": "complete, forward-reading copyright",
+        "silhouette": "tower, star and cloud perimeter continuous at normal and two oblique views",
+        "upper_right_bright_edges": "consistent with original photo rim highlights plus physical metal rim; oblique views expose continuous metal side, no missing surface observed",
+        "limitations": "photo-estimated geometry and perspective texture registration, not a scan"
+      }
+    },
+    "final_html_430": {
+      "entry": "dist/keepsake.html",
+      "html_sha256": "b2f0dbee5aac4da193294414e7af2368538025d01c58c5c7daaa1c91013f3ab8",
+      "frames": 313,
+      "flip_frames": 240,
+      "bounds": {
+        "minX": 106.15795479843005,
+        "maxX": 362.47124925292115,
+        "minY": 95.90643594403491,
+        "maxY": 460.6075340397222
+      },
+      "minimum_relative_scale_estimate": 0.9910574638125731,
+      "all_native_events_trusted": true,
+      "all_inside_viewport": true,
+      "final_state": {
+        "current": "plush",
+        "held": true,
+        "stage": "plush",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.4344085079901718,
+        "targetDistance": 0.43440850123587477,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 15.69800000000009,
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "plush"
+        ],
+        "viewport": [
+          430,
+          844
+        ]
+      }
+    },
+    "fixed_320": {
+      "frames": 1409,
+      "flip_frames": 239,
+      "automatic_turn_bounds": {
+        "minX": 52.38366535044142,
+        "maxX": 293.65678720340526,
+        "minY": 114.83531491628254,
+        "maxY": 460.60984504621786
+      },
+      "automatic_turn_all_inside_viewport": true,
+      "minimum_relative_scale_estimate": 0.9069021730780294,
+      "native_events": 156,
+      "all_native_events_trusted": true,
+      "checks": [
+        {
+          "name": "narrow tap 1 starts turn",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "narrow tap 2 starts turn",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "tag drag sleeps",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "chain release sleeps",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "rapid taps release",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "remaining finger clears",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "cancel clears",
+          "pass": true,
+          "detail": null
+        },
+        {
+          "name": "no application errors",
+          "pass": true,
+          "detail": []
+        },
+        {
+          "name": "no physics resets",
+          "pass": true,
+          "detail": null
+        }
+      ],
+      "final_state": {
+        "current": "plush",
+        "held": true,
+        "stage": "plush",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.43439904112300065,
+        "targetDistance": 0.43439904112295463,
+        "quaternion": [
+          0,
+          0.9537169647540714,
+          0,
+          0.3007057550834062
+        ],
+        "angularVelocity": [
+          0,
+          0,
+          0
+        ],
+        "tagTurning": false,
+        "physicsSleeping": true,
+        "time": 70.49799999999814,
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "plush"
+        ],
+        "viewport": [
+          320,
+          844
+        ]
+      },
+      "phase_summary": {
+        "drag-tag-side": {
+          "frames": 127,
+          "gesture_kinds": [
+            "None",
+            "tag"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": -1.8424532184823337,
+          "max_bead_speed_m_s": 0.18543146074014538,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 3.7000000000000526,
+          "release_to_sleep_wall_seconds": 71.35010000000055
+        },
+        "drag-tag-across-body": {
+          "frames": 150,
+          "gesture_kinds": [
+            "None",
+            "tag"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": -0.12751440592327504,
+          "max_bead_speed_m_s": 0.5764760072873598,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 4.90000000000007,
+          "release_to_sleep_wall_seconds": 43.1255
+        },
+        "drag-chain": {
+          "frames": 114,
+          "gesture_kinds": [
+            "None",
+            "bead"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": 0.12351783563764845,
+          "max_bead_speed_m_s": 0.2413763303678709,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 2.9499999999998963,
+          "release_to_sleep_wall_seconds": 26.4575
+        },
+        "rapid-taps": {
+          "frames": 192,
+          "gesture_kinds": [
+            "None",
+            "tag"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": -1.01298189263491,
+          "max_bead_speed_m_s": 0.35982288362652354,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 6.349999999999639,
+          "release_to_sleep_wall_seconds": 54.49689999999944
+        },
+        "two-finger-handoff": {
+          "frames": 79,
+          "gesture_kinds": [
+            "None",
+            "tag"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": 0.05239342859011758,
+          "max_bead_speed_m_s": 0.0015537372254456816,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 0.4499999999999744,
+          "release_to_sleep_wall_seconds": 4.3952000000001865
+        },
+        "touch-cancel": {
+          "frames": 128,
+          "gesture_kinds": [
+            "None",
+            "tag"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": -0.05775661465823453,
+          "max_bead_speed_m_s": 0.1349731444358402,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 2.9499999999998323,
+          "release_to_sleep_wall_seconds": 25.891799999999815
+        },
+        "rotate-read-card": {
+          "frames": 315,
+          "gesture_kinds": [
+            "None"
+          ],
+          "final_pointers": 0,
+          "final_sleeping": true,
+          "max_reset_count": 0,
+          "tag_bounds_inside": true,
+          "min_sampled_body_sdf_mm": 0.3230873432530943,
+          "max_bead_speed_m_s": 0.006784652366833825,
+          "final_bead_speed_m_s": 0,
+          "release_to_sleep_sim_seconds": 1.1499999999999346,
+          "release_to_sleep_wall_seconds": 10.116100000000559
+        }
+      },
+      "repeat_tap_cadence": {
+        "count": 6,
+        "wall_intervals_seconds": [
+          4.114900000000373,
+          3.3160999999996275,
+          3.431,
+          3.4105,
+          3.2439000000003726
+        ],
+        "simulation_intervals_seconds": [
+          0.39999999999997726,
+          0.39999999999997726,
+          0.39999999999997726,
+          0.39999999999997726,
+          0.39999999999997726
+        ],
+        "limitation": "Software rendering delayed real event processing. This verifies repeated interruption during the flip, not real-device rapid wall-clock tap cadence."
+      },
+      "card_reading_views": {
+        "03-tag-settled": {
+          "samples": 63,
+          "visible": 63,
+          "inView": 63,
+          "body": 0,
+          "other": 0
+        },
+        "11-rear-view": {
+          "samples": 63,
+          "visible": 63,
+          "inView": 63,
+          "body": 0,
+          "other": 0
+        },
+        "12-oblique-card": {
+          "samples": 63,
+          "visible": 63,
+          "inView": 63,
+          "body": 0,
+          "other": 0
+        }
+      },
+      "collision_diagnostic_note": "Read-only approximate SDF diagnostic uses 2.5 mm voxels and 0.6 mm fur inflation. Negative samples do not by themselves prove visible triangle penetration. Screenshots and selected frames extracted from recordings were visually checked separately; no gross tunnelling or visible slice-through was observed in these gestures."
+    }
+  },
+  "findings": [
+    {
+      "id": "V1",
+      "severity": "blocking_before_fix",
+      "status": "fixed_verified_320_390_430",
+      "summary": "Original automatic tag flip cropped the right edge, confirmed with native touch. 320 maximum x=376.534 in a 320 viewport. Dynamic framing now contains card through tested automatic turns."
+    },
+    {
+      "id": "V2",
+      "severity": "informational",
+      "status": "documented",
+      "summary": "At natural front rest roughly half the card is hidden behind the toy by ordinary depth occlusion. Both photographed faces appear complete during raised turns. Native side drag, rear orbit and oblique orbit each yield 63/63 visible card samples; inspected images show the full photo. No depth-test workaround is needed."
+    },
+    {
+      "id": "V3",
+      "severity": "informational",
+      "status": "visually_accepted",
+      "summary": "Magnet back lettering and silhouette are continuous in normal and oblique views. Fine upper-right bright edges match source-photo highlights and the continuous metal rim; no missing texture patch observed."
+    },
+    {
+      "id": "V4",
+      "severity": "cosmetic",
+      "status": "open_nonblocking",
+      "summary": "Dynamic pan brings the chain apex over the left status hint at some frames, slightly reducing hint legibility; card face remains unobscured."
+    }
+  ],
+  "remaining": [],
+  "provenance_notes": [
+    "Baseline 390 DPR2 recording ended early while still keeping one full turn and settled screenshots; recovered video is explicitly marked partial. Baseline 320 has complete trace and finalized recording.",
+    "4x MP4 is accelerated playback of the untouched browser recording; original WebM and a real-time excerpt are retained.",
+    "Magnet-phase tagBounds describe the hidden plush and are not magnet viewport measurements.",
+    "Initial video finalization rename exceptions affected the Python evidence filename only after complete runs; the already finalized WebM files were renamed and validated with ffprobe. Application errors remained empty.",
+    "Source files were not edited by this reviewer. Parent implementation changes occurred after frozen baseline capture; final delivery HTML SHA256 is b2f0dbee5aac4da193294414e7af2368538025d01c58c5c7daaa1c91013f3ab8.",
+    "Original Google Drive HEIC/PNG reference photos were read only for comparison and are not included in this evidence bundle. No Library upload, commit, push or deployment was performed."
+  ],
+  "completed_utc": "2026-10-30T15:01:27Z",
+  "blockers": [],
+  "limitations": [
+    "Linux headless Chromium with software rendering only. Physical iPhone/Safari, hardware frame rate, thermals and touch feel are untested.",
+    "Six repeat taps interrupted the flip at 0.4-second application simulation intervals, but observed wall-clock event intervals were 3.24–4.11 seconds because software rendering blocked input processing. Real-device rapid wall-clock tapping rate is not validated.",
+    "Collision acceptance is visual for the recorded gestures. A read-only 2.5 mm voxel SDF with 0.6 mm fur inflation produced a minimum -1.842 mm contact sample during side drag; this approximate proxy is not a measurement of visible triangle penetration. No gross visible tunnelling or slice-through was observed in inspected gesture frames.",
+    "Deliberate pinch magnification can crop the outer toy/chain; the tested card remained visible and was recovered by the normal reset control. Automatic flips at the default held zoom stayed wholly inside all three viewports."
+  ],
+  "primary_evidence": {
+    "real_time_flip": "fixed-turns-390/single-flip-realtime.mp4",
+    "four_flips_4x_playback": "fixed-turns-390/four-flips-4x.mp4",
+    "continuous_flip_frames": "fixed-turns-390/first-flip-sequence/sequence.json",
+    "narrow_interaction_timeline": "fixed-stress-320/actions.json",
+    "narrow_interaction_frames": "fixed-stress-320/gesture-keyframes/keyframes.json",
+    "rear_reading_view": "fixed-stress-320/11-rear-view.png",
+    "oblique_reading_view": "fixed-stress-320/12-oblique-card.png",
+    "magnet_back": "fixed-magnet-390/magnet-back-normal.png",
+    "magnet_oblique": "fixed-magnet-390/magnet-back-oblique-left.png",
+    "final_html_verification": "final-html-turns-430/summary.json"
+  }
+}

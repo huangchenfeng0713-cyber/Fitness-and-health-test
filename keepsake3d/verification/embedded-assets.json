@@ -1,0 +1,227 @@
+{
+  "html_sha256": "b2f0dbee5aac4da193294414e7af2368538025d01c58c5c7daaa1c91013f3ab8",
+  "checks": [
+    {
+      "name": "magnet_spec.json",
+      "source_sha256": "ed54d68059d46efb29bd327f751320d6c0c15711555a67b8ce07cecbafa65a45",
+      "embedded_sha256": "73e7bdabb56f9053e261568a84b0d78d3c213db2d3f9984884db04798dddebca",
+      "embedded_mime": "application/json",
+      "comparison": "parsed JSON (build removes whitespace)",
+      "pass": true
+    },
+    {
+      "name": "plush.glb",
+      "source_sha256": "d143f11179489b60b245b1462e7a658e533ab421019f8c924de2fb691c055dcc",
+      "embedded_sha256": "d143f11179489b60b245b1462e7a658e533ab421019f8c924de2fb691c055dcc",
+      "embedded_mime": "model/gltf-binary",
+      "comparison": "exact bytes",
+      "pass": true
+    },
+    {
+      "name": "plush_meta.json",
+      "source_sha256": "fefc73a233cd1a9b58151cbb70696df35d7c36247db413868451e63f309487f6",
+      "embedded_sha256": "976d342e9eb4e13146bfcf7dee68280b851aaae9bf6622a80ff36fa33dd90d6f",
+      "embedded_mime": "application/json",
+      "comparison": "parsed JSON (build removes whitespace)",
+      "pass": true
+    },
+    {
+      "name": "tex/bag_header_front.png",
+      "source_sha256": "273bd2702145814279c37a18c46b9dcd4ba7b88736b6426876ef7c226533a3cf",
+      "embedded_sha256": "f18db13bcfaf553c7031a217c784d4aab06342f6309a915b8cbba07f210bd8ae",
+      "embedded_mime": "image/webp",
+      "size": [
+        1064,
+        413
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "f6cf5bf37bdd2895fecae5cc9bed0783c90013f719c7c628be868b992812d737",
+      "embedded_pixel_sha256": "468bd2c8e53e83eae7e5434814559078d7182fa85f303ce698398a0b63463ef3",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 11385,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 255
+    },
+    {
+      "name": "tex/card_back.png",
+      "source_sha256": "3bdfb70a2ed3c1432df7f818c3d1c54db254b9407166371e7a88d104ebdedd70",
+      "embedded_sha256": "3fe02bc0e3354c45beb42504fbd0c36de6ae76e3e8050f33fcdcc18cb2312035",
+      "embedded_mime": "image/webp",
+      "size": [
+        816,
+        1146
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "e08fe78883e6fd0f5697059fdd61bb625a5f8c44f35dc2532817b95aac198240",
+      "embedded_pixel_sha256": "e08fe78883e6fd0f5697059fdd61bb625a5f8c44f35dc2532817b95aac198240",
+      "exact_rgba_match": true,
+      "different_transparent_pixels": 0,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 0
+    },
+    {
+      "name": "tex/card_front.png",
+      "source_sha256": "250b17e64b8dcdc7bd5e88c3ff37fe912af43d07bad766af66546c8ea8f1d730",
+      "embedded_sha256": "844d8527e0a3e09514918b4fa91c1f4e653c11964dbe7d83ade85d5abbf6303a",
+      "embedded_mime": "image/webp",
+      "size": [
+        816,
+        1146
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "5fb33ff841483e05461ce7b541027276f8d945b5db5f774d49c72344559656b0",
+      "embedded_pixel_sha256": "71a25065bc8e0d52ba3a21b93371d061f30b508733004cd79e05a496c85348fd",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 305991,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 254
+    },
+    {
+      "name": "tex/card_inside_back.png",
+      "source_sha256": "bafd1e8c31a46c5179f2ee0ad3193b56ddbae4bc06b746b9f69bd26875b64272",
+      "embedded_sha256": "da58305d50404c72252e2cc1c446f0051fe730419db5adc9fbf5eae160d70786",
+      "embedded_mime": "image/webp",
+      "size": [
+        816,
+        1146
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "7daa74acfe796e2b23817c65587d1d9611bd2bff73c9bed59202c8e396805e55",
+      "embedded_pixel_sha256": "5bd266e94bd10484670cfce48f540dbe5baa3e99c06df284a0be40b373c2ffd3",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 34621,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 247
+    },
+    {
+      "name": "tex/card_inside_front.png",
+      "source_sha256": "c91fcc40fa0e43412107dddd8bd11a17230b6bbed1aa668d06206e63b6ccf059",
+      "embedded_sha256": "745f614d05860d6a307fcdaed29c46e77df609e713957f0ba8b29306b82512b5",
+      "embedded_mime": "image/webp",
+      "size": [
+        816,
+        1146
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "77c2c4b03c65e26f29f2cc75003c97f5b2b87f61a749ed65513cd11b95f674bc",
+      "embedded_pixel_sha256": "41f9f5502c98d2cc7d3507c63c0f286650927e71f6a39068f3a90a32fba9e8a4",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 245173,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 10
+    },
+    {
+      "name": "tex/magnet_back.png",
+      "source_sha256": "d923dd687f6099fe0a61f6d9677d94a631f7528bdf8ddf651a89588ed7359de4",
+      "embedded_sha256": "697d3c97cad8946e4b2eb92f5ecb5a91e9bd5bf0b77ac8ffeedb63578d91b7a1",
+      "embedded_mime": "image/webp",
+      "size": [
+        1548,
+        1535
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "98a2bee8a78374a9357bb45d636a368a600da0a7c16ae4dc73fd838be654f76a",
+      "embedded_pixel_sha256": "98a2bee8a78374a9357bb45d636a368a600da0a7c16ae4dc73fd838be654f76a",
+      "exact_rgba_match": true,
+      "different_transparent_pixels": 0,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 0
+    },
+    {
+      "name": "tex/magnet_front.png",
+      "source_sha256": "dc9ee4652cf02d96b635197b6ebab31154f6b6dd0b47b07558e154971dd1f589",
+      "embedded_sha256": "05f82c4fd644563be1e6a98ea4b160b3e03b70831cca780daf5280844ba0b8b6",
+      "embedded_mime": "image/webp",
+      "size": [
+        1548,
+        1535
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "68eb7aac846e2d47b23dce6f5c61a1e67e46a01b73dad90a361f6dfa641c0d40",
+      "embedded_pixel_sha256": "7fb1f695c008a63b7f07a50b9b383ee9d1c535d4b95bf9d2b19ea2d8ac800a70",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 1228019,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 255
+    },
+    {
+      "name": "tex/plush_masks.png",
+      "source_sha256": "0b2b010313100a03e956f0e61276a15d14a33c35ecfdbd8bca65e8e89c0a6d39",
+      "embedded_sha256": "ab2fed03d7c4f9705dba1ef98772b6a1cd36529533d0bca3b0ef67418e8c0433",
+      "embedded_mime": "image/webp",
+      "size": [
+        1024,
+        1024
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "ad044cd8d0143dec06ce94e8aa98280aec5e19ac9a043fbd78e0519d4219b0d1",
+      "embedded_pixel_sha256": "ad044cd8d0143dec06ce94e8aa98280aec5e19ac9a043fbd78e0519d4219b0d1",
+      "exact_rgba_match": true,
+      "different_transparent_pixels": 0,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 0
+    },
+    {
+      "name": "tex/plush_pile_normal.png",
+      "source_sha256": "402a53701b19f7c15d891ac69f91b61ef91e9a6649cea8fd791462f7ad7a08fe",
+      "embedded_sha256": "b87a4bc42372bc00cee75f6c682a1adc039535e56f921144d95f007055513ab9",
+      "embedded_mime": "image/webp",
+      "size": [
+        3072,
+        3072
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "6f2f6ac7f7006ce8001f2063a42e044d04ffa23c3cc7d0c69eba4f284ed19d0f",
+      "embedded_pixel_sha256": "6f2f6ac7f7006ce8001f2063a42e044d04ffa23c3cc7d0c69eba4f284ed19d0f",
+      "exact_rgba_match": true,
+      "different_transparent_pixels": 0,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 0
+    },
+    {
+      "name": "tex/tag_back.png",
+      "source_sha256": "e5e7d2ec2e78dbd9898d8532d8cc9e17ca7fe5314f0011bdad3ecd53fa10126f",
+      "embedded_sha256": "db249222fc78cd1c7c58a6d6a9cb2f459c14e7d6eee6711dfe49f856df7ce8e4",
+      "embedded_mime": "image/webp",
+      "size": [
+        522,
+        680
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "872b076e3a64aa8d714377b0962e5de2cfec4356f0ae1f4096fdb9ff9bf7b9eb",
+      "embedded_pixel_sha256": "cde8aabe6a7a7029c500292756173cc5b54c8c44c90aa2ac8a2f639738d07129",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 2070,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 245
+    },
+    {
+      "name": "tex/tag_front.png",
+      "source_sha256": "a7049c7696db687b3255002dfc4260100659cf58ad01892d77cc2e00be05124e",
+      "embedded_sha256": "284131e93017e384f601499adf52d60120b8081862f1f51e9da0530de401c152",
+      "embedded_mime": "image/webp",
+      "size": [
+        522,
+        680
+      ],
+      "comparison": "decoded visible RGB and alpha; exact RGBA match reported separately",
+      "source_pixel_sha256": "52d4d8be09a06ee8e93f3ead5a8caf79d6be5882dc51d98cd509030568f5bd2e",
+      "embedded_pixel_sha256": "a39136f6e25cad9aa4b57162af69f69cc71dacb946d342989da4fd5b262586db",
+      "exact_rgba_match": false,
+      "different_transparent_pixels": 2548,
+      "different_visible_pixels": 0,
+      "pass": true,
+      "max_channel_error": 224
+    }
+  ]
+}

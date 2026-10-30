@@ -1,0 +1,423 @@
+{
+  "method": "Node geometry, soft-body physics and standard GLB export",
+  "checks": [
+    {
+      "name": "seam binding matches rebuilt photo-traced mesh",
+      "pass": true,
+      "detail": {
+        "vertices": 82484
+      }
+    },
+    {
+      "name": "side-photo head depth is below 17 mm",
+      "pass": true,
+      "detail": {
+        "depth": 0.0164882130920887
+      }
+    },
+    {
+      "name": "slim lower legs stay below 6.5 mm depth",
+      "pass": true,
+      "detail": {
+        "depth": 0.005960407201200724
+      }
+    },
+    {
+      "name": "all label roots are buried within the side seam",
+      "pass": true,
+      "detail": {
+        "maxDistance": 0.0006741451723868746
+      }
+    },
+    {
+      "name": "revised mesh and hanging mechanism finite",
+      "pass": true
+    },
+    {
+      "name": "toy remains on hook at rest",
+      "pass": true
+    },
+    {
+      "name": "white pile normal texture retained",
+      "pass": true
+    },
+    {
+      "name": "cloth remains exclusively on front",
+      "pass": true,
+      "detail": {
+        "minZ": 0.003650000086054206
+      }
+    },
+    {
+      "name": "local touch still moves toy",
+      "pass": true
+    },
+    {
+      "name": "toy settles after touch",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 0",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 1",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 2",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 3",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 4",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 5",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 6",
+      "pass": true
+    },
+    {
+      "name": "light tap hits 7",
+      "pass": true
+    },
+    {
+      "name": "repeated taps do not launch toy",
+      "pass": true,
+      "detail": {
+        "maxSpeed": 0.014172040559058335
+      }
+    },
+    {
+      "name": "first finger hits shortened head",
+      "pass": true
+    },
+    {
+      "name": "second finger hits shortened head",
+      "pass": true
+    },
+    {
+      "name": "two-finger deformation stays within 2 mm sewn envelope",
+      "pass": true,
+      "detail": {
+        "deformation": 0.0014393482535217873
+      }
+    },
+    {
+      "name": "sewn label stays attached during two-finger interaction",
+      "pass": true,
+      "detail": {
+        "maxDistance": 0.0006741451723868746
+      }
+    },
+    {
+      "name": "dense filling settles without rubber-like wobble",
+      "pass": true,
+      "detail": {
+        "deformation": 0
+      }
+    },
+    {
+      "name": "lower-body contact is directly grabbable",
+      "pass": true
+    },
+    {
+      "name": "label root stays sewn under lower-body pull",
+      "pass": true,
+      "detail": {
+        "maxDistance": 0.0006754027748727417
+      }
+    },
+    {
+      "name": "large drag cannot stretch the cloth envelope",
+      "pass": true,
+      "detail": {
+        "deformation": 0.001241373907291814
+      }
+    },
+    {
+      "name": "single finger can lift toy",
+      "pass": true
+    },
+    {
+      "name": "lifting unhooks toy",
+      "pass": true
+    },
+    {
+      "name": "new lower body collides with table",
+      "pass": true,
+      "detail": {
+        "minY": -0.00011486060552143209
+      }
+    },
+    {
+      "name": "landing stays weakly elastic and settles",
+      "pass": true
+    },
+    {
+      "name": "dropped toy enters sleep",
+      "pass": true,
+      "detail": {
+        "speed": 0
+      }
+    },
+    {
+      "name": "sleeping toy stays still for five seconds",
+      "pass": true
+    },
+    {
+      "name": "release has real inertia at 30 Hz",
+      "pass": true
+    },
+    {
+      "name": "rotation stops at 30 Hz",
+      "pass": true
+    },
+    {
+      "name": "release has real inertia at 60 Hz",
+      "pass": true
+    },
+    {
+      "name": "rotation stops at 60 Hz",
+      "pass": true
+    },
+    {
+      "name": "release has real inertia at 120 Hz",
+      "pass": true
+    },
+    {
+      "name": "rotation stops at 120 Hz",
+      "pass": true
+    },
+    {
+      "name": "rotation travel is frame-rate independent",
+      "pass": true,
+      "detail": {
+        "error": 0
+      }
+    },
+    {
+      "name": "holding still before release discards stale velocity",
+      "pass": true
+    },
+    {
+      "name": "cancel discards release momentum",
+      "pass": true
+    },
+    {
+      "name": "invalid clock values cannot corrupt rotation",
+      "pass": true
+    },
+    {
+      "name": "exhibition sleeps under gravity",
+      "pass": true
+    },
+    {
+      "name": "both tag faces have distinct full-size textures",
+      "pass": true
+    },
+    {
+      "name": "input moves body and flexible chain",
+      "pass": true
+    },
+    {
+      "name": "suspension stays attached during a flick",
+      "pass": true
+    },
+    {
+      "name": "released chain and body settle",
+      "pass": true
+    },
+    {
+      "name": "sleep is exactly stationary",
+      "pass": true
+    },
+    {
+      "name": "tag accepts turn 0",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 0",
+      "pass": true,
+      "detail": {
+        "dot": -0.99986372614331
+      }
+    },
+    {
+      "name": "tag accepts turn 1",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 1",
+      "pass": true,
+      "detail": {
+        "dot": 0.9987074467426285
+      }
+    },
+    {
+      "name": "tag accepts turn 2",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 2",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998416882996441
+      }
+    },
+    {
+      "name": "tag accepts turn 3",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 3",
+      "pass": true,
+      "detail": {
+        "dot": 0.9987300315090076
+      }
+    },
+    {
+      "name": "tag accepts turn 4",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 4",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998427713458591
+      }
+    },
+    {
+      "name": "tag accepts turn 5",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 5",
+      "pass": true,
+      "detail": {
+        "dot": 0.9987361896319149
+      }
+    },
+    {
+      "name": "tag accepts turn 6",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 6",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998412089878883
+      }
+    },
+    {
+      "name": "tag accepts turn 7",
+      "pass": true
+    },
+    {
+      "name": "tag shows alternate face 7",
+      "pass": true,
+      "detail": {
+        "dot": 0.998737723838017
+      }
+    },
+    {
+      "name": "repeated flips never detach or reset the mechanism",
+      "pass": true,
+      "detail": {
+        "resets": 0
+      }
+    },
+    {
+      "name": "chain link stretch stays bounded during flips",
+      "pass": true,
+      "detail": {
+        "peakStretch": 1.1658022107748525
+      }
+    },
+    {
+      "name": "repeated flips settle",
+      "pass": true
+    },
+    {
+      "name": "paper tag is independently grabbable",
+      "pass": true
+    },
+    {
+      "name": "drag moves the tag independently of the view",
+      "pass": true
+    },
+    {
+      "name": "cancel releases the tag and preserves suspension",
+      "pass": true
+    },
+    {
+      "name": "gravity trajectory agrees at 30, 60 and 120 Hz",
+      "pass": true,
+      "detail": {
+        "frameError": 5.706494328662636e-8
+      }
+    },
+    {
+      "name": "mechanism does not stretch sewn fabric",
+      "pass": true
+    },
+    {
+      "name": "fibre winding agrees with outward fabric normals",
+      "pass": true,
+      "detail": {
+        "ratio": 1
+      }
+    },
+    {
+      "name": "export plush-body.glb",
+      "pass": true,
+      "detail": {
+        "bytes": 18580484
+      }
+    },
+    {
+      "name": "readback plush-body.glb",
+      "pass": true,
+      "detail": {
+        "size": [
+          0.04585897736251354,
+          0.11715541800367646,
+          0.01699862629175186
+        ]
+      }
+    },
+    {
+      "name": "export plush-chain-tag.glb",
+      "pass": true,
+      "detail": {
+        "bytes": 20003320
+      }
+    },
+    {
+      "name": "readback plush-chain-tag.glb",
+      "pass": true,
+      "detail": {
+        "size": [
+          0.0582403911436417,
+          0.1814102789676899,
+          0.047530695455904895
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "assets/plush.glb": "d143f11179489b60b245b1462e7a658e533ab421019f8c924de2fb691c055dcc",
+    "assets/plush_meta.json": "fefc73a233cd1a9b58151cbb70696df35d7c36247db413868451e63f309487f6",
+    "assets/tex/plush_masks.png": "0b2b010313100a03e956f0e61276a15d14a33c35ecfdbd8bca65e8e89c0a6d39",
+    "src/fur_strands.js": "beeee0249c32379761ce194865a0fa56acb684e0fbc466aa83fb840fe48802a1",
+    "src/plush_engine.js": "2367c911057375711396c977e737fc5430e72678d24fe8640652e8d9ca99475e"
+  }
+}

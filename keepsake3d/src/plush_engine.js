@@ -774,7 +774,7 @@ export async function createPlush(ctx, opts = {}) {
   if (!wallMount) for (let y = baseTop + 0.004; y < postTop; y += 0.004) probes.push(postXZ.x, y, postXZ.z, P.postRadius);
   // box colliders (world space, e.g. the hutch boards) + horizontal resting surfaces
   const boxList = (Array.isArray(opts.colliders) ? opts.colliders : []).filter((b) => b && b.isBox3).map((b) => [b.min.x, b.min.y, b.min.z, b.max.x, b.max.y, b.max.z]);
-  if (wallMount) boxList.push([H.x - 0.12, Math.max(tableY, H.y - 0.3), wallZ - 0.012, H.x + 0.12, H.y + 0.15, wallZ]);   // the wall the hook comes out of
+  if (wallMount && !opts.exhibition) boxList.push([H.x - 0.12, Math.max(tableY, H.y - 0.3), wallZ - 0.012, H.x + 0.12, H.y + 0.15, wallZ]);   // the wall the hook comes out of
   const BOX = Float64Array.from(boxList.flat()); const nBox = BOX.length / 6;
   const supports = (Array.isArray(opts.supports) && opts.supports.length ? opts.supports : [{ y: tableY, min: { x: -1e3, y: -1e3 }, max: { x: 1e3, y: 1e3 } }])
     .map((s) => ({ y: s.y, x0: s.min.x, z0: s.min.y, x1: s.max.x, z1: s.max.y }));
@@ -835,6 +835,8 @@ export async function createPlush(ctx, opts = {}) {
   const bx = new Float64Array(N * 3), bp = new Float64Array(N * 3), bv = new Float64Array(N * 3);
   const bim = new Float64Array(N).fill(1 / P.beadMass);
   bim[0] = bim[1] = 1 / (P.beadMass + P.claspMass / 2);
+  let exhibitionPin = -1;
+  const pinPosition = new THREE.Vector3();
   const bendMin = new Float64Array(N);
   const cosB = Math.cos(P.bendMaxDeg * Math.PI / 180);
   for (let i = 0; i < N; i++) { const L1 = segL[(i - 1 + N) % N], L2 = segL[i]; bendMin[i] = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * cosB); }
@@ -968,6 +970,32 @@ export async function createPlush(ctx, opts = {}) {
   const furStrokes = [];
   let furStrokeVersion = 0;
   let sleeping = false, calm = 0, floorCalm = 0, acc = 0, offHook = 0;
+  let tagTurn = null, tagFlipDirection = 1;
+  const turnQ = new THREE.Quaternion(), turnError = new THREE.Quaternion();
+  const turnHole = new THREE.Vector3(), turnTarget = new THREE.Vector3();
+  // A brief hand-assisted turn: lift the hole along the chain before turning the
+  // card. The same attachment, collision and gravity solver remains in charge.
+  function stepTagTurn(h) {
+    if (!tagTurn) return;
+    const t = tagTurn.t += h;
+    if (t > 1.8) { tagTurn = null; return; }
+    const lift = clamp(t / .4, 0, 1), turn = clamp((t - .35) / .7, 0, 1);
+    turnTarget.lerpVectors(tagTurn.hole, tagTurn.target, lift * lift * (3 - 2 * lift));
+    turnQ.slerpQuaternions(tagTurn.from, tagTurn.to, turn * turn * (3 - 2 * turn));
+    turnError.set(-tag.qx, -tag.qy, -tag.qz, tag.qw).premultiply(turnQ).normalize();
+    const sign = turnError.w < 0 ? -1 : 1;
+    tag.wx += clamp(600 * turnError.x * sign - 34 * tag.wx, -450, 450) * h;
+    tag.wy += clamp(600 * turnError.y * sign - 34 * tag.wy, -450, 450) * h;
+    tag.wz += clamp(600 * turnError.z * sign - 34 * tag.wz, -450, 450) * h;
+    const R = tag.R;
+    const rx = R[0] * holeL[0] + R[1] * holeL[1], ry = R[3] * holeL[0] + R[4] * holeL[1], rz = R[6] * holeL[0] + R[7] * holeL[1];
+    const k = P.tagMass * 1600, c = P.tagMass * 72;
+    turnHole.set(
+      k * (turnTarget.x - tag.x - rx) - c * tag.vx,
+      k * (turnTarget.y - tag.y - ry) - c * tag.vy + P.tagMass * GRAV,
+      k * (turnTarget.z - tag.z - rz) - c * tag.vz).clampLength(0, .12);
+    tag.applyImpulse(turnHole.x * h, turnHole.y * h, turnHole.z * h, 0, 0, 0);
+  }
   const stats = { ms: 0, mechMs: 0, fleshMs: 0, skinMs: 0, steps: 0, particles: nP, cells: nCells, verts: soft.reduce((a, s) => a + s.n, 0),
     tris: soft.reduce((a, s) => a + s.nTri, 0), sleeping: false, fleshActive: false, fleshDev: 0, fleshRelV: 0, fleshResets: 0, mechResets: 0,
     beads: N, activeCells: 0 };
@@ -975,12 +1003,19 @@ export async function createPlush(ctx, opts = {}) {
   /* ---------------------------------------------- state init ---------------------------------------------- */
   const qPlushInit = new THREE.Quaternion().setFromAxisAngle(UP, facing);
   function initState() {
+    tagTurn = null; tagFlipDirection = 1;
     // chain: bead 0/1 (the clasp) partway down the +SIDE strand
     const sOff = qT + Lst * 0.42;
     const v = new THREE.Vector3();
     for (let i = 0; i < N; i++) {
       loopPoint(sOff + cum[i], v);
       bx[i * 3] = v.x; bx[i * 3 + 1] = v.y; bx[i * 3 + 2] = v.z;
+    }
+    if (opts.exhibition) {
+      if (exhibitionPin >= 0) bim[exhibitionPin] = 1 / P.beadMass;
+      exhibitionPin = 0;
+      for (let i = 1; i < N; i++) if (bx[i * 3 + 1] > bx[exhibitionPin * 3 + 1]) exhibitionPin = i;
+      pinPosition.fromArray(bx, exhibitionPin * 3); bim[exhibitionPin] = 0;
     }
     bp.set(bx); bv.fill(0); bxPrev.set(bx);
     // plush: cord loop at the bottom of the loop
@@ -1047,6 +1082,7 @@ export async function createPlush(ctx, opts = {}) {
     for (let i = 0; i < N; i++) {
       const o = i * 3;
       bp[o] = bx[o]; bp[o + 1] = bx[o + 1]; bp[o + 2] = bx[o + 2];
+      if (i === exhibitionPin) { bv[o] = bv[o + 1] = bv[o + 2] = 0; continue; }
       bv[o] *= d; bv[o + 1] = (bv[o + 1] - gh) * d; bv[o + 2] *= d;
       bx[o] += bv[o] * h; bx[o + 1] += bv[o + 1] * h; bx[o + 2] += bv[o + 2] * h;
     }
@@ -1094,10 +1130,15 @@ export async function createPlush(ctx, opts = {}) {
   // bead vs table / base / eye (torus) / arm / tip / post.  record: store contacts + near flags.
   function beadCollideStatic(i, friction, record) {
     const o = i * 3;
+    if (opts.exhibition) {
+      if (i === exhibitionPin) pinPosition.toArray(bx, o);
+      bcontact[i] = i === exhibitionPin ? 1 : 0; bnear[i] = bcontact[i];
+      return;
+    }
     let x = bx[o], y = bx[o + 1], z = bx[o + 2];
     let touched = 0, near = 0;
     const ty = tableY + rb;
-    if (y < ty + 0.002) {
+    if (!opts.exhibition && y < ty + 0.002) {
       near = 1;
       if (y < ty) { const d = ty - y; bx[o + 1] = ty; y = ty; if (friction) { beadFriction(o, 0, 1, 0, d, P.tableFriction); x = bx[o]; z = bx[o + 2]; } touched = 2; }
     }
@@ -1113,7 +1154,7 @@ export async function createPlush(ctx, opts = {}) {
     }
     // base disc
     const ddx = x - baseC.x, ddz = z - baseC.z, hd = Math.hypot(ddx, ddz);
-    if (hd < P.baseRadius + rb + 0.002 && y < baseTop + rb + 0.002) {
+    if (!opts.exhibition && hd < P.baseRadius + rb + 0.002 && y < baseTop + rb + 0.002) {
       near = 1;
       if (hd < P.baseRadius + rb && y < baseTop + rb) {
         const up = baseTop + rb - y, side = P.baseRadius + rb - hd;
@@ -1208,7 +1249,7 @@ export async function createPlush(ctx, opts = {}) {
   // Link wires vs the eye: the midpoint of every link near the eye must stay on the side of the wire it started the
   // substep on, at least a link radius away - otherwise a stretched link could let the wire slip between two beads.
   function linksVsEye() {
-    if (!hooked) return;
+    if (opts.exhibition || !hooked) return;
     const rl = P.hookWire + 0.0004, Re = P.eyeRadius;
     for (let i = 0; i < N; i++) {
       const j = i === N - 1 ? 0 : i + 1;
@@ -1265,6 +1306,24 @@ export async function createPlush(ctx, opts = {}) {
       const s = (d - m) / ((wa + wb) * Math.max(d, 1e-9));
       bx[oa] += dx * s * wa; bx[oa + 1] += dy * s * wa; bx[oa + 2] += dz * s * wa;
       bx[ob] -= dx * s * wb; bx[ob + 1] -= dy * s * wb; bx[ob + 2] -= dz * s * wb;
+    }
+  }
+  // Opposite sides of the closed loop must not collapse into the same strand.
+  // Adjacent beads are already separated by the link-length constraint.
+  function separateBeads() {
+    if (!opts.exhibition) return;
+    const separation = 2 * rb + .0001;
+    for (let i = 0; i < N; i++) for (let j = i + 2; j < N; j++) {
+      if (i === 0 && j === N - 1) continue;
+      const a = i * 3, b = j * 3;
+      let x = bx[b] - bx[a], y = bx[b + 1] - bx[a + 1], z = bx[b + 2] - bx[a + 2];
+      let d = Math.hypot(x, y, z);
+      if (d >= separation || bim[i] + bim[j] === 0) continue;
+      if (d < 1e-9) { x = 1e-9; y = z = 0; d = 1e-9; }
+      const scale = (separation - d) / (d * (bim[i] + bim[j]));
+      const wi = scale * bim[i], wj = scale * bim[j];
+      bx[a] -= x * wi; bx[a + 1] -= y * wi; bx[a + 2] -= z * wi;
+      bx[b] += x * wj; bx[b + 1] += y * wj; bx[b + 2] += z * wj;
     }
   }
   // plush cord loop / tag hole <-> nearest point on the chain (two-way, slides freely)
@@ -1392,6 +1451,7 @@ export async function createPlush(ctx, opts = {}) {
   let tagFloor = 0;
   function plushVsFloor() {
     floorContact = 0;
+    if (opts.exhibition) return;
     if (nBox && sphereNearBoxes(core.x, core.y, core.z, plushBoundR)) {
       for (let i = 0; i < nPS; i++) {
         const lx = plushSamples[i * 3], ly = plushSamples[i * 3 + 1], lz = plushSamples[i * 3 + 2], R = core.R;
@@ -1421,7 +1481,8 @@ export async function createPlush(ctx, opts = {}) {
   }
   // tag samples vs table, base, eye, arm, post
   function tagVsStatic() {
-    const nearFloor = tag.y - tagBoundR < Math.max(baseTop, tableY) + 0.003;
+    if (opts.exhibition) return;
+    const nearFloor = !opts.exhibition && tag.y - tagBoundR < Math.max(baseTop, tableY) + 0.003;
     tagFloor = nearFloor ? 1 : 0;
     const nearEye = (tag.x - ringC.x) ** 2 + (tag.y - ringC.y) ** 2 + (tag.z - ringC.z) ** 2 < (tagBoundR + eyeReach + 0.002) ** 2;
     const nearArm = (tag.x - armBound.center.x) ** 2 + (tag.y - armBound.center.y) ** 2 + (tag.z - armBound.center.z) ** 2 < (tagBoundR + armBound.radius) ** 2;
@@ -1476,6 +1537,7 @@ export async function createPlush(ctx, opts = {}) {
   }
   // hook wire / post points pushing the plush (via its SDF)
   function probesVsPlush() {
+    if (opts.exhibition) return;
     const bR = plushBoundR + 0.007;
     for (let i = 0; i < nProbes; i++) {
       const k = i * 4, px = PROBE[k], py = PROBE[k + 1], pz = PROBE[k + 2], pr = PROBE[k + 3];
@@ -1569,6 +1631,7 @@ export async function createPlush(ctx, opts = {}) {
   function mechStep(h) {
     integrateBeads(h);
     integratePlush(h);
+    stepTagTurn(h);
     tag.integrate(h, P.tagLinDamp, P.tagAngDamp);
     if (grabBead) grabBead.lambda = 0;
     if (grabTag) grabTag.lambda = 0;
@@ -1576,13 +1639,14 @@ export async function createPlush(ctx, opts = {}) {
     for (let it = 0; it < P.mechIters; it++) {
       chainDistances(0); chainDistances(1); chainDistances(0);
       chainBending();
+      separateBeads();
       grabConstraints(h);
       attachBody(core, attachB[0], attachB[1], attachB[2], trackP, P.cordSlack);
       attachBody(tag, holeL[0], holeL[1], 0, trackT, P.tagHoleSlack);
       separateTagPlush();
       beadsVsPlush();
       tagVsPlush();
-      if (it === 0) tagAlign();
+      if (it === 0 && !tagTurn && !grabTag) tagAlign();
       for (let i = 0; i < N; i++) if (bnear[i]) beadCollideStatic(i, false, false);
       linksVsEye();
     }
@@ -1800,7 +1864,7 @@ export async function createPlush(ctx, opts = {}) {
     // a sharp jolt of the core (yank, collision, flick) wakes the flesh
     const jolt = Math.hypot(core.vx - v0x, core.vy - v0y, core.vz - v0z) / hF;
     if (jolt > 6) lastExcite = simTime;
-    const wantFlesh = simTime - lastExcite < 1.0 || stats.fleshDev > 2e-5 || stats.fleshRelV > 4e-4;
+    const wantFlesh = !opts.exhibition && (simTime - lastExcite < 1.0 || stats.fleshDev > 2e-5 || stats.fleshRelV > 4e-4);
     if (wantFlesh && !fleshActive) { fleshToRest(); fleshActive = true; }
     if (fleshActive) {
       fleshStep(hF);
@@ -1962,6 +2026,7 @@ export async function createPlush(ctx, opts = {}) {
   function pickBeads(ray) {
     let best = null; const pr = rb + 0.0011, o = ray.origin, d = ray.direction;
     for (let i = 0; i < N; i++) {
+      if (i === exhibitionPin) continue;
       const cx = bxR[i * 3] - o.x, cy = bxR[i * 3 + 1] - o.y, cz = bxR[i * 3 + 2] - o.z;
       const t = cx * d.x + cy * d.y + cz * d.z; if (t < 0) continue;
       const q2 = cx * cx + cy * cy + cz * cz - t * t; const r = i <= 1 ? pr + 0.0008 : pr;
@@ -2237,7 +2302,7 @@ export async function createPlush(ctx, opts = {}) {
     const R = core.R; return out.set(core.x + R[0] * attachB[0] + R[1] * attachB[1] + R[2] * attachB[2], core.y + R[3] * attachB[0] + R[4] * attachB[1] + R[5] * attachB[2], core.z + R[6] * attachB[0] + R[7] * attachB[1] + R[8] * attachB[2]);
   }
   function checkUnhook() {   // lifting the loop / the toy clearly above the eye takes it off the hook
-    if (!hooked || !gesture) return;
+    if (opts.exhibition || !hooked || !gesture) return;
     let y = -1;
     if (grabBead) y = bx[grabBead.i * 3 + 1];
     else if (plushGrabs.length) y = attachWorld(_v).y;
@@ -2310,6 +2375,7 @@ export async function createPlush(ctx, opts = {}) {
     setTool(name) { tool = name; },
     get hooked() { return hooked; },
     pointerDown(info) {
+      tagTurn = null;
       if (gesture) {   // a second finger on the plush turns the gesture into a two-finger one (pinch / bend / twist)
         if (gesture.kind === 'pending' || gesture.kind === 'pet' || gesture.kind === 'grab') {
           const hit = pickPlush(localRay(info));
@@ -2430,18 +2496,18 @@ export async function createPlush(ctx, opts = {}) {
       const t0 = performance.now();
       stats.mechMs = 0; stats.fleshMs = 0; stats.skinMs = 0; stats.normalMs = 0; stats.steps = 0;
       checkUnhook();
-      if (gesture || squeeze || grabBead || grabTag || plushGrabs.length) wake();
+      if (gesture || squeeze || grabBead || grabTag || tagTurn || plushGrabs.length) wake();
       if (!sleeping) {
         const hF = 1 / P.fleshHz;
         acc += dt;
         let n = 0;
-        while (acc >= hF && n < 4) { stepOnce(); acc -= hF; n++; }
+        while (acc >= hF && n < (opts.exhibition ? 12 : 4)) { stepOnce(); acc -= hF; n++; }
         if (acc >= hF) acc = hF * 0.999;
         stats.steps = n;
         // if the loop ever leaves the hook without being lifted off (it shouldn't), treat it as taken off
         let onHook = false; for (let i = 0; i < N; i++) if (bcontact[i] === 1) { onHook = true; break; }
         offHook = onHook || gesture || !hooked ? 0 : offHook + dt;
-        if (offHook > 2.0) { offHook = 0; hooked = false; }
+        if (!opts.exhibition && offHook > 2.0) { offHook = 0; hooked = false; }
         if (!hooked && !awayFromHook) {
           let near = Infinity; for (let i = 0; i < N; i++) near = Math.min(near, Math.hypot(bx[i * 3] - ringC.x, bx[i * 3 + 1] - ringC.y, bx[i * 3 + 2] - ringC.z));
           if (near > P.rehangRadius * 2.2) awayFromHook = true;
@@ -2449,7 +2515,7 @@ export async function createPlush(ctx, opts = {}) {
         if (hooked) awayFromHook = false;
         syncVisuals(clamp(acc / hF, 0, 1));
         let maxB = 0; for (let i = 0; i < N * 3; i += 3) maxB = Math.max(maxB, bv[i] * bv[i] + bv[i + 1] * bv[i + 1] + bv[i + 2] * bv[i + 2]);
-        const busy = gesture || squeeze || (fleshActive && stats.fleshRelV > 2e-3) || maxB > 4e-6 || Math.hypot(core.vx, core.vy, core.vz) > 1.5e-3 || Math.hypot(core.wx, core.wy, core.wz) > 0.03
+        const busy = gesture || squeeze || tagTurn || (fleshActive && stats.fleshRelV > 2e-3) || maxB > 4e-6 || Math.hypot(core.vx, core.vy, core.vz) > 1.5e-3 || Math.hypot(core.wx, core.wy, core.wz) > 0.03
           || Math.hypot(tag.vx, tag.vy, tag.vz) > 3e-3 || Math.hypot(tag.wx, tag.wy, tag.wz) > 0.08;
         calm = busy ? 0 : calm + dt;
         // A supported toy may rest even if lightweight beads retain solver noise.
@@ -2483,6 +2549,30 @@ export async function createPlush(ctx, opts = {}) {
       if (t.front) { tagMats[0].map = t.front; tagMats[0].needsUpdate = true; }
       if (t.back) { tagMats[1].map = t.back; tagMats[1].needsUpdate = true; }
     },
+    // Exhibition gestures use the mechanism without re-skinning 160k triangles.
+    nudge(velocity) {
+      const v = velocity.clone();
+      group.updateWorldMatrix(true, false);
+      const length = Math.min(.12, v.length());
+      v.transformDirection(_inv.copy(group.matrixWorld).invert()).multiplyScalar(length);
+      core.vx = clamp(core.vx + v.x, -.18, .18);
+      core.vy = clamp(core.vy + v.y, -.18, .18);
+      core.vz = clamp(core.vz + v.z, -.18, .18);
+      tag.vx += v.x * .6; tag.vy += v.y * .6; tag.vz += v.z * .6;
+      wake();
+    },
+    turnTag() {
+      if (!opts.exhibition || gesture) return false;
+      const from = new THREE.Quaternion(tag.qx, tag.qy, tag.qz, tag.qw);
+      const hole = new THREE.Vector3(...holeL).applyQuaternion(from).add(new THREE.Vector3(tag.x, tag.y, tag.z));
+      const to = from.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(...holeL).normalize(), Math.PI * tagFlipDirection));
+      tagFlipDirection *= -1;
+      tagTurn = {t: 0, from, to, hole, target: H.clone().add(new THREE.Vector3(.035, -.025, -.012))};
+      wake(); return true;
+    },
+    cancelInteraction() { endGesture(null, true); tagTurn = null; },
+    get tagTurning() { return !!tagTurn; },
+    get isGrabbed() { return !!(gesture || squeeze || grabBead || grabTag || plushGrabs.length); },
     get isSleeping() { return sleeping; },
     exportObject() { return group; },
     dispose() {
@@ -2492,7 +2582,7 @@ export async function createPlush(ctx, opts = {}) {
     },
     /** internals for tests / tuning (not part of the contract) */
     _debug: { core, tag, bx, bv, bim, bcontact, H, com0, attachRest, sdf, sdfSample, nP, N, fu, fw, XA, X0, initState, mechStep, preroll,
-      get trackP() { return trackP; }, get trackT() { return trackT; }, get gesture() { return gesture; }, get squeeze() { return squeeze; },
+      get exhibitionPin() { return exhibitionPin; }, get trackP() { return trackP; }, get trackT() { return trackT; }, get gesture() { return gesture; }, get squeeze() { return squeeze; },
       get fleshActive() { return fleshActive; }, get simTime() { return simTime; }, plushBoundR, ringC, postXZ },
   };
 

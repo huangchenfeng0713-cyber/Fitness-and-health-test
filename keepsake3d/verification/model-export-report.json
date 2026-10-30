@@ -1,0 +1,14 @@
+{
+  "exports": {
+    "magnet.glb": 7822032,
+    "magnet-packaged.glb": 13863512,
+    "exhibit-plush.glb": 21384600,
+    "exhibit-magnet.glb": 13863512
+  },
+  "pageErrors": [],
+  "missingPhotoFailure": {
+    "error": "Error: magnet_scene: required photo failed to load: tex/magnet_back.png",
+    "ready": false,
+    "message": "暂时无法载入藏品，请刷新重试。"
+  }
+}

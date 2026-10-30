@@ -2,7 +2,7 @@ name: Deploy UI preview site
 
 on:
   push:
-    branches: [main]
+    branches: [main, codex/keepsake-photo-refinement]
   workflow_dispatch:
 
 permissions:
@@ -51,6 +51,12 @@ jobs:
           cp deploy-source/clothing-alert/index.html site/clothing-alert/index.html
           echo "deployed face-score files:"
           find site/face-score -type f | sort
+
+      - name: Add verified keepsake exhibition
+        if: hashFiles('deploy-source/keepsake3d/dist/keepsake.html') != ''
+        run: |
+          mkdir -p site/keepsake3d
+          cp deploy-source/keepsake3d/dist/keepsake.html site/keepsake3d/index.html
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

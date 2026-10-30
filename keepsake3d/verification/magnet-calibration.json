@@ -1,0 +1,15 @@
+{
+  "landmarks": 15,
+  "rms_error_px": 7.707561011945004,
+  "max_error_px": 13.77526326297166,
+  "back_photo_sha256": "d923dd687f6099fe0a61f6d9677d94a631f7528bdf8ddf651a89588ed7359de4",
+  "original_photo_preserved": true,
+  "note": "Manual silhouette landmarks; projective registration, not a replacement texture. Dimensions and edge tracing remain photo estimates.",
+  "embedded_mime": "image/webp",
+  "embedded_sha256": "697d3c97cad8946e4b2eb92f5ecb5a91e9bd5bf0b77ac8ffeedb63578d91b7a1",
+  "decoded_rgba_sha256": "98a2bee8a78374a9357bb45d636a368a600da0a7c16ae4dc73fd838be654f76a",
+  "embedded_decoded_rgba_sha256": "98a2bee8a78374a9357bb45d636a368a600da0a7c16ae4dc73fd838be654f76a",
+  "exact_rgba_match": true,
+  "max_channel_error": 0,
+  "encoding_note": "build.py encodes PNG as lossless WebP. Encoded byte hashes differ; this opaque magnet photograph has exactly identical decoded RGBA pixels."
+}
