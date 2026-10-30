@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><title>毛绒外观核对</title><style>body{margin:0;background:#111;color:#ddd;font:12px monospace}iframe{border:0;width:100vw;height:85vh}pre{white-space:pre-wrap}</style><iframe src="../"></iframe><pre>正在核对外观…</pre><script type="module">
+const f=document.querySelector('iframe'),report={checks:[],errors:[]};
+const post=(name,body)=>fetch('http://127.0.0.1:8876/save?name='+name,{method:'POST',body});
+try{
+for(let i=0;i<180&&!f.contentWindow.__app;i++)await new Promise(r=>setTimeout(r,250));
+const a=f.contentWindow.__app;if(!a?.modules.plush?._debug)throw Error('plush failed to load');
+a.renderer.setAnimationLoop(null);a.step(90);a.view('plush');a.step(90);
+const p=a.modules.plush,b=p.__body,center=b.localToWorld(b.position.clone().set(0,.060,0)),q=b.getWorldQuaternion(b.quaternion.clone());
+const pose=(x,y,z)=>{a.controls.target.copy(center);a.camera.position.copy(center).add(b.position.clone().set(x,y,z).applyQuaternion(q));a.controls.update();a.step(1);};
+const snap=async name=>{a.renderer.render(a.scene,a.camera);await post(name,a.renderer.domElement.toDataURL('image/jpeg',.94));};
+p.tagMesh.visible=false;
+a.lamp({on:true,color:'white',spot:1});a.step(60);pose(0,.002,.25);await snap('appearance-front-white.jpg');
+p.__fur.group.visible=false;await snap('appearance-base-only.jpg');p.__fur.group.visible=true;
+const fiber=p.__fur.materials[0];fiber.side=0;fiber.needsUpdate=true;await snap('appearance-single-sided.jpg');
+a.lamp({color:'warm',spot:2});a.step(60);pose(0,.002,.25);await snap('appearance-front-warm.jpg');
+pose(.20,.015,.12);await snap('appearance-side.jpg');
+pose(.04,.01,-.25);await snap('appearance-back.jpg');
+p.tagMesh.visible=true;
+const collar=p.softMeshes.find(o=>o.name==='plush_collar').geometry.attributes.position;
+let minZ=Infinity,maxZ=-Infinity;for(let i=0;i<collar.count;i++){minZ=Math.min(minZ,collar.getZ(i));maxZ=Math.max(maxZ,collar.getZ(i));}
+report.checks.push({name:'front-only cloth',pass:minZ>0,minZ,maxZ});
+report.checks.push({name:'cloth and body finite',pass:p.softMeshes.every(o=>Array.from(o.geometry.attributes.position.array).every(Number.isFinite))});
+report.checks.push({name:'short pile',pass:p.__fur.group.children[0].receiveShadow===false});
+a.view('plush');a.step(90);await snap('appearance-default.jpg');
+}catch(e){report.errors.push(e.stack||String(e));}
+await post('appearance-report.json',JSON.stringify(report,null,2));document.querySelector('pre').textContent=JSON.stringify(report,null,2);
+</script>

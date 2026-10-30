@@ -1,0 +1,7 @@
+Pillow
+pillow-heif
+numpy
+scipy
+scikit-image
+matplotlib
+numba

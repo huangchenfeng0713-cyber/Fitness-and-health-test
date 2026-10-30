@@ -1,0 +1,177 @@
+{
+  "method": "Node geometry, soft-body physics and standard GLB export; browser unavailable",
+  "checks": [
+    {
+      "name": "seam binding matches rebuilt photo-traced mesh",
+      "pass": true,
+      "detail": {
+        "vertices": 46634
+      }
+    },
+    {
+      "name": "side-photo head depth is below 17 mm",
+      "pass": true,
+      "detail": {
+        "depth": 0.016484702471643686
+      }
+    },
+    {
+      "name": "slim lower legs stay below 6.5 mm depth",
+      "pass": true,
+      "detail": {
+        "depth": 0.005967101315036416
+      }
+    },
+    {
+      "name": "all label roots are buried within the side seam",
+      "pass": true,
+      "detail": {
+        "maxDistance": 0.0006813084777796857
+      }
+    },
+    {
+      "name": "revised mesh and hanging mechanism finite",
+      "pass": true
+    },
+    {
+      "name": "toy remains on hook at rest",
+      "pass": true
+    },
+    {
+      "name": "white pile normal texture retained",
+      "pass": true
+    },
+    {
+      "name": "cloth remains exclusively on front",
+      "pass": true,
+      "detail": {
+        "minZ": 0.003650000086054206
+      }
+    },
+    {
+      "name": "local touch still moves toy",
+      "pass": true
+    },
+    {
+      "name": "toy settles after touch",
+      "pass": true
+    },
+    {
+      "name": "first finger hits shortened head",
+      "pass": true
+    },
+    {
+      "name": "second finger hits shortened head",
+      "pass": true
+    },
+    {
+      "name": "two-finger deformation stays within 2 mm sewn envelope",
+      "pass": true,
+      "detail": {
+        "deformation": 0.0015763807541937587
+      }
+    },
+    {
+      "name": "sewn label stays attached during two-finger interaction",
+      "pass": true,
+      "detail": {
+        "maxDistance": 0.0006813084777796857
+      }
+    },
+    {
+      "name": "dense filling settles without rubber-like wobble",
+      "pass": true,
+      "detail": {
+        "deformation": 2.8965685849678713e-9
+      }
+    },
+    {
+      "name": "lower-body contact is directly grabbable",
+      "pass": true
+    },
+    {
+      "name": "label root stays sewn under lower-body pull",
+      "pass": true,
+      "detail": {
+        "maxDistance": 0.0006830475659170547
+      }
+    },
+    {
+      "name": "large drag cannot stretch the cloth envelope",
+      "pass": true,
+      "detail": {
+        "deformation": 0.0012396177827565696
+      }
+    },
+    {
+      "name": "single finger can lift toy",
+      "pass": true
+    },
+    {
+      "name": "lifting unhooks toy",
+      "pass": true
+    },
+    {
+      "name": "new lower body collides with table",
+      "pass": true,
+      "detail": {
+        "minY": 0.0006000000559187261
+      }
+    },
+    {
+      "name": "landing stays weakly elastic and settles",
+      "pass": true
+    },
+    {
+      "name": "fibre winding agrees with outward fabric normals",
+      "pass": true,
+      "detail": {
+        "ratio": 1
+      }
+    },
+    {
+      "name": "export plush-body.glb",
+      "pass": true,
+      "detail": {
+        "bytes": 15512668
+      }
+    },
+    {
+      "name": "readback plush-body.glb",
+      "pass": true,
+      "detail": {
+        "size": [
+          0.045854486525058746,
+          0.1172995485831052,
+          0.01702634710818529
+        ]
+      }
+    },
+    {
+      "name": "export plush-chain-tag.glb",
+      "pass": true,
+      "detail": {
+        "bytes": 16935504
+      }
+    },
+    {
+      "name": "readback plush-chain-tag.glb",
+      "pass": true,
+      "detail": {
+        "size": [
+          0.05824016491274103,
+          0.18155428945162286,
+          0.04753599889947285
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "assets/plush.glb": "49e398714412a64325def6a1268a4b252a1ba8eaf06416b181fd655bc2ddb932",
+    "assets/plush_meta.json": "a943ffb7f3ab7d64f045550bd7b8af8eb90cac418e5c44ec4ef5d7c029661ffe",
+    "assets/tex/plush_masks.png": "1960e01ee00e19165073d403238c083b1e10ed473d8b805a44380849a1a6a46c",
+    "src/fur_strands.js": "beeee0249c32379761ce194865a0fa56acb684e0fbc466aa83fb840fe48802a1",
+    "src/plush_engine.js": "2a70fb6892ad6f511e8469e85f75beda317f3bdcdd7a74891df046ef2f3261d8"
+  }
+}

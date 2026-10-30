@@ -1,0 +1,8 @@
+node_modules/
+references/
+dev/revisions/
+dev/qa-output/
+dev/generated-*.mjs
+__pycache__/
+*.pyc
+dist/app.bundle.js

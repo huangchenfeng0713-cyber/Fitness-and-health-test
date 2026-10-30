@@ -1,0 +1,24 @@
+<!doctype html><meta charset="utf-8"><title>GLB 读回验证</title><style>html,body{margin:0;height:100%;background:#171818;color:#eee;font:13px monospace}canvas{width:100%;height:82vh;display:block}pre{white-space:pre-wrap;margin:12px}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<canvas></canvas><pre>正在读回导出的模型…</pre><script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+const renderer=new THREE.WebGLRenderer({canvas:document.querySelector('canvas'),antialias:true});renderer.setSize(1280,720,false);renderer.toneMapping=THREE.ACESFilmicToneMapping;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x242727);scene.environment=new THREE.PMREMGenerator(renderer).fromScene(new RoomEnvironment(),.04).texture;
+scene.environmentIntensity=.18;
+const light=new THREE.DirectionalLight(0xfffaf2,1.6);light.position.set(.3,.5,.6);scene.add(light);
+const camera=new THREE.PerspectiveCamera(30,1280/720,.001,20),out=document.querySelector('pre'),report={checks:[],errors:[]};
+const post=(name,body)=>fetch('http://127.0.0.1:8876/save?name='+name,{method:'POST',body});
+try{
+for(const [name,dir] of [['plush-body',[.32,.12,1]],['plush-chain-tag',[.32,.12,1]],['magnet',[0,0,1]],['magnet-packaged',[0,.85,.5]]]){
+const gltf=await new GLTFLoader().loadAsync('./qa-output/'+name+'.glb');scene.add(gltf.scene);
+const box=new THREE.Box3().setFromObject(gltf.scene),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());
+if(![...size.toArray(),...center.toArray()].every(Number.isFinite)||size.length()<=0)throw Error('Invalid bounds '+name);
+camera.position.copy(center).add(new THREE.Vector3(...dir).normalize().multiplyScalar(Math.max(size.x,size.y,size.z)*2.3));camera.lookAt(center);camera.updateMatrixWorld();
+await renderer.compileAsync(scene,camera);renderer.render(scene,camera);
+await post('readback-'+name+'.jpg',renderer.domElement.toDataURL('image/jpeg',.92));
+let meshes=0;gltf.scene.traverse(o=>{if(o.isMesh)meshes++;});report.checks.push({name,pass:true,meshes,size_m:size.toArray()});out.textContent=JSON.stringify(report,null,2);
+scene.remove(gltf.scene);gltf.scene.traverse(o=>{if(o.isMesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){m.map?.dispose();m.dispose();}}});
+}
+}catch(e){report.errors.push(e.stack||String(e));}
+await post('readback-report.json',JSON.stringify(report,null,2));out.textContent=JSON.stringify(report,null,2);
+</script>

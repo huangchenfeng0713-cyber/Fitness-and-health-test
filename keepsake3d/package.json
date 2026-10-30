@@ -1,0 +1,22 @@
+{
+  "name": "keepsake3d",
+  "version": "1.0.0",
+  "description": "Photo-based plush keychain and fridge magnet keepsake viewer",
+  "main": "index.js",
+  "scripts": {
+    "test": "node tools/test.mjs",
+    "build": "python tools/build.py"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.21.0",
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "skia-canvas": "^3.0.8"
+  }
+}

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>珍藏小物 3D</title>
+<style>
+  :root {
+    --bg: #000; --ink: #efe9e1; --muted: #9c9389; --card: rgba(28,26,24,.72); --line: rgba(255,255,255,.10);
+    --accent: #e3b46a; --accent-ink: #1b1408; --shadow: 0 6px 24px rgba(0,0,0,.5);
+  }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden;
+    font: 14px/1.45 -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif; -webkit-tap-highlight-color: transparent; }
+  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; }
+  .ui { position: fixed; z-index: 2; pointer-events: none; }
+  .ui > * { pointer-events: auto; }
+  .panel { background: var(--card); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
+  #top { left: 16px; right: 16px; top: max(14px, env(safe-area-inset-top)); display: flex; align-items: center; gap: 10px; }
+  #title { padding: 8px 14px; font-weight: 600; letter-spacing: .04em; }
+  #title small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; letter-spacing: 0; }
+  #top .spacer { flex: 1; pointer-events: none; }
+  .iconbtn { border: 1px solid var(--line); background: var(--card); color: var(--ink); height: 38px; min-width: 38px; padding: 0 12px;
+    border-radius: 12px; cursor: pointer; font: inherit; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+  .iconbtn:hover { border-color: var(--accent); }
+  .iconbtn svg { width: 18px; height: 18px; }
+  #bottom { left: 50%; transform: translateX(-50%); bottom: max(16px, env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 10px; width: min(560px, calc(100vw - 32px)); }
+  #hint { padding: 8px 14px; text-align: center; color: var(--ink); min-height: 21px; max-width: 100%; transition: opacity .3s; }
+  .seg { display: flex; padding: 4px; gap: 4px; }
+  .seg button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 10px; cursor: pointer; font: inherit; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+  .seg button.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .seg button svg { width: 17px; height: 17px; }
+  #magtools[hidden], #lampPanel[hidden] { display: none; }
+  #lampPanel { right: 16px; top: calc(max(14px, env(safe-area-inset-top)) + 54px); width: min(300px, calc(100vw - 32px)); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+  #lampPanel .row { display: flex; align-items: center; gap: 8px; }
+  #lampPanel .row label { color: var(--muted); font-size: 12px; width: 34px; flex: none; }
+  #lampPanel .seg { padding: 0; flex: 1; }
+  #lampPanel .seg button { padding: 6px 8px; border: 1px solid var(--line); }
+  #lampLevel { flex: 1; accent-color: var(--accent); }
+  #lampOn.on, #cabOn.on { background: var(--accent); color: var(--accent-ink); }
+  #info { right: 16px; top: calc(max(14px, env(safe-area-inset-top)) + 54px); width: min(340px, calc(100vw - 32px)); padding: 14px 16px; max-height: calc(100vh - 220px); overflow: auto; }
+  #info[hidden] { display: none; }
+  #info h3 { margin: 0 0 6px; font-size: 15px; }
+  #info table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+  #info td { padding: 4px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  #info td:last-child { text-align: right; color: var(--muted); padding-left: 10px; }
+  #info p { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 5; background: var(--bg); transition: opacity .6s; }
+  #loading div { color: var(--muted); letter-spacing: .1em; }
+  #loading.done { opacity: 0; pointer-events: none; }
+  @media (max-width: 520px) { #title small { display: none; } .seg button span.long { display: none; } #info { top: auto; bottom: 170px; } }
+</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
+</head>
+<body>
+<canvas id="c" tabindex="0" aria-label="3D 场景"></canvas>
+<div id="loading"><div>正在布置桌面…</div></div>
+<div id="top" class="ui">
+  <div id="title" class="panel">珍藏小物<small>毛绒挂件 · 晴空塔冰箱贴</small></div>
+  <div class="spacer"></div>
+  <button class="iconbtn" id="btnLamp" title="台灯" aria-label="台灯">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l3 7H6z"/><path d="M12 10v8M8 21h8"/></svg><span>台灯</span>
+  </button>
+  <button class="iconbtn" id="btnInfo" title="尺寸与说明" aria-label="尺寸与说明">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
+  </button>
+  <button class="iconbtn" id="btnExport" title="下载当前物件的 3D 模型 (GLB)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>模型</span>
+  </button>
+</div>
+<div id="lampPanel" class="ui panel" hidden>
+  <div class="row"><button class="iconbtn on" id="lampOn" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.5 6.5a8 8 0 1 0 11 0"/></svg><span>关灯</span></button><button class="iconbtn on" id="cabOn" style="flex:1;justify-content:center"><span>关柜灯</span></button></div>
+  <div class="row"><label for="lampLevel">亮度</label><input id="lampLevel" type="range" min="5" max="100" value="75"></div>
+  <div class="row"><label>颜色</label><div class="seg"><button data-lamp-color="white">白光</button><button data-lamp-color="warm" class="on">护眼黄</button></div></div>
+  <div class="row"><label>位置</label><div class="seg"><button data-lamp-spot="0">左侧</button><button data-lamp-spot="1">左前</button><button data-lamp-spot="2" class="on">右前</button><button data-lamp-spot="3">右侧</button></div></div>
+</div>
+<div id="info" class="ui panel" hidden>
+  <h3>实物尺寸</h3>
+  <table id="dims"></table>
+  <p>尺寸按照片中的身份证约 85.6 × 54 mm 估算，并参考不同角度修正透视。毛绒轮廓、厚度和材料弹性仍有估计误差，不等同于实物扫描或实测。贴图来自你的照片；身份证信息未用于模型。</p>
+</div>
+<div id="bottom" class="ui">
+  <div id="hint" class="panel" aria-live="polite"></div>
+  <div id="views" class="seg panel" role="tablist" aria-label="切换物件">
+    <button data-view="plush" class="on" role="tab"><span>毛绒挂件</span></button>
+    <button data-view="all" role="tab"><span>全部</span></button>
+    <button data-view="magnet" role="tab"><span>冰箱贴</span></button>
+  </div>
+  <div id="magtools" class="seg panel" hidden>
+    <button id="btnFridge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6v2M9 13v3"/></svg><span>看铁板</span></button>
+    <button id="btnRepack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4v4.7h4.7"/></svg><span>重新装回包装</span></button>
+  </div>
+</div>
+<script type="module" src="./src/app.js?v=7"></script>
+</body>
+</html>
