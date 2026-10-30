@@ -2412,6 +2412,7 @@ export async function createMagnetScene(ctx, opts = {}) {
   // shadows, render order, hints
   // ==========================================================================
   function updateShadow(b) {
+    if(opts.exhibition) { if(b.shadow) b.shadow.mesh.visible=false; return; }
     const sh = b.shadow; if (!sh) return;
     const m = sh.mesh;
     let show = false, alpha = 0, sx = 1, sy = 1;
@@ -2627,7 +2628,7 @@ export async function createMagnetScene(ctx, opts = {}) {
       const count = Math.max(1, Math.ceil(dt * 120));
       for (let i = 0; i < count; i++) stepBend(b, dt / count);
     }
-    physicsStep(dt);
+    if(!opts.exhibition) physicsStep(dt);
 
     // magnet sitting in the blister: drop onto the bubble's inside when the bubble points down
     if (S.magnetInBlister) {
@@ -2701,6 +2702,32 @@ export async function createMagnetScene(ctx, opts = {}) {
     pointerUp,
     wheel,
     reset,
+    exhibition: {
+      get activeRoot() { return S.magnetInBlister ? (S.blisterInCard ? (S.cardInBag ? bag.root : card.root) : blister.root) : magnet.root; },
+      get busy() { return !!(anims.flap || anims.slide || anims.hinge || BODIES.some(b=>b.anim)); },
+      advance() {
+        if(this.busy) return false;
+        if(!S.flapOpen) tapPeel();
+        else if(S.cardInBag) tapSlide();
+        else if(!S.cardOpen) tapOpen();
+        else if(S.blisterInCard) tapLift();
+        else if(S.magnetInBlister) tapPop();
+        else return false;
+        return true;
+      },
+      reset() { hardReset(); },
+      bend(amount) {
+        const b=S.magnetInBlister?card:magnet;
+        setBendFrame(b,0,0,midZ(b),1,0);
+        b.bend.active=amount!==0; b.bend.target=clamp(amount,-1,1)*b.bend.kMax*.65;
+      },
+      syncVisibility() {
+        bag.root.visible=S.cardInBag;
+        card.root.visible=S.blisterInCard;
+        blister.root.visible=S.magnetInBlister;
+        magnet.root.visible=true;
+      },
+    },
     dispose,
     get stage() { return stageName(); },
     tunables: T,

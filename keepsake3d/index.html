@@ -1,111 +1,17 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>珍藏小物 3D</title>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#050607"><title>珍藏 · 私人藏品</title>
 <style>
-  :root {
-    --bg: #000; --ink: #efe9e1; --muted: #9c9389; --card: rgba(28,26,24,.72); --line: rgba(255,255,255,.10);
-    --accent: #e3b46a; --accent-ink: #1b1408; --shadow: 0 6px 24px rgba(0,0,0,.5);
-  }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); overflow: hidden;
-    font: 14px/1.45 -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif; -webkit-tap-highlight-color: transparent; }
-  #c { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline: none; -webkit-touch-callout:none; user-select:none; }
-  *, *::before, *::after { box-sizing: border-box; }
-  button { touch-action: manipulation; }
-  #lampLevel { min-height: 44px; }
-  .ui { position: fixed; z-index: 2; pointer-events: none; }
-  .ui > * { pointer-events: auto; }
-  .panel { background: var(--card); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
-    border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); }
-  #top { left: 16px; right: 16px; top: max(14px, env(safe-area-inset-top)); display: flex; align-items: center; gap: 10px; }
-  #title { padding: 8px 14px; font-weight: 600; letter-spacing: .04em; }
-  #title small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; letter-spacing: 0; }
-  #top .spacer { flex: 1; pointer-events: none; }
-  .iconbtn { border: 1px solid var(--line); background: var(--card); color: var(--ink); height: 38px; min-width: 38px; padding: 0 12px;
-    border-radius: 12px; cursor: pointer; font: inherit; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow);
-    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
-  .iconbtn:hover { border-color: var(--accent); }
-  .iconbtn svg { width: 18px; height: 18px; }
-  #bottom { right: 12px; top: calc(max(14px, env(safe-area-inset-top)) + 58px); display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: min(340px, calc(100vw - 24px)); max-height: calc(100dvh - 100px); overflow-y: auto; }
-  #bottom[hidden] { display: none; }
-  .iconbtn, .seg button { min-height: 44px; min-width: 44px; }
-  #hint { padding: 8px 14px; text-align: center; color: var(--ink); min-height: 21px; max-width: 100%; transition: opacity .3s; }
-  .seg { display: flex; padding: 4px; gap: 4px; }
-  .seg button { flex: 1; border: 0; background: transparent; color: var(--muted); padding: 8px 12px; border-radius: 10px; cursor: pointer; font: inherit; white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-  .seg button.on { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
-  .seg button svg { width: 17px; height: 17px; }
-  #magtools[hidden], #lampPanel[hidden] { display: none; }
-  #lampPanel { right: 16px; top: calc(max(14px, env(safe-area-inset-top)) + 54px); width: min(300px, calc(100vw - 32px)); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
-  #lampPanel .row { display: flex; align-items: center; gap: 8px; }
-  #lampPanel .row label { color: var(--muted); font-size: 12px; width: 34px; flex: none; }
-  #lampPanel .seg { padding: 0; flex: 1; }
-  #lampPanel .seg button { padding: 6px 8px; border: 1px solid var(--line); }
-  #lampLevel { flex: 1; accent-color: var(--accent); }
-  #lampOn.on, #cabOn.on { background: var(--accent); color: var(--accent-ink); }
-  #info { right: 16px; top: calc(max(14px, env(safe-area-inset-top)) + 54px); width: min(340px, calc(100vw - 32px)); padding: 14px 16px; max-height: calc(100vh - 220px); overflow: auto; }
-  #info[hidden] { display: none; }
-  #info h3 { margin: 0 0 6px; font-size: 15px; }
-  #info table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
-  #info td { padding: 4px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
-  #info td:last-child { text-align: right; color: var(--muted); padding-left: 10px; }
-  #info p { color: var(--muted); font-size: 12px; margin: 10px 0 0; }
-  #loading { position: fixed; inset: 0; display: grid; place-items: center; z-index: 5; background: var(--bg); transition: opacity .6s; }
-  #loading div { color: var(--muted); letter-spacing: .1em; }
-  #loading.done { opacity: 0; pointer-events: none; }
-  @media (max-width: 520px) {
-    #top { left: 10px; right: 10px; gap: 6px; }
-    #title { padding: 8px; font-size: 12px; }
-    #title small, #btnLamp > span, #btnExport > span { display: none; }
-    .iconbtn { padding: 0 10px; }
-    #info { top: calc(max(14px, env(safe-area-inset-top)) + 58px); max-height: calc(100dvh - 120px); }
-    #hint { font-size: 12px; text-align: left; }
-  }
-</style>
-<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
-</head>
-<body>
-<canvas id="c" tabindex="0" aria-label="3D 场景"></canvas>
-<div id="loading"><div>正在布置桌面…</div></div>
-<div id="top" class="ui">
-  <div id="title" class="panel">珍藏小物<small>毛绒挂件 · 晴空塔冰箱贴</small></div>
-  <div class="spacer"></div>
-  <button class="iconbtn" id="btnMenu" aria-controls="bottom" aria-expanded="false" aria-label="展开物件与操作说明">菜单</button>
-  <button class="iconbtn" id="btnLamp" title="台灯" aria-label="台灯">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6l3 7H6z"/><path d="M12 10v8M8 21h8"/></svg><span>台灯</span>
-  </button>
-  <button class="iconbtn" id="btnInfo" title="尺寸与说明" aria-label="尺寸与说明">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>
-  </button>
-  <button class="iconbtn" id="btnExport" title="下载当前物件的 3D 模型 (GLB)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>模型</span>
-  </button>
-</div>
-<div id="lampPanel" class="ui panel" hidden>
-  <div class="row"><button class="iconbtn on" id="lampOn" style="flex:1;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v8"/><path d="M6.5 6.5a8 8 0 1 0 11 0"/></svg><span>关灯</span></button><button class="iconbtn on" id="cabOn" style="flex:1;justify-content:center"><span>关柜灯</span></button></div>
-  <div class="row"><label for="lampLevel">亮度</label><input id="lampLevel" type="range" min="5" max="100" value="75"></div>
-  <div class="row"><label>颜色</label><div class="seg"><button data-lamp-color="white">白光</button><button data-lamp-color="warm" class="on">护眼黄</button></div></div>
-  <div class="row"><label>位置</label><div class="seg"><button data-lamp-spot="0">左侧</button><button data-lamp-spot="1">左前</button><button data-lamp-spot="2" class="on">右前</button><button data-lamp-spot="3">右侧</button></div></div>
-</div>
-<div id="info" class="ui panel" hidden>
-  <h3>实物尺寸</h3>
-  <table id="dims"></table>
-  <p>尺寸按照片中的身份证约 85.6 × 54 mm 估算，并参考不同角度修正透视。毛绒轮廓、厚度和材料弹性仍有估计误差，不等同于实物扫描或实测。贴图来自你的照片；身份证信息未用于模型。</p>
-</div>
-<div id="bottom" class="ui" hidden>
-  <div id="hint" class="panel" aria-live="polite"></div>
-  <div class="panel" style="padding:10px 14px;font-size:12px;color:var(--muted)">单指轻触／按住拖动物件；两指在同一物件上轻捏或弯折。空白处单指转动视角、双指缩放和移动。<button id="btnCenter" class="iconbtn" style="margin-top:8px;width:100%;justify-content:center">物件居中</button></div>
-  <div id="views" class="seg panel" role="tablist" aria-label="切换物件">
-    <button data-view="plush" class="on" role="tab"><span>毛绒挂件</span></button>
-    <button data-view="all" role="tab"><span>全部</span></button>
-    <button data-view="magnet" role="tab"><span>冰箱贴</span></button>
-  </div>
-  <div id="magtools" class="seg panel" hidden>
-    <button id="btnFridge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6v2M9 13v3"/></svg><span>看铁板</span></button>
-    <button id="btnRepack"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7M4 4v4.7h4.7"/></svg><span>重新装回包装</span></button>
-  </div>
-</div>
-<script type="module" src="./src/app.js?v=7"></script>
-</body>
-</html>
+:root{color-scheme:dark;--ink:#eee9df;--muted:#8c8a85;--gold:#c6b28a;--line:rgba(220,211,191,.15)}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050607;color:var(--ink);font:14px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;-webkit-tap-highlight-color:transparent}body{background:radial-gradient(ellipse at 50% 43%,#191b1d 0%,#0b0d0f 34%,#050607 68%)}button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}button:focus-visible{outline:2px solid var(--gold);outline-offset:5px}button:disabled{opacity:.35}[hidden]{display:none!important}#c{position:fixed;inset:0;width:100%;height:100%;touch-action:none;user-select:none;-webkit-touch-callout:none;outline:none}.topbar{position:fixed;z-index:3;top:max(26px,env(safe-area-inset-top));left:38px;right:38px;display:flex;align-items:center;gap:12px;pointer-events:none}.topbar>*{pointer-events:auto}.spacer{flex:1;pointer-events:none}.brand{position:absolute;left:50%;transform:translateX(-50%);text-align:center;letter-spacing:.3em;color:#c8c1b2;font:13px Georgia,serif;pointer-events:none}.brand small{display:block;font:8px/2.4 sans-serif;letter-spacing:.25em;color:#686b6c}.nav-button{min-height:46px;min-width:46px;padding:0 17px;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);border-radius:999px;background:rgba(9,10,11,.56);backdrop-filter:blur(20px);font-size:12px;letter-spacing:.08em}.nav-button:hover{border-color:#a79676}.nav-button svg{width:16px;height:16px}.icon{padding:0;width:46px}#returnItem{color:var(--gold);border-color:rgba(198,178,138,.3)}
+.caption{position:fixed;bottom:max(38px,calc(env(safe-area-inset-bottom) + 24px));left:30px;right:30px;text-align:center;pointer-events:none;transition:opacity .4s,transform .4s}.eyebrow{color:var(--gold);font-size:9px;letter-spacing:.25em}.caption h1{font:400 28px/1.4 "Songti SC",SimSun,serif;letter-spacing:.2em;margin:11px 0 8px}.caption p{font-size:11px;color:var(--muted);letter-spacing:.1em;margin:0}.caption .gesture-hint{color:#626669;font-size:10px;margin-top:18px;letter-spacing:.06em}body.handling .caption{opacity:.35;transform:translateY(8px)}#status{position:fixed;top:max(100px,calc(env(safe-area-inset-top) + 78px));left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.1em;color:#a7a196;pointer-events:none;text-align:center;width:80%}body.holding .caption{opacity:0;transform:translateY(10px)}#status{left:38px;transform:none;width:220px;text-align:left}#touchMark{position:fixed;z-index:1;width:34px;height:34px;border:1px solid rgba(226,211,181,.5);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%)}
+.overlay{position:fixed;z-index:8;inset:0;background:rgba(6,7,8,.97);backdrop-filter:blur(24px);overflow:auto;overscroll-behavior:contain;padding:max(34px,env(safe-area-inset-top)) 7vw max(30px,env(safe-area-inset-bottom))}.overlay header{display:flex;align-items:center;justify-content:space-between;max-width:1040px;margin:auto}.overlay h2{font:400 28px "Songti SC",SimSun,serif;letter-spacing:.12em;margin:12px 0}.intro{font-size:11px;color:var(--muted);letter-spacing:.08em}.gallery-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;max-width:840px;margin:44px auto 24px}.collection-card{border:1px solid var(--line);background:linear-gradient(150deg,#121416,#08090a);border-radius:4px;padding:0;overflow:hidden;text-align:left;transition:border-color .25s,transform .25s}.collection-card:hover{transform:translateY(-3px);border-color:#a79676}.collection-card[aria-pressed=true]{border-color:#8f7f60}.collection-card img{display:block;object-fit:contain;width:100%;height:320px}.card-label{display:block;border-top:1px solid var(--line);padding:20px 23px}.card-number{color:var(--gold);font-size:9px;letter-spacing:.18em}.card-title{display:block;font:400 21px/1.5 "Songti SC",SimSun,serif;margin:8px 0 6px;letter-spacing:.1em}.card-note{font-size:10px;color:var(--muted)}.card-arrow{float:right;color:var(--gold);font-size:18px}.gallery-footer{text-align:center;font-size:10px;color:#62676a;letter-spacing:.15em}
+#details{inset:auto 24px auto auto;top:86px;width:min(340px,calc(100vw - 48px));max-height:calc(100dvh - 120px);padding:24px;background:rgba(17,18,19,.96);border:1px solid var(--line);border-radius:8px;z-index:7}.details-top{display:flex;align-items:center;justify-content:space-between}.details-top h2{font:20px "Songti SC",SimSun,serif;margin:0}#details p{font-size:12px;line-height:1.9;color:var(--muted);margin:20px 0}.detail-actions{display:flex;flex-direction:column;gap:10px}.detail-actions button{width:100%}.close-text{border:0;background:none;padding:8px;color:var(--muted);min-width:44px;min-height:44px;font-size:20px}#loading{position:fixed;z-index:20;inset:0;background:#050607;display:grid;place-items:center;text-align:center;transition:opacity .5s}.loading-mark{font:32px "Songti SC",SimSun,serif;letter-spacing:.4em;color:#d2c4a6}.loading-label{color:#706e67;font-size:10px;letter-spacing:.18em;margin-top:20px}.loading-line{height:1px;width:80px;background:var(--gold);margin:26px auto}#loading.done{opacity:0;pointer-events:none}
+@media(max-width:600px){.topbar{top:max(18px,env(safe-area-inset-top));left:20px;right:20px;gap:8px}.brand{display:none}.nav-button{padding:0 15px}.icon{padding:0}.caption{bottom:max(30px,calc(env(safe-area-inset-bottom) + 20px))}.caption h1{font-size:25px;margin:9px 0 7px}.caption .gesture-hint{margin-top:15px;font-size:10px;letter-spacing:0}.gallery-grid{gap:13px;margin-top:30px}.collection-card img{height:220px}.card-label{padding:15px 12px}.card-title{font-size:17px;letter-spacing:.04em}.card-note{font-size:9px}.overlay{padding-left:20px;padding-right:20px}.overlay h2{font-size:27px}.card-arrow{font-size:14px}.gallery-footer{line-height:2}.caption p{font-size:10px}#status{top:82px;left:20px;width:140px}}@media(max-width:360px){.collection-card img{height:180px}.card-note{display:none}.caption h1{font-size:22px}}@media(max-height:540px) and (orientation:landscape){.caption{left:28px;right:auto;bottom:25px;text-align:left}.caption h1{font-size:20px}.caption .gesture-hint{margin-top:7px}#status{top:80px}.collection-card img{height:180px}.gallery-grid{margin-top:20px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style><script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script></head><body>
+<canvas id="c" tabindex="0" aria-label="可旋转和放大的 3D 藏品"></canvas>
+<header class="topbar"><button id="openGallery" class="nav-button" aria-label="展示台" aria-controls="gallery" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor"><rect x="2" y="2" width="6" height="6"/><rect x="12" y="2" width="6" height="6"/><rect x="2" y="12" width="6" height="6"/><rect x="12" y="12" width="6" height="6"/></svg>展示台</button><div class="brand">珍 藏<small>PRIVATE COLLECTION</small></div><div class="spacer"></div><button id="returnItem" class="nav-button" hidden>放回展示</button><button id="openDetails" class="nav-button icon" aria-label="藏品详情与操作说明" aria-controls="details" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor"><circle cx="10" cy="10" r="7.5"/><path d="M10 9v5M10 5.5v1"/></svg></button></header>
+<div id="status" aria-live="polite">轻点藏品，拿近一点</div><div id="touchMark" hidden></div><footer class="caption"><div id="itemIndex" class="eyebrow">OBJECT 01 / 02</div><h1 id="itemName">毛绒挂件</h1><p id="itemMaterial">短绒织物 · 珠链 · 纸质吊牌</p><p class="gesture-hint">单指旋转 · 双指放大 · 长按轻触</p></footer>
+<section id="gallery" class="overlay" role="dialog" aria-modal="true" aria-labelledby="galleryTitle" hidden><header><div><span class="eyebrow">THE COLLECTION</span><h2 id="galleryTitle">我的珍藏</h2><p class="intro">选一件，慢慢看。</p></div><button id="closeGallery" class="nav-button icon" aria-label="关闭展示台">×</button></header><div class="gallery-grid">
+<button class="collection-card" data-item="plush" aria-label="展示毛绒挂件" aria-pressed="true"><img id="previewPlush" alt="毛绒挂件的悬浮预览"><span class="card-label"><span class="card-number">01 / TEXTILE</span><span class="card-arrow">↗</span><span class="card-title">毛绒挂件</span><span class="card-note">一份被珍藏的温柔</span></span></button>
+<button class="collection-card" data-item="magnet" aria-label="展示晴空塔冰箱贴" aria-pressed="false"><img id="previewMagnet" alt="冰箱贴与原包装的悬浮预览"><span class="card-label"><span class="card-number">02 / SOUVENIR</span><span class="card-arrow">↗</span><span class="card-title">晴空塔冰箱贴</span><span class="card-note">连同原包装，一起留下</span></span></button></div><p class="gallery-footer">属于你的物件，也属于被记住的时刻。</p></section>
+<section id="details" class="overlay" role="dialog" aria-modal="true" aria-labelledby="detailsTitle" hidden><div class="details-top"><h2 id="detailsTitle">藏品细节</h2><button id="closeDetails" class="close-text" aria-label="关闭详情">×</button></div><p id="detailCopy"></p><div class="detail-actions"><button id="resetView" class="nav-button">回到正面</button><button id="repack" class="nav-button" hidden>收好原包装</button><button id="downloadModel" class="nav-button">下载 3D 模型</button></div><p>模型依据原照片还原，尺寸与材质响应为估算。单指旋转，双指缩放与转动；拿起后长按表面，可轻触短绒或轻弯物件。</p></section>
+<div id="loading" role="status"><div><div class="loading-mark">珍藏</div><div class="loading-line"></div><div class="loading-label">正在为藏品布光</div></div></div><script type="module" src="./src/app.js?v=8"></script></body></html>

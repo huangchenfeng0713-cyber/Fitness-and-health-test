@@ -1,3 +1,19 @@
+# Current exhibition contract
+
+The current entry point is `src/app.js`, with adapters in `src/exhibit_objects.js`.
+One object is visible at a time. Presentation units are metres; there is no floor, cabinet, lamp or gravity integration in the active shell.
+
+- Tap: bring the object closer; tap a held magnet to advance one normal unpacking stage.
+- One pointer drag: rotate the display pivot. Two pointers: zoom and twist. Long press: bounded material response.
+- All gestures are cancelled on modal opening, selection, blur, visibility loss, and resize.
+- Plush surface displacement is limited to 0.45 mm and returns with exponential damping. Geometry and stitched attachments share the same local displacement.
+- Magnet exhibition mode preserves nested packaging and animation but skips rigid-body stepping. Its active root controls framing and hit testing; empty containers become invisible.
+- `createExhibitObjects(ctx)` returns `{plush,magnet}`, each with root, alignment, boundsRoot, stage, busy, update, touch, release, advance and reset.
+- `visibleBounds` excludes fur, hidden proxies and zero-scale instances. Export excludes display helpers and converts custom transparent film to a portable physical material.
+- `dev/exhibit-check.html` is the current interaction test; the older contract below documents the retained legacy engines only.
+
+---
+
 # keepsake3d — module contract (shared by all contributors)
 
 Goal: an interactive, physically-plausible 3D keepsake viewer for two real objects the owner received from

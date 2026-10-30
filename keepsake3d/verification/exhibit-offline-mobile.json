@@ -1,0 +1,326 @@
+{
+  "mode": "offline",
+  "viewport": "mobile",
+  "checks": [
+    {
+      "name": "both original objects ready",
+      "pass": true
+    },
+    {
+      "name": "only one object visible",
+      "pass": true
+    },
+    {
+      "name": "no display furniture or lamp",
+      "pass": true
+    },
+    {
+      "name": "preview images are real rendered models",
+      "pass": true
+    },
+    {
+      "name": "canvas owns touch gestures",
+      "pass": true
+    },
+    {
+      "name": "caption never blocks touch",
+      "pass": true
+    },
+    {
+      "name": "no bottom buttons",
+      "pass": true
+    },
+    {
+      "name": "tap picks up and moves closer",
+      "pass": true
+    },
+    {
+      "name": "single finger rotates without translation",
+      "pass": true
+    },
+    {
+      "name": "pinch brings detail closer",
+      "pass": true
+    },
+    {
+      "name": "remaining finger continues rotation",
+      "pass": true
+    },
+    {
+      "name": "cancel clears contact",
+      "pass": true
+    },
+    {
+      "name": "long press creates only a submillimetre fabric dent",
+      "pass": true,
+      "detail": {
+        "pressure": 0.7499916033863682,
+        "depth": 0.0003369709280021155
+      }
+    },
+    {
+      "name": "fabric returns without oscillation",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "idle geometry never jitters",
+      "pass": true
+    },
+    {
+      "name": "interrupted touch releases",
+      "pass": true
+    },
+    {
+      "name": "gallery opens with focus",
+      "pass": true
+    },
+    {
+      "name": "gallery card targets are large",
+      "pass": true
+    },
+    {
+      "name": "selecting another object resets held state",
+      "pass": true
+    },
+    {
+      "name": "magnet picked up",
+      "pass": true
+    },
+    {
+      "name": "normal unpacking: flapOpen",
+      "pass": true,
+      "detail": {
+        "current": "magnet",
+        "held": true,
+        "stage": "flapOpen",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.3542952157686217,
+        "targetDistance": 0.3542952157686215,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "magnet"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    },
+    {
+      "name": "flapOpen stays visible and centered",
+      "pass": true
+    },
+    {
+      "name": "normal unpacking: cardOut",
+      "pass": true,
+      "detail": {
+        "current": "magnet",
+        "held": true,
+        "stage": "cardOut",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.3170010100462233,
+        "targetDistance": 0.31700100995057906,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "magnet"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    },
+    {
+      "name": "cardOut stays visible and centered",
+      "pass": true
+    },
+    {
+      "name": "normal unpacking: cardOpen",
+      "pass": true,
+      "detail": {
+        "current": "magnet",
+        "held": true,
+        "stage": "cardOpen",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.47816078198114864,
+        "targetDistance": 0.4781607819844924,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "magnet"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    },
+    {
+      "name": "cardOpen stays visible and centered",
+      "pass": true
+    },
+    {
+      "name": "normal unpacking: blisterFree",
+      "pass": true,
+      "detail": {
+        "current": "magnet",
+        "held": true,
+        "stage": "blisterFree",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.27038319189548543,
+        "targetDistance": 0.2703831918953417,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "magnet"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    },
+    {
+      "name": "blisterFree stays visible and centered",
+      "pass": true
+    },
+    {
+      "name": "normal unpacking: magnetFree",
+      "pass": true,
+      "detail": {
+        "current": "magnet",
+        "held": true,
+        "stage": "magnetFree",
+        "busy": false,
+        "zoom": 1,
+        "distance": 0.23301793111942348,
+        "targetDistance": 0.23301793111939764,
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "pointers": 0,
+        "pressure": 0,
+        "visible": [
+          "magnet"
+        ],
+        "viewport": [
+          390,
+          844
+        ]
+      }
+    },
+    {
+      "name": "magnetFree stays visible and centered",
+      "pass": true
+    },
+    {
+      "name": "empty packaging leaves the display",
+      "pass": true
+    },
+    {
+      "name": "magnet bend is limited",
+      "pass": true,
+      "detail": {
+        "k": 0.3364820323329706,
+        "kv": 0,
+        "target": 0.3364820325283892,
+        "active": true,
+        "C": {
+          "x": 0,
+          "y": 0,
+          "z": 0.0014050000000000002
+        },
+        "D": {
+          "x": 0,
+          "y": -1,
+          "z": 0
+        },
+        "kMax": 1.035329330856582,
+        "art": null
+      }
+    },
+    {
+      "name": "magnet bend returns",
+      "pass": true,
+      "detail": 0
+    },
+    {
+      "name": "packaging can be restored",
+      "pass": true
+    },
+    {
+      "name": "controls fit 320×568",
+      "pass": true
+    },
+    {
+      "name": "touch targets at least 44px 320",
+      "pass": true
+    },
+    {
+      "name": "controls fit 390×844",
+      "pass": true
+    },
+    {
+      "name": "touch targets at least 44px 390",
+      "pass": true
+    },
+    {
+      "name": "controls fit 844×390",
+      "pass": true
+    },
+    {
+      "name": "touch targets at least 44px 844",
+      "pass": true
+    },
+    {
+      "name": "all view transforms remain finite",
+      "pass": true
+    },
+    {
+      "name": "offline page has no remote resources",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "sourceHashes": {
+    "index.html": "506c4f3433e3924f242ea76740a812f0b289cc72219730a0b5bdffde87ccddf2",
+    "src/app.js": "56a2dfdae6cf8f74ca1dd049e5cab00f70ef66ba0a77f5615a2683da88ee2a6b",
+    "src/exhibit_objects.js": "697da1a851a1a02b830714678ac90dc7230204403b720842e453b6918fe079e6",
+    "src/magnet_scene.js": "b5f9b0567956604c8a2ff6746eebf2fdc5423d1762cb9b46154082ee919e11f3",
+    "dist/keepsake.html": "f4b5004ab3ae09da5986fd95968932fbefa61adb0c3b16f4abf36801179ffd56"
+  }
+}
