@@ -15,7 +15,7 @@ with sync_playwright() as p:
  page=context.new_page();page.on('pageerror',lambda e:errors.append(str(e)))
  failed=[];page.on('requestfailed',lambda r:failed.append(r.url))
  page.goto('http://127.0.0.1:8877/index.html');page.wait_for_function('window.__app',timeout=60000)
- page.evaluate('''() => {__app.renderer.setAnimationLoop(null);__app.pickup();__app.step(360,1/60,false);window.tagPoint=()=>{const a=__app,p=a.items.plush.api;for(const x of [-.014,0,.014])for(const y of [.018,.01,0,-.016]){const v=p.tagMesh.localToWorld(p.tagMesh.position.clone().set(x,y,0)).project(a.camera);const q={x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};if(a.pick(q.x,q.y)?.object===p.tagMesh)return q;}throw Error('Tag is occluded');};}''')
+ page.evaluate('''() => {__app.renderer.setAnimationLoop(null);__app.pickup();__app.step(360,1/60,false);window.tagPoint=()=>{const a=__app,p=a.items.plush.api;for(const x of [-.017,-.012,-.006,0,.006,.012,.017])for(const y of [.021,.016,.010,.003,-.005,-.013,-.021]){const v=p.tagMesh.localToWorld(p.tagMesh.position.clone().set(x,y,0)).project(a.camera);const q={x:(v.x+1)*innerWidth/2,y:(1-v.y)*innerHeight/2};if(a.pick(q.x,q.y)?.object===p.tagMesh)return q;}throw Error('Tag is occluded');};}''')
  cdp=context.new_cdp_session(page)
  def point(x,y,id=1):return {'x':x,'y':y,'id':id,'radiusX':4,'radiusY':4,'force':.5}
  def touch(kind,points):cdp.send('Input.dispatchTouchEvent',{'type':kind,'touchPoints':points})
@@ -57,4 +57,4 @@ with sync_playwright() as p:
  check('reduced motion stops release rotation',before==page.evaluate('__app.state().quaternion'))
  check('browser has no unhandled errors',not errors,errors)
  context.close();browser.close()
-(OUT/'native-touch-report.json').write_text(json.dumps({'browser':'Chromium 390×844 touch emulation; physical iPhone/Safari not tested','checks':checks,'errors':errors},ensure_ascii=False,indent=2)+'\n')
+(OUT/'native-touch-report.json').write_text(json.dumps({'browser':'Chromium 390×844 touch emulation; physical iPhone/Safari not tested','method':'CDP native input with controlled simulation stepping; independent continuous-animation review is recorded separately','checks':checks,'errors':errors},ensure_ascii=False,indent=2)+'\n')

@@ -63,7 +63,7 @@ export function plushDefaults(quality = 'high') {
     // ---- interaction ----
     grabFreq: 4.0, grabZeta: 1.15, grabMaxForce: 0.45,
     grabSigma: 0.0075, maxStretch: 0.0020, stretchGain: 0.22,
-    tagGrabStiffness: 160, tagGrabMaxForce: 0.12, maxReach: 0.32, rehangRadius: 0.04,
+    tagGrabStiffness: 160, tagGrabMaxForce: 0.12, chainGrabStiffness: 160, chainGrabMaxForce: 0.08, maxReach: 0.32, rehangRadius: 0.04,
     flickGain: 0.22, flickMaxSpeed: 0.12, pokeSpeed: 0.03, jiggleGain: 0.035,
     pressGrabTime: 0.18, flickTime: 0.28, dragThresholdPx: 6,
     squeezeDepth: 0.075, squeezeRise: 0.28, fingerRadius: 0.0068, showFingers: false,
@@ -222,10 +222,13 @@ class RB {
     this.iiw(ry * jz - rz * jy, rz * jx - rx * jz, rx * jy - ry * jx, this.t);
     this.wx += this.t[0]; this.wy += this.t[1]; this.wz += this.t[2];
   }
-  integrate(h, linD, angD) {
+  integrate(h, linD, angD, gravity) {
     this.px = this.x; this.py = this.y; this.pz = this.z;
     this.pqx = this.qx; this.pqy = this.qy; this.pqz = this.qz; this.pqw = this.qw; this.pR.set(this.R);
-    this.vy -= GRAV * h;
+    if (this.im === 0) return; // a held body supplies support, without pinning any chain particle
+    this.vx += (gravity?.x || 0) * h;
+    this.vy += (gravity?.y ?? -GRAV) * h;
+    this.vz += (gravity?.z || 0) * h;
     const ld = Math.exp(-linD * h), ad = Math.exp(-angD * h);
     this.vx *= ld; this.vy *= ld; this.vz *= ld; this.wx *= ad; this.wy *= ad; this.wz *= ad;
     this.x += this.vx * h; this.y += this.vy * h; this.z += this.vz * h;
@@ -814,6 +817,10 @@ export async function createPlush(ctx, opts = {}) {
 
   /* ---------------------------------------------- bodies & chain state ---------------------------------------------- */
   const core = new RB(P.plushMass, Ibody);
+  // In the close-up the user holds the toy, so its sewn-in loop supports the
+  // loose chain. The room/stand mode still suspends the full dynamic body.
+  if (opts.exhibition) { core.im = 0; core.Iib.fill(0); }
+  const gravity = new THREE.Vector3(0, -GRAV, 0);
   const tw = opts.tagSize?.w ?? 0.0373, th = opts.tagSize?.h ?? 0.0486, tt = opts.tagSize?.t ?? 0.00035;
   const holeX = opts.tagHole?.x ?? 0.0054, holeY = opts.tagHole?.y ?? 0.0075, holeD = opts.tagHole?.d ?? 0.0032;
   const tagCorner = opts.tagCornerRadius ?? 0.0025;
@@ -835,8 +842,6 @@ export async function createPlush(ctx, opts = {}) {
   const bx = new Float64Array(N * 3), bp = new Float64Array(N * 3), bv = new Float64Array(N * 3);
   const bim = new Float64Array(N).fill(1 / P.beadMass);
   bim[0] = bim[1] = 1 / (P.beadMass + P.claspMass / 2);
-  let exhibitionPin = -1;
-  const pinPosition = new THREE.Vector3();
   const bendMin = new Float64Array(N);
   const cosB = Math.cos(P.bendMaxDeg * Math.PI / 180);
   for (let i = 0; i < N; i++) { const L1 = segL[(i - 1 + N) % N], L2 = segL[i]; bendMin[i] = Math.sqrt(L1 * L1 + L2 * L2 + 2 * L1 * L2 * cosB); }
@@ -970,31 +975,58 @@ export async function createPlush(ctx, opts = {}) {
   const furStrokes = [];
   let furStrokeVersion = 0;
   let sleeping = false, calm = 0, floorCalm = 0, acc = 0, offHook = 0;
-  let tagTurn = null, tagFlipDirection = 1;
+  let tagTurn = null;
   const turnQ = new THREE.Quaternion(), turnError = new THREE.Quaternion();
   const turnHole = new THREE.Vector3(), turnTarget = new THREE.Vector3();
-  // A brief hand-assisted turn: lift the hole along the chain before turning the
-  // card. The same attachment, collision and gravity solver remains in charge.
+  // A finite hand force lifts the card over the head, turns it, then lowers it
+  // in front of the toy before letting go. All attachment/contact constraints
+  // remain active; the path describes a target, never a prescribed body pose.
   function stepTagTurn(h) {
     if (!tagTurn) return;
     const t = tagTurn.t += h;
-    if (t > 1.8) { tagTurn = null; return; }
-    const lift = clamp(t / .4, 0, 1), turn = clamp((t - .35) / .7, 0, 1);
-    turnTarget.lerpVectors(tagTurn.hole, tagTurn.target, lift * lift * (3 - 2 * lift));
-    turnQ.slerpQuaternions(tagTurn.from, tagTurn.to, turn * turn * (3 - 2 * turn));
+    const axis = tagTurn.axis, lift = clamp(t / .7, 0, 1);
+    const height = (tag.x - tagTurn.anchor.x) * axis.x + (tag.y - tagTurn.anchor.y) * axis.y + (tag.z - tagTurn.anchor.z) * axis.z;
+    if (!tagTurn.ready && lift === 1 && tagClearOfPlush() && height < -.016) tagTurn.ready = true;
+    if (tagTurn.ready && tagClearOfPlush()) tagTurn.turn = Math.min(1, tagTurn.turn + h);
+    if (tagTurn.turn === 1) tagTurn.hold += h;
+    if (tagTurn.hold > 2.6 || t > 7) { tagTurn = null; return; }
+    const turn = tagTurn.turn;
+    turnTarget.lerpVectors(tagTurn.center, tagTurn.liftGoal, lift * lift * (3 - 2 * lift));
+    if (tagTurn.ready) turnTarget.lerpVectors(tagTurn.liftGoal, tagTurn.target, turn);
+    turnQ.slerpQuaternions(tagTurn.from, tagTurn.to, turn);
+    const u = tagTurn.hold;
+    if (u > 0) {
+      // Clear the head before descending, then approach the natural hanging
+      // position. Retracting toward the body too early can catch a card corner.
+      let s;
+      if (u < .45) { s = u / .45; turnTarget.lerpVectors(tagTurn.target, tagTurn.frontGoal, s * s * (3 - 2 * s)); }
+      else if (u < 1.2) { s = (u - .45) / .75; turnTarget.lerpVectors(tagTurn.frontGoal, tagTurn.lowGoal, s * s * (3 - 2 * s)); }
+      else if (u < 1.65) { s = (u - 1.2) / .45; turnTarget.lerpVectors(tagTurn.lowGoal, tagTurn.restGoal, s * s * (3 - 2 * s)); }
+      else turnTarget.copy(tagTurn.restGoal);
+    }
+    // Guide the center and derive the corresponding hole point. Holding the
+    // hole on a circle would add its offset to the card's horizontal reach.
+    turnTarget.add(turnHole.set(...holeL).applyQuaternion(turnQ));
     turnError.set(-tag.qx, -tag.qy, -tag.qz, tag.qw).premultiply(turnQ).normalize();
-    const sign = turnError.w < 0 ? -1 : 1;
-    tag.wx += clamp(600 * turnError.x * sign - 34 * tag.wx, -450, 450) * h;
-    tag.wy += clamp(600 * turnError.y * sign - 34 * tag.wy, -450, 450) * h;
-    tag.wz += clamp(600 * turnError.z * sign - 34 * tag.wz, -450, 450) * h;
+    const sign = turnError.w < 0 ? -1 : 1, fade = 1 - clamp((u - 1.8) / .7, 0, 1);
+    // Keep a finite turning torque while the pulling force fades: the chain
+    // must take the card's weight before the hand releases its orientation.
+    tag.wx += clamp(10000 * turnError.x * sign - 140 * tag.wx, -10000, 10000) * h;
+    tag.wy += clamp(10000 * turnError.y * sign - 140 * tag.wy, -10000, 10000) * h;
+    tag.wz += clamp(10000 * turnError.z * sign - 140 * tag.wz, -10000, 10000) * h;
     const R = tag.R;
     const rx = R[0] * holeL[0] + R[1] * holeL[1], ry = R[3] * holeL[0] + R[4] * holeL[1], rz = R[6] * holeL[0] + R[7] * holeL[1];
     const k = P.tagMass * 1600, c = P.tagMass * 72;
+    // Lifting the loose loop carries its weight as well as the paper. Without
+    // this load compensation the soft spring sags about 15 mm below its target.
+    const supportedMass = P.tagMass + (N * P.beadMass + P.claspMass) * lift;
     turnHole.set(
-      k * (turnTarget.x - tag.x - rx) - c * tag.vx,
-      k * (turnTarget.y - tag.y - ry) - c * tag.vy + P.tagMass * GRAV,
-      k * (turnTarget.z - tag.z - rz) - c * tag.vz).clampLength(0, .12);
-    tag.applyImpulse(turnHole.x * h, turnHole.y * h, turnHole.z * h, 0, 0, 0);
+      k * (turnTarget.x - tag.x - rx) - c * (tag.vx + tag.wy * rz - tag.wz * ry) - supportedMass * gravity.x,
+      k * (turnTarget.y - tag.y - ry) - c * (tag.vy + tag.wz * rx - tag.wx * rz) - supportedMass * gravity.y,
+      k * (turnTarget.z - tag.z - rz) - c * (tag.vz + tag.wx * ry - tag.wy * rx) - supportedMass * gravity.z).clampLength(0, .12);
+    // The spring follows the hole, so both its velocity and force application
+    // must use that point rather than the card's center of mass.
+    tag.applyImpulse(turnHole.x * h * fade, turnHole.y * h * fade, turnHole.z * h * fade, rx, ry, rz);
   }
   const stats = { ms: 0, mechMs: 0, fleshMs: 0, skinMs: 0, steps: 0, particles: nP, cells: nCells, verts: soft.reduce((a, s) => a + s.n, 0),
     tris: soft.reduce((a, s) => a + s.nTri, 0), sleeping: false, fleshActive: false, fleshDev: 0, fleshRelV: 0, fleshResets: 0, mechResets: 0,
@@ -1003,19 +1035,13 @@ export async function createPlush(ctx, opts = {}) {
   /* ---------------------------------------------- state init ---------------------------------------------- */
   const qPlushInit = new THREE.Quaternion().setFromAxisAngle(UP, facing);
   function initState() {
-    tagTurn = null; tagFlipDirection = 1;
+    tagTurn = null;
     // chain: bead 0/1 (the clasp) partway down the +SIDE strand
     const sOff = qT + Lst * 0.42;
     const v = new THREE.Vector3();
     for (let i = 0; i < N; i++) {
       loopPoint(sOff + cum[i], v);
       bx[i * 3] = v.x; bx[i * 3 + 1] = v.y; bx[i * 3 + 2] = v.z;
-    }
-    if (opts.exhibition) {
-      if (exhibitionPin >= 0) bim[exhibitionPin] = 1 / P.beadMass;
-      exhibitionPin = 0;
-      for (let i = 1; i < N; i++) if (bx[i * 3 + 1] > bx[exhibitionPin * 3 + 1]) exhibitionPin = i;
-      pinPosition.fromArray(bx, exhibitionPin * 3); bim[exhibitionPin] = 0;
     }
     bp.set(bx); bv.fill(0); bxPrev.set(bx);
     // plush: cord loop at the bottom of the loop
@@ -1078,16 +1104,16 @@ export async function createPlush(ctx, opts = {}) {
 
   /* ---------------------------------------------- mechanism ---------------------------------------------- */
   function integrateBeads(h) {
-    const d = Math.exp(-P.chainDamp * h), gh = GRAV * h;
+    const d = Math.exp(-P.chainDamp * h);
     for (let i = 0; i < N; i++) {
       const o = i * 3;
       bp[o] = bx[o]; bp[o + 1] = bx[o + 1]; bp[o + 2] = bx[o + 2];
-      if (i === exhibitionPin) { bv[o] = bv[o + 1] = bv[o + 2] = 0; continue; }
-      bv[o] *= d; bv[o + 1] = (bv[o + 1] - gh) * d; bv[o + 2] *= d;
+      bv[o] = (bv[o] + gravity.x * h) * d; bv[o + 1] = (bv[o + 1] + gravity.y * h) * d; bv[o + 2] = (bv[o + 2] + gravity.z * h) * d;
       bx[o] += bv[o] * h; bx[o + 1] += bv[o + 1] * h; bx[o + 2] += bv[o + 2] * h;
     }
   }
   function integratePlush(h) {
+    if (opts.exhibition) { core.integrate(h, 0, 0, gravity); return; }
     let linD = P.plushLinDamp, angD = P.plushAngDamp;
     if (squeeze && !squeeze.releasing) { linD += 6; angD += 10; }
     if (floorContact && !plushGrabs.length) { linD += P.floorDamping * 0.5; angD += P.floorDamping; }
@@ -1116,7 +1142,7 @@ export async function createPlush(ctx, opts = {}) {
         core.wy += (-P.twistStiffness * err - P.twistDamping * core.wy) / Iv * h;
       }
     }
-    core.integrate(h, linD, angD);
+    core.integrate(h, linD, angD, gravity);
   }
   function beadFriction(o, nx, ny, nz, depth, mu) {
     const dx = bx[o] - bp[o], dy = bx[o + 1] - bp[o + 1], dz = bx[o + 2] - bp[o + 2];
@@ -1131,8 +1157,7 @@ export async function createPlush(ctx, opts = {}) {
   function beadCollideStatic(i, friction, record) {
     const o = i * 3;
     if (opts.exhibition) {
-      if (i === exhibitionPin) pinPosition.toArray(bx, o);
-      bcontact[i] = i === exhibitionPin ? 1 : 0; bnear[i] = bcontact[i];
+      bcontact[i] = bnear[i] = 0;
       return;
     }
     let x = bx[o], y = bx[o + 1], z = bx[o + 2];
@@ -1295,6 +1320,29 @@ export async function createPlush(ctx, opts = {}) {
     }
   }
   function chainBending() {
+    if (opts.exhibition) {
+      // Limit the actual angle, using all three particle gradients. A fixed
+      // two-hop rest distance incorrectly straightens shortened ball links and
+      // fights their allowed axial slack, continually adding energy at contact.
+      for (let i = 0; i < N; i++) {
+        const a = (i + N - 1) % N, b = (i + 1) % N, oa = a * 3, oi = i * 3, ob = b * 3;
+        let ux = bx[oa] - bx[oi], uy = bx[oa + 1] - bx[oi + 1], uz = bx[oa + 2] - bx[oi + 2];
+        let vx = bx[ob] - bx[oi], vy = bx[ob + 1] - bx[oi + 1], vz = bx[ob + 2] - bx[oi + 2];
+        const lu = Math.hypot(ux, uy, uz), lv = Math.hypot(vx, vy, vz); if (lu < 1e-9 || lv < 1e-9) continue;
+        ux /= lu; uy /= lu; uz /= lu; vx /= lv; vy /= lv; vz /= lv;
+        const c = ux * vx + uy * vy + uz * vz, C = c + cosB; if (C <= 0) continue;
+        const ax = (vx - c * ux) / lu, ay = (vy - c * uy) / lu, az = (vz - c * uz) / lu;
+        const cx = (ux - c * vx) / lv, cy = (uy - c * vy) / lv, cz = (uz - c * vz) / lv;
+        const mx = -ax - cx, my = -ay - cy, mz = -az - cz;
+        const w = bim[a] * (ax * ax + ay * ay + az * az) + bim[i] * (mx * mx + my * my + mz * mz) + bim[b] * (cx * cx + cy * cy + cz * cz);
+        if (w < 1e-12) continue;
+        const lambda = -C / w;
+        bx[oa] += lambda * bim[a] * ax; bx[oa + 1] += lambda * bim[a] * ay; bx[oa + 2] += lambda * bim[a] * az;
+        bx[oi] += lambda * bim[i] * mx; bx[oi + 1] += lambda * bim[i] * my; bx[oi + 2] += lambda * bim[i] * mz;
+        bx[ob] += lambda * bim[b] * cx; bx[ob + 1] += lambda * bim[b] * cy; bx[ob + 2] += lambda * bim[b] * cz;
+      }
+      return;
+    }
     for (let i = 0; i < N; i++) {
       const a = i === 0 ? N - 1 : i - 1, b = i === N - 1 ? 0 : i + 1;
       const oa = a * 3, ob = b * 3;
@@ -1344,6 +1392,7 @@ export async function createPlush(ctx, opts = {}) {
     // instead of stretching the light chain (the loss of momentum exactness is invisible here)
     const ms = P.attachMassScale, wc0 = (1 - t) * (1 - t) * bim[j] + t * t * bim[k], sc = ms > 0 && wc0 > ms * wb ? ms * wb / wc0 : 1;
     const wj = (1 - t) * (1 - t) * bim[j] * sc, wk = t * t * bim[k] * sc;
+    if (wb + wj + wk <= 0) return;
     const lam = C / (wb + wj + wk);
     body.applyP(-dx * lam, -dy * lam, -dz * lam, rx, ry, rz);
     const sj = (1 - t) * bim[j] * sc * lam, sk = t * bim[k] * sc * lam;
@@ -1362,6 +1411,7 @@ export async function createPlush(ctx, opts = {}) {
     tag.applyP(dx * lam, dy * lam, dz * lam, sx, sy, sz);
     core.applyP(-dx * lam, -dy * lam, -dz * lam, rx, ry, rz);
   }
+  const beadPlushContact = new Float64Array(N * 4), beadPlushActive = new Uint8Array(N);
   function beadsVsPlush() {
     const ex2 = 0.011 * 0.011, bR = (plushBoundR + rb) * (plushBoundR + rb);
     for (let i = 0; i < N; i++) {
@@ -1378,11 +1428,91 @@ export async function createPlush(ctx, opts = {}) {
       const nx = R[0] * gx + R[1] * gy + R[2] * gz, ny = R[3] * gx + R[4] * gy + R[5] * gz, nz = R[6] * gx + R[7] * gy + R[8] * gz;
       const C = Math.min(rb - phi, 0.004);
       const wb = bim[i], wp = core.w(rx, ry, rz, nx, ny, nz);
+      if (wb + wp <= 0) continue;
       const lam = C / (wb + wp);
+      if (opts.exhibition) {
+        const k = i * 4;
+        beadPlushContact[k] = nx; beadPlushContact[k + 1] = ny; beadPlushContact[k + 2] = nz;
+        beadPlushContact[k + 3] += lam; beadPlushActive[i] = 1;
+      }
       bx[o] += nx * lam * wb; bx[o + 1] += ny * lam * wb; bx[o + 2] += nz * lam * wb;
       core.applyP(-nx * lam, -ny * lam, -nz * lam, rx, ry, rz);
     }
   }
+  function beadPlushVelocities(h) {
+    if (!opts.exhibition) return;
+    for (let i = 0; i < N; i++) if (beadPlushActive[i]) {
+      const o = i * 3, k = i * 4, nx = beadPlushContact[k], ny = beadPlushContact[k + 1], nz = beadPlushContact[k + 2];
+      const normal = bv[o] * nx + bv[o + 1] * ny + bv[o + 2] * nz;
+      // A metal bead resting on stuffing does not rebound from positional
+      // depenetration. Tangential resistance is limited by the contact load.
+      let vx = bv[o] - normal * nx, vy = bv[o + 1] - normal * ny, vz = bv[o + 2] - normal * nz;
+      const speed = Math.hypot(vx, vy, vz), friction = .35 * beadPlushContact[k + 3] * bim[i] / h;
+      const scale = speed > 1e-12 ? Math.max(0, 1 - friction / speed) : 0;
+      bv[o] = vx * scale; bv[o + 1] = vy * scale; bv[o + 2] = vz * scale;
+    }
+  }
+  // The card is a thin solid with a real circular aperture. A bead can slide
+  // through that aperture, but cannot pass through either printed face. Contact
+  // impulses act on both bodies, including the torque at the card contact point.
+  const beadTagContact = new Float64Array(N * 7), beadTagActive = new Uint8Array(N);
+  function beadsVsTag() {
+    if (!opts.exhibition) return;
+    for (let i = 0; i < N; i++) {
+      const o = i * 3, T = tag.R, dx = bx[o] - tag.x, dy = bx[o + 1] - tag.y, dz = bx[o + 2] - tag.z;
+      if (dx * dx + dy * dy + dz * dz > (tagBoundR + rb) ** 2) continue;
+      const x = T[0] * dx + T[3] * dy + T[6] * dz, y = T[1] * dx + T[4] * dy + T[7] * dz, z = T[2] * dx + T[5] * dy + T[8] * dz;
+      const hx = x - holeL[0], hy = y - holeL[1], hd = Math.hypot(hx, hy), hr = holeD * .5;
+      let cx = clamp(x, -tw * .5, tw * .5), cy = clamp(y, -th * .5, th * .5), cz = clamp(z, -tt * .5, tt * .5);
+      if (hd < hr) { const s = hr / Math.max(hd, 1e-12); cx = holeL[0] + (hd > 1e-12 ? hx * s : hr); cy = holeL[1] + hy * s; }
+      let nx = x - cx, ny = y - cy, nz = z - cz, distance = Math.hypot(nx, ny, nz), depth = rb - distance;
+      const prevZ = tag.pR[2] * (bp[o] - tag.px) + tag.pR[5] * (bp[o + 1] - tag.py) + tag.pR[8] * (bp[o + 2] - tag.pz);
+      // Swept face contact keeps a fast card/chain drag from tunnelling through
+      // the thin sheet. The previous side resolves the otherwise ambiguous z=0.
+      const overFace = Math.abs(x) < tw * .5 && Math.abs(y) < th * .5 && hd >= hr;
+      const crossed = overFace && prevZ * z < 0 && Math.abs(prevZ) > tt * .5;
+      if (overFace && (distance < 1e-12 || crossed)) {
+        nx = ny = 0; nz = (crossed ? prevZ : z || prevZ) < 0 ? -1 : 1;
+        depth = rb + tt * .5 - nz * z; cz = nz * tt * .5;
+      } else {
+        if (depth <= 0 || distance < 1e-12) continue;
+        nx /= distance; ny /= distance; nz /= distance;
+      }
+      const wx = T[0] * nx + T[1] * ny + T[2] * nz, wy = T[3] * nx + T[4] * ny + T[5] * nz, wz = T[6] * nx + T[7] * ny + T[8] * nz;
+      const rx = T[0] * cx + T[1] * cy + T[2] * cz, ry = T[3] * cx + T[4] * cy + T[5] * cz, rz = T[6] * cx + T[7] * cy + T[8] * cz;
+      const w = bim[i] + tag.w(rx, ry, rz, wx, wy, wz);
+      if (w <= 0) continue;
+      const lambda = depth / w, k = i * 7;
+      beadTagContact[k] = wx; beadTagContact[k + 1] = wy; beadTagContact[k + 2] = wz;
+      beadTagContact[k + 3] = rx; beadTagContact[k + 4] = ry; beadTagContact[k + 5] = rz;
+      beadTagContact[k + 6] += lambda; beadTagActive[i] = 1;
+      bx[o] += wx * lambda * bim[i]; bx[o + 1] += wy * lambda * bim[i]; bx[o + 2] += wz * lambda * bim[i];
+      tag.applyP(-wx * lambda, -wy * lambda, -wz * lambda, rx, ry, rz);
+    }
+  }
+  function beadTagVelocities(h) {
+    if (!opts.exhibition) return;
+    for (let it = 0; it < 2; it++) for (let i = 0; i < N; i++) if (beadTagActive[i]) {
+      const o = i * 3, k = i * 7, nx = beadTagContact[k], ny = beadTagContact[k + 1], nz = beadTagContact[k + 2];
+      const rx = beadTagContact[k + 3], ry = beadTagContact[k + 4], rz = beadTagContact[k + 5];
+      let vx = bv[o] - tag.vx - tag.wy * rz + tag.wz * ry, vy = bv[o + 1] - tag.vy - tag.wz * rx + tag.wx * rz, vz = bv[o + 2] - tag.vz - tag.wx * ry + tag.wy * rx;
+      const vn = vx * nx + vy * ny + vz * nz;
+      // Paper/chain contact is inelastic. Positional depenetration must not turn
+      // into a bounce on the next substep (and feed back through the hole).
+      const j = -vn / (bim[i] + tag.w(rx, ry, rz, nx, ny, nz));
+      bv[o] += nx * j * bim[i]; bv[o + 1] += ny * j * bim[i]; bv[o + 2] += nz * j * bim[i];
+      tag.applyImpulse(-nx * j, -ny * j, -nz * j, rx, ry, rz);
+      if (it) continue;
+      vx -= vn * nx; vy -= vn * ny; vz -= vn * nz;
+      const speed = Math.hypot(vx, vy, vz);
+      if (speed < 1e-9) continue;
+      vx /= speed; vy /= speed; vz /= speed;
+      const friction = Math.min(speed / (bim[i] + tag.w(rx, ry, rz, vx, vy, vz)), .25 * beadTagContact[k + 6] / h);
+      bv[o] -= vx * friction * bim[i]; bv[o + 1] -= vy * friction * bim[i]; bv[o + 2] -= vz * friction * bim[i];
+      tag.applyImpulse(vx * friction, vy * friction, vz * friction, rx, ry, rz);
+    }
+  }
+  const tagPlushContact = new Float64Array(nTS * 7), tagPlushActive = new Uint8Array(nTS);
   function tagVsPlush() {
     const dcx = tag.x - core.x, dcy = tag.y - core.y, dcz = tag.z - core.z, rr = plushBoundR + tagBoundR;
     if (dcx * dcx + dcy * dcy + dcz * dcz > rr * rr) return;
@@ -1399,13 +1529,39 @@ export async function createPlush(ctx, opts = {}) {
       const C = Math.min(margin - phi, 0.004);
       const rx = wx - core.x, ry = wy - core.y, rz = wz - core.z;
       const lam = C / (tag.w(sx, sy, sz, nx, ny, nz) + core.w(rx, ry, rz, nx, ny, nz));
+      if (opts.exhibition) {
+        const k = i * 7;
+        tagPlushContact[k] = nx; tagPlushContact[k + 1] = ny; tagPlushContact[k + 2] = nz;
+        tagPlushContact[k + 3] = sx; tagPlushContact[k + 4] = sy; tagPlushContact[k + 5] = sz;
+        tagPlushContact[k + 6] += lam; tagPlushActive[i] = 1;
+      }
       tag.applyP(nx * lam, ny * lam, nz * lam, sx, sy, sz);
       core.applyP(-nx * lam, -ny * lam, -nz * lam, rx, ry, rz);
     }
   }
+  function tagPlushVelocities(h) {
+    if (!opts.exhibition) return;
+    for (let it = 0; it < 2; it++) for (let i = 0; i < nTS; i++) if (tagPlushActive[i]) {
+      const k = i * 7, nx = tagPlushContact[k], ny = tagPlushContact[k + 1], nz = tagPlushContact[k + 2];
+      const rx = tagPlushContact[k + 3], ry = tagPlushContact[k + 4], rz = tagPlushContact[k + 5];
+      let vx = tag.vx + tag.wy * rz - tag.wz * ry, vy = tag.vy + tag.wz * rx - tag.wx * rz, vz = tag.vz + tag.wx * ry - tag.wy * rx;
+      const vn = vx * nx + vy * ny + vz * nz;
+      const j = -vn / tag.w(rx, ry, rz, nx, ny, nz);
+      tag.applyImpulse(nx * j, ny * j, nz * j, rx, ry, rz);
+      if (it) continue;
+      vx -= vn * nx; vy -= vn * ny; vz -= vn * nz;
+      const speed = Math.hypot(vx, vy, vz); if (speed < 1e-9) continue;
+      vx /= speed; vy /= speed; vz /= speed;
+      const friction = Math.min(speed / tag.w(rx, ry, rz, vx, vy, vz), .35 * tagPlushContact[k + 6] / h);
+      tag.applyImpulse(-vx * friction, -vy * friction, -vz * friction, rx, ry, rz);
+    }
+  }
   // the chain passes through the hole: the card can't turn edge-on to the chain
   function tagAlign() {
-    if (!(P.tagAlignDeg < 89.9) || !hooked || tagFloor) return;   // lying on the table the chain simply kinks at the hole
+    // A ball chain swivels in the hole. Forcing the card normal toward a single
+    // tracked link injects angular velocity each time that link changes sides.
+    // Exhibition uses bead/card contact and the hole constraint instead.
+    if (opts.exhibition || !(P.tagAlignDeg < 89.9) || !hooked || tagFloor) return;
     const cosAlign = Math.cos(P.tagAlignDeg * Math.PI / 180);
     const j = trackT.seg, k = (j + 1) % N, oj = j * 3, ok = k * 3;
     let tx = bx[ok] - bx[oj], ty = bx[ok + 1] - bx[oj + 1], tz = bx[ok + 2] - bx[oj + 2];
@@ -1582,7 +1738,7 @@ export async function createPlush(ctx, opts = {}) {
   function tethers() {
     gatherAnchors();
     if (!nAnch) return;
-    tetherBody(core, attachB[0], attachB[1], attachB[2], P.cordSlack + 0.0003);
+    if (!opts.exhibition) tetherBody(core, attachB[0], attachB[1], attachB[2], P.cordSlack + 0.0003);
     if (!grabTag) tetherBody(tag, holeL[0], holeL[1], 0, P.tagHoleSlack + 0.0003);
     if (grabBead) {   // the grabbed bead itself stays within reach of the hook contacts (beads don't slide)
       const o = grabBead.i * 3;
@@ -1595,7 +1751,18 @@ export async function createPlush(ctx, opts = {}) {
     }
   }
   function grabConstraints(h) {
-    if (grabBead) {
+    if (grabBead && opts.exhibition) {
+      // A hand can pull a bead, but the held toy can still block it. Keeping its
+      // real inverse mass avoids a kinematic-bead / kinematic-core 0/0 contact.
+      const g = grabBead, o = g.i * 3;
+      const dx = bx[o] - g.sx, dy = bx[o + 1] - g.sy, dz = bx[o + 2] - g.sz, distance = Math.hypot(dx, dy, dz);
+      if (distance > 1e-9) {
+        const alpha = 1 / (P.chainGrabStiffness * g.ramp + 1e-9) / (h * h);
+        const lambda = clamp(g.lambda + (-distance - alpha * g.lambda) / (bim[g.i] + alpha), -P.chainGrabMaxForce * h * h, 0);
+        const scale = (lambda - g.lambda) * bim[g.i] / distance; g.lambda = lambda;
+        bx[o] += dx * scale; bx[o + 1] += dy * scale; bx[o + 2] += dz * scale;
+      }
+    } else if (grabBead) {
       // the grabbed bead is kinematic: it sits on the (speed-limited) target, clamped to what the chain can
       // reach from the beads resting on the hook - so the light chain in between never has to stretch
       const g = grabBead, o = g.i * 3;
@@ -1629,10 +1796,13 @@ export async function createPlush(ctx, opts = {}) {
     }
   }
   function mechStep(h) {
+    beadPlushActive.fill(0); beadPlushContact.fill(0);
+    beadTagActive.fill(0); beadTagContact.fill(0);
+    tagPlushActive.fill(0); tagPlushContact.fill(0);
     integrateBeads(h);
     integratePlush(h);
     stepTagTurn(h);
-    tag.integrate(h, P.tagLinDamp, P.tagAngDamp);
+    tag.integrate(h, P.tagLinDamp, P.tagAngDamp, gravity);
     if (grabBead) grabBead.lambda = 0;
     if (grabTag) grabTag.lambda = 0;
     for (let i = 0; i < N; i++) beadCollideStatic(i, false, true);
@@ -1646,6 +1816,7 @@ export async function createPlush(ctx, opts = {}) {
       separateTagPlush();
       beadsVsPlush();
       tagVsPlush();
+      beadsVsTag();
       if (it === 0 && !tagTurn && !grabTag) tagAlign();
       for (let i = 0; i < N; i++) if (bnear[i]) beadCollideStatic(i, false, false);
       linksVsEye();
@@ -1655,6 +1826,11 @@ export async function createPlush(ctx, opts = {}) {
     tagVsStatic();
     tethers();
     chainDistances(1); chainDistances(0);
+    if (opts.exhibition) {
+      attachBody(core, attachB[0], attachB[1], attachB[2], trackP, P.cordSlack);
+      attachBody(tag, holeL[0], holeL[1], 0, trackT, P.tagHoleSlack);
+      beadsVsTag();
+    }
     for (let i = 0; i < N; i++) if (bnear[i]) beadCollideStatic(i, true, false);
     linksVsEye();
     for (let i = 0; i < N; i++) if (bnear[i]) beadCollideStatic(i, false, false);
@@ -1674,6 +1850,9 @@ export async function createPlush(ctx, opts = {}) {
       core.vx = core.vy = core.vz = core.wx = core.wy = core.wz = 0;
     }
     tag.finish(h, 4, 120);
+    beadTagVelocities(h);
+    tagPlushVelocities(h);
+    beadPlushVelocities(h);
     if (grabTag) {   // damp the dragged card toward the pointer's motion
       const k = 1 - Math.exp(-8 * h);
       tag.vx += (grabTag.svx - tag.vx) * k; tag.vy += (grabTag.svy - tag.vy) * k; tag.vz += (grabTag.svz - tag.vz) * k;
@@ -1942,6 +2121,8 @@ export async function createPlush(ctx, opts = {}) {
       links.setMatrixAt(i, _m4);
     }
     beads.instanceMatrix.needsUpdate = true; links.instanceMatrix.needsUpdate = true;
+    // Raycasting caches these spheres, even with render frustum culling off.
+    beads.boundingSphere = null; links.boundingSphere = null;
     lerpPose(tagPrev, tag, alpha, tagMesh.position, tagMesh.quaternion);
     updateFingerVisuals();
     stats.skinMs += performance.now() - t0;
@@ -2026,7 +2207,6 @@ export async function createPlush(ctx, opts = {}) {
   function pickBeads(ray) {
     let best = null; const pr = rb + 0.0011, o = ray.origin, d = ray.direction;
     for (let i = 0; i < N; i++) {
-      if (i === exhibitionPin) continue;
       const cx = bxR[i * 3] - o.x, cy = bxR[i * 3 + 1] - o.y, cz = bxR[i * 3 + 2] - o.z;
       const t = cx * d.x + cy * d.y + cz * d.z; if (t < 0) continue;
       const q2 = cx * cx + cy * cy + cz * cz - t * t; const r = i <= 1 ? pr + 0.0008 : pr;
@@ -2389,7 +2569,10 @@ export async function createPlush(ctx, opts = {}) {
       const btn = info.pointerType === 'mouse' ? (info.button ?? 0) : 0;
       if (btn === 1) return false;
       const ray = localRay(info);
-      const hit = pickAll(ray);
+      // The exhibit has already picked the visible render surface. Its thin
+      // card may lie inside the plush's inflated picking SDF, so keep that hit.
+      const beadHit = opts.exhibition && info.part === 'chain' && Number.isInteger(info.bead) && info.bead >= 0 && info.bead < N ? { type: 'bead', i: info.bead, t: 0 } : null;
+      const hit = opts.exhibition && info.part === 'tag' ? pickTag(ray) : opts.exhibition && info.part === 'chain' ? beadHit || pickBeads(ray) : pickAll(ray);
       if (!hit) return false;
       if (btn === 2 && hit.type !== 'plush') return false;
       wake();
@@ -2399,7 +2582,7 @@ export async function createPlush(ctx, opts = {}) {
       if (hit.type === 'bead') {
         const i = hit.i, p = new THREE.Vector3(bx[i * 3], bx[i * 3 + 1], bx[i * 3 + 2]);
         g.kind = 'bead'; g.pp = p.clone();
-        grabBead = { i, im: bim[i] }; bim[i] = 0; newTarget(grabBead, p);
+        grabBead = { i, im: bim[i] }; if (!opts.exhibition) bim[i] = 0; newTarget(grabBead, p);
       } else if (hit.type === 'tag') {
         const l = hit.local, T = tag.R;
         const p = new THREE.Vector3(tag.x + T[0] * l[0] + T[1] * l[1] + T[2] * l[2], tag.y + T[3] * l[0] + T[4] * l[1] + T[5] * l[2], tag.z + T[6] * l[0] + T[7] * l[1] + T[8] * l[2]);
@@ -2550,24 +2733,52 @@ export async function createPlush(ctx, opts = {}) {
       if (t.back) { tagMats[1].map = t.back; tagMats[1].needsUpdate = true; }
     },
     // Exhibition gestures use the mechanism without re-skinning 160k triangles.
+    setGravity(direction) {
+      if (!opts.exhibition || !Number.isFinite(direction.x + direction.y + direction.z) || direction.lengthSq() < 1e-12) return;
+      const scale = GRAV / direction.length();
+      const x = direction.x * scale, y = direction.y * scale, z = direction.z * scale;
+      if (Math.hypot(x - gravity.x, y - gravity.y, z - gravity.z) > 1e-5) { gravity.set(x, y, z); wake(); }
+    },
     nudge(velocity) {
       const v = velocity.clone();
       group.updateWorldMatrix(true, false);
       const length = Math.min(.12, v.length());
       v.transformDirection(_inv.copy(group.matrixWorld).invert()).multiplyScalar(length);
-      core.vx = clamp(core.vx + v.x, -.18, .18);
-      core.vy = clamp(core.vy + v.y, -.18, .18);
-      core.vz = clamp(core.vz + v.z, -.18, .18);
+      if (opts.exhibition) {
+        for (let i = 0; i < N; i++) if (bim[i] > 0) { bv[i * 3] += v.x * .6; bv[i * 3 + 1] += v.y * .6; bv[i * 3 + 2] += v.z * .6; }
+      } else {
+        core.vx = clamp(core.vx + v.x, -.18, .18);
+        core.vy = clamp(core.vy + v.y, -.18, .18);
+        core.vz = clamp(core.vz + v.z, -.18, .18);
+      }
       tag.vx += v.x * .6; tag.vy += v.y * .6; tag.vz += v.z * .6;
       wake();
     },
     turnTag() {
       if (!opts.exhibition || gesture) return false;
       const from = new THREE.Quaternion(tag.qx, tag.qy, tag.qz, tag.qw);
-      const hole = new THREE.Vector3(...holeL).applyQuaternion(from).add(new THREE.Vector3(tag.x, tag.y, tag.z));
-      const to = from.clone().multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(...holeL).normalize(), Math.PI * tagFlipDirection));
-      tagFlipDirection *= -1;
-      tagTurn = {t: 0, from, to, hole, target: H.clone().add(new THREE.Vector3(.035, -.025, -.012))};
+      const axis = gravity.clone().normalize(), front = FWD.clone().projectOnPlane(axis);
+      if (front.lengthSq() < 1e-10) front.copy(SIDE).projectOnPlane(axis);
+      front.normalize();
+      // End with the opposite face showing and the hole vertically above the
+      // center, so releasing the card does not retain a tipping moment.
+      const targetNormal = new THREE.Vector3(0, 0, 1).applyQuaternion(from).projectOnPlane(axis).negate();
+      if (targetNormal.lengthSq() < 1e-10) targetNormal.copy(front);
+      targetNormal.normalize();
+      const up = axis.clone().negate(), right = new THREE.Vector3().crossVectors(up, targetNormal).normalize();
+      const len = Math.hypot(holeL[0], holeL[1]), hx = holeL[0] / len, hy = holeL[1] / len;
+      const to = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(
+        right.clone().multiplyScalar(hy).addScaledVector(up, hx), right.clone().multiplyScalar(-hx).addScaledVector(up, hy), targetNormal));
+      const anchor = attachWorld(new THREE.Vector3());
+      const radial = new THREE.Vector3(tag.x, tag.y, tag.z).sub(anchor).projectOnPlane(axis);
+      if (radial.lengthSq() < 1e-10) radial.copy(FWD).projectOnPlane(axis);
+      if (radial.lengthSq() < 1e-10) radial.copy(SIDE).projectOnPlane(axis);
+      radial.normalize();
+      const target = front.clone().multiplyScalar(.030).add(anchor).addScaledVector(axis, -.020);
+      const liftGoal = anchor.clone().addScaledVector(axis, -.020).addScaledVector(radial, .020);
+      const frontGoal = anchor.clone().addScaledVector(front, .045), lowGoal = frontGoal.clone().addScaledVector(axis, .050);
+      const restGoal = anchor.clone().addScaledVector(axis, .070).addScaledVector(front, .018);
+      tagTurn = { t: 0, turn: 0, hold: 0, from, to, center: new THREE.Vector3(tag.x, tag.y, tag.z), target, anchor, axis, liftGoal, frontGoal, lowGoal, restGoal };
       wake(); return true;
     },
     cancelInteraction() { endGesture(null, true); tagTurn = null; },
@@ -2581,8 +2792,8 @@ export async function createPlush(ctx, opts = {}) {
       beads.dispose(); links.dispose();
     },
     /** internals for tests / tuning (not part of the contract) */
-    _debug: { core, tag, bx, bv, bim, bcontact, H, com0, attachRest, sdf, sdfSample, nP, N, fu, fw, XA, X0, initState, mechStep, preroll,
-      get exhibitionPin() { return exhibitionPin; }, get trackP() { return trackP; }, get trackT() { return trackT; }, get gesture() { return gesture; }, get squeeze() { return squeeze; },
+    _debug: { core, tag, bx, bv, bim, bcontact, beadTagActive, H, com0, attachRest, sdf, sdfSample, nP, N, fu, fw, XA, X0, initState, mechStep, preroll,
+      get exhibitionPin() { return -1; }, gravity, get trackP() { return trackP; }, get trackT() { return trackT; }, get gesture() { return gesture; }, get squeeze() { return squeeze; },
       get fleshActive() { return fleshActive; }, get simTime() { return simTime; }, plushBoundR, ringC, postXZ },
   };
 

@@ -1,19 +1,20 @@
 # Current exhibition contract
 
 The current entry point is `src/app.js`, with adapters in `src/exhibit_objects.js`.
-One object is visible at a time. Presentation units are metres; there is no floor, cabinet or lamp. Display rotation acts as an orbit around the suspended scene; gravity remains Y-down in that scene.
+One object is visible at a time. Presentation units are metres; there is no floor, cabinet or lamp. The display supports the held plush body; its chain and paper tag remain dynamic. Gravity stays world-down when the display pivot rotates, with the direction converted into the mechanism frame.
 
-- Tap: bring the object closer; tap a held magnet to advance one normal unpacking stage. Tap the plush paper tag to lift and turn it about the hole-to-centre axis, exposing the opposite textured face.
+- Tap: bring the object closer; tap a held magnet to advance one normal unpacking stage. Tap the plush paper tag to lift it clear of the head, expose the opposite textured face and lower it to its natural hanging position. Assistance is finite and ends while all attachment and collision constraints stay active.
 - One pointer drag on the body/background: rotate the display pivot. Release velocity is in radians/second with analytically integrated exponential drag. There is no idle sine-wave motion. Two pointers: zoom and twist. Long press: bounded material response.
-- Drag the tag or chain directly: constrain the grabbed point with the existing mechanism solver, then release to gravity. The apex bead is fixed; the remaining 33 beads have length, bend, self-contact and body-contact constraints. The mechanism runs at 480 Hz with bounded catch-up, then sleeps.
+- Drag the tag or chain directly: constrain the grabbed point with the existing mechanism solver, then release to gravity. There is no invisible apex pin: all 34 beads are dynamic and the closed chain passes through the supported toy’s cloth loop. Length, true three-point bend, self-contact, bead/card and body-contact constraints remain active. The mechanism runs at 480 Hz with bounded catch-up, then sleeps.
 - Exhibition plush simulation skips lattice re-skinning and invisible room collisions. Its original 20 g body, 0.9 g tag and bead masses remain in use. Turning the view nudges the mechanism; reduced-motion mode suppresses that nudge and rotational coast.
-- Automatic tag turns and released motion update the framing bounds. Pan follows those bounds without lag, outward fitting is immediate, and inward restoration is damped. Direct grabs retain pointer control. The full tag stays visible at 320/390/430 portrait widths without reducing the model below 85% of its resting display scale.
+- Automatic tag turns and released motion update the framing bounds. Bounds are measured in the current world orientation without temporarily changing the gravity frame. Cached convex boundary vertices avoid fictitious rounded-card/foot box corners. Perspective pan and distance fit the actual depth; outward fitting is immediate and inward fitting is damped. Direct grabs retain pointer control. Four consecutive turns keep the actual tag geometry visible at 320/390/430 portrait widths without reducing the toy below 85% of its initial projected height; camera-distance ratios are not used as a size proxy.
 - All gestures are cancelled on modal opening, selection, blur, visibility loss, and resize.
 - Plush surface displacement is limited to 0.45 mm and returns with exponential damping. Geometry and stitched attachments share the same local displacement.
 - Magnet exhibition mode preserves nested packaging and animation but skips rigid-body stepping. Its active root controls framing and hit testing; empty containers become invisible.
 - `createExhibitObjects(ctx)` returns `{plush,magnet}`, each with root, alignment, boundsRoot, stage, busy, update, touch, release, advance and reset.
 - `visibleBounds` excludes fur, hidden proxies and zero-scale instances. Export excludes display helpers and converts custom transparent film to a portable physical material.
 - Magnet back UVs use the calibrated projective transform in `magnet_spec.json`; the two photographed concave cuts must remain open. Required photo failures must never silently produce a plain fallback material.
+- The backing paper photograph is independently rectified by `photo_rectification.js` using the paper-edge and hole registration in `magnet_spec.json`. Photographic fabric outside the paper is excluded and the bowed print is mapped flat; the original image bytes and printed ink are preserved. GLB exports embed the corrected canvas material.
 - `dev/exhibit-check.html` plus `dev/verify-exhibit-physics.js` and `dev/verify-magnet-textures.js` is the current interaction test; the older contract below documents the retained legacy engines only.
 
 ---

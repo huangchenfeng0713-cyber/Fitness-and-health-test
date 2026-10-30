@@ -1,38 +1,389 @@
-[
-  {
-    "width": 320,
-    "initialDistance": 0.434411555800678,
-    "left": 44.8376188854064,
-    "right": 296.7900777886319,
-    "top": 110.76897226464818,
-    "bottom": 463.74547665484766,
-    "maxDistance": 0.47898709437090325,
-    "scaleRatio": 0.9069379131628372,
-    "finalDistance": 0.43440799322733886,
-    "sleep": true
-  },
-  {
-    "width": 390,
-    "initialDistance": 0.4344115680180072,
-    "left": 78.83041247233994,
-    "right": 345.8838683362646,
-    "top": 91.62658568659181,
-    "bottom": 463.74547665484766,
-    "maxDistance": 0.43833273901147196,
-    "scaleRatio": 0.9910543506234378,
-    "finalDistance": 0.43440799322733886,
-    "sleep": true
-  },
-  {
-    "width": 430,
-    "initialDistance": 0.4344115680180072,
-    "left": 98.8304124723399,
-    "right": 365.88386833626464,
-    "top": 91.62658568659181,
-    "bottom": 463.74547665484766,
-    "maxDistance": 0.43833273901147196,
-    "scaleRatio": 0.9910543506234378,
-    "finalDistance": 0.43440799322733886,
-    "sleep": true
+{
+  "method": "Final offline HTML, controlled frame stepping with real mesh vertex projection; four consecutive card taps at each 320/390/430x844 viewport. Whole-body screen height is measured, not inferred from camera distance.",
+  "html_sha256": "efa9fa74a6e41f7ae2abe276c2c5351caf4ddcdba36d2e8be8a762bc2230b399",
+  "checks_per_viewport": "4 opposite-face checks, all-frame full actual card geometry visibility, actual body height >=85%, settled card/camera stability.",
+  "results": {
+    "mobile": [
+      {
+        "name": "responsive turn exposes the opposite face 320px #0",
+        "pass": true,
+        "detail": {
+          "dot": -0.9453213806012594,
+          "normalZ": 0.9927565216428292
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 320px #1",
+        "pass": true,
+        "detail": {
+          "dot": -0.9870555403179652,
+          "normalZ": -0.9703643045217958
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 320px #2",
+        "pass": true,
+        "detail": {
+          "dot": -0.8709727911250562,
+          "normalZ": 0.9638873717732063
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 320px #3",
+        "pass": true,
+        "detail": {
+          "dot": -0.9963932150827197,
+          "normalZ": -0.9392186956043197
+        }
+      },
+      {
+        "name": "complete automatic tag turn stays inside 320px viewport",
+        "pass": true,
+        "detail": {
+          "left": 15.320328719830574,
+          "right": 310.00000000000006,
+          "top": 79.99999999999989,
+          "bottom": 631.9333031590888,
+          "maxDistance": 0.38826781061464616,
+          "minBodyHeight": 473.6626004920602
+        }
+      },
+      {
+        "name": "responsive framing preserves actual model height at 320px",
+        "pass": true,
+        "detail": {
+          "smallestScale": 0.9057633140284571,
+          "initialHeight": 522.94301740419,
+          "minHeight": 473.6626004920602,
+          "cameraDistanceRatio": 0.9057605186661616
+        }
+      },
+      {
+        "name": "tag and framing remain steady after release at 320px",
+        "pass": true,
+        "detail": {
+          "initial": 0.3516776535236969,
+          "restingDistance": 0.3516776535236969,
+          "final": 0.3516776535236969
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #0",
+        "pass": true,
+        "detail": {
+          "dot": -0.9453213801848572,
+          "normalZ": 0.9927565216752793
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #1",
+        "pass": true,
+        "detail": {
+          "dot": -0.9870555405894275,
+          "normalZ": -0.9703643045951406
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #2",
+        "pass": true,
+        "detail": {
+          "dot": -0.8709725256355367,
+          "normalZ": 0.963887227819235
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #3",
+        "pass": true,
+        "detail": {
+          "dot": -0.9963932592091077,
+          "normalZ": -0.9392186970125799
+        }
+      },
+      {
+        "name": "complete automatic tag turn stays inside 390px viewport",
+        "pass": true,
+        "detail": {
+          "left": 28.5845470714354,
+          "right": 379.99999999999994,
+          "top": 79.99999999999989,
+          "bottom": 661.0424568255619,
+          "maxDistance": 0.35933416515645056,
+          "minBodyHeight": 512.4076972306877
+        }
+      },
+      {
+        "name": "responsive framing preserves actual model height at 390px",
+        "pass": true,
+        "detail": {
+          "smallestScale": 0.8647729396715254,
+          "initialHeight": 592.5343795162233,
+          "minHeight": 512.4076972306877,
+          "cameraDistanceRatio": 0.8637443855777703
+        }
+      },
+      {
+        "name": "tag and framing remain steady after release at 390px",
+        "pass": true,
+        "detail": {
+          "initial": 0.3103728677001594,
+          "restingDistance": 0.3103728677001594,
+          "final": 0.3103728677001594
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #0",
+        "pass": true,
+        "detail": {
+          "dot": -0.9453213801848572,
+          "normalZ": 0.9927565216752793
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #1",
+        "pass": true,
+        "detail": {
+          "dot": -0.9870555405894275,
+          "normalZ": -0.9703643045951406
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #2",
+        "pass": true,
+        "detail": {
+          "dot": -0.8709725256355367,
+          "normalZ": 0.963887227819235
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #3",
+        "pass": true,
+        "detail": {
+          "dot": -0.9963932592091082,
+          "normalZ": -0.939218697012582
+        }
+      },
+      {
+        "name": "complete automatic tag turn stays inside 430px viewport",
+        "pass": true,
+        "detail": {
+          "left": 48.584547071435374,
+          "right": 405.23232363757023,
+          "top": 79.99999999999989,
+          "bottom": 661.0424568255619,
+          "maxDistance": 0.35933416515645056,
+          "minBodyHeight": 512.4076972306877
+        }
+      },
+      {
+        "name": "responsive framing preserves actual model height at 430px",
+        "pass": true,
+        "detail": {
+          "smallestScale": 0.8647729396715254,
+          "initialHeight": 592.5343795162233,
+          "minHeight": 512.4076972306877,
+          "cameraDistanceRatio": 0.8637443855777703
+        }
+      },
+      {
+        "name": "tag and framing remain steady after release at 430px",
+        "pass": true,
+        "detail": {
+          "initial": 0.3103728677001594,
+          "restingDistance": 0.3103728677001594,
+          "final": 0.3103728677001594
+        }
+      }
+    ],
+    "desktop": [
+      {
+        "name": "responsive turn exposes the opposite face 320px #0",
+        "pass": true,
+        "detail": {
+          "dot": -0.8473134502241266,
+          "normalZ": 0.9399835386580527
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 320px #1",
+        "pass": true,
+        "detail": {
+          "dot": -0.9998620914363637,
+          "normalZ": -0.9402353552339656
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 320px #2",
+        "pass": true,
+        "detail": {
+          "dot": -0.9998086400022176,
+          "normalZ": 0.9404716804374164
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 320px #3",
+        "pass": true,
+        "detail": {
+          "dot": -0.9997970225442523,
+          "normalZ": -0.9420984866947375
+        }
+      },
+      {
+        "name": "complete automatic tag turn stays inside 320px viewport",
+        "pass": true,
+        "detail": {
+          "left": 10.021539180147556,
+          "right": 309.45059082726624,
+          "top": 79.99999999999984,
+          "bottom": 643.2743971873803,
+          "maxDistance": 0.3595317714747766,
+          "minBodyHeight": 512.1266349791844
+        }
+      },
+      {
+        "name": "responsive framing preserves actual model height at 320px",
+        "pass": true,
+        "detail": {
+          "smallestScale": 0.9296164225716737,
+          "initialHeight": 550.9010195435734,
+          "minHeight": 512.1266349791844,
+          "cameraDistanceRatio": 0.928512050332279
+        }
+      },
+      {
+        "name": "tag and framing remain steady after release at 320px",
+        "pass": true,
+        "detail": {
+          "initial": 0.3338295822916412,
+          "restingDistance": 0.3338295822916411,
+          "final": 0.3338295822916411
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #0",
+        "pass": true,
+        "detail": {
+          "dot": -0.8473134435342755,
+          "normalZ": 0.9399835339605418
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #1",
+        "pass": true,
+        "detail": {
+          "dot": -0.9998620913820909,
+          "normalZ": -0.940235353008359
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #2",
+        "pass": true,
+        "detail": {
+          "dot": -0.9998086399432031,
+          "normalZ": 0.9404716796081788
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 390px #3",
+        "pass": true,
+        "detail": {
+          "dot": -0.9997970225397773,
+          "normalZ": -0.9420984868693123
+        }
+      },
+      {
+        "name": "complete automatic tag turn stays inside 390px viewport",
+        "pass": true,
+        "detail": {
+          "left": 29.397460088147373,
+          "right": 354.44396622632746,
+          "top": 79.99999999999989,
+          "bottom": 663.2393133364542,
+          "maxDistance": 0.35953177142008813,
+          "minBodyHeight": 512.1266350569271
+        }
+      },
+      {
+        "name": "responsive framing preserves actual model height at 390px",
+        "pass": true,
+        "detail": {
+          "smallestScale": 0.8558979824044282,
+          "initialHeight": 598.3500902972539,
+          "minHeight": 512.1266350569271,
+          "cameraDistanceRatio": 0.8548787391971763
+        }
+      },
+      {
+        "name": "tag and framing remain steady after release at 390px",
+        "pass": true,
+        "detail": {
+          "initial": 0.3073560674529323,
+          "restingDistance": 0.3073560674529323,
+          "final": 0.3073560674529323
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #0",
+        "pass": true,
+        "detail": {
+          "dot": -0.8473134435342755,
+          "normalZ": 0.9399835339605418
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #1",
+        "pass": true,
+        "detail": {
+          "dot": -0.9998620913820909,
+          "normalZ": -0.940235353008359
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #2",
+        "pass": true,
+        "detail": {
+          "dot": -0.9998086399432033,
+          "normalZ": 0.9404716796081829
+        }
+      },
+      {
+        "name": "responsive turn exposes the opposite face 430px #3",
+        "pass": true,
+        "detail": {
+          "dot": -0.9997970225397772,
+          "normalZ": -0.9420984868693149
+        }
+      },
+      {
+        "name": "complete automatic tag turn stays inside 430px viewport",
+        "pass": true,
+        "detail": {
+          "left": 49.39746008814732,
+          "right": 374.4439662263275,
+          "top": 79.99999999999989,
+          "bottom": 663.2393133364542,
+          "maxDistance": 0.35953177142008935,
+          "minBodyHeight": 512.1266350569254
+        }
+      },
+      {
+        "name": "responsive framing preserves actual model height at 430px",
+        "pass": true,
+        "detail": {
+          "smallestScale": 0.8558979824044254,
+          "initialHeight": 598.3500902972539,
+          "minHeight": 512.1266350569254,
+          "cameraDistanceRatio": 0.8548787391971734
+        }
+      },
+      {
+        "name": "tag and framing remain steady after release at 430px",
+        "pass": true,
+        "detail": {
+          "initial": 0.3073560674529323,
+          "restingDistance": 0.3073560674529323,
+          "final": 0.3073560674529323
+        }
+      }
+    ]
   }
-]
+}

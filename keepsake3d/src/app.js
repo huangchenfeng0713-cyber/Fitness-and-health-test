@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import {ConvexHull} from 'three/addons/math/ConvexHull.js';
 import {RectAreaLightUniformsLib} from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import {createExhibitObjects,visibleBounds,exportExhibit} from './exhibit_objects.js';
 import {createExhibitMotion} from './exhibit_motion.js';
@@ -39,7 +40,61 @@ const raycaster=new THREE.Raycaster(),v2=new THREE.Vector2();
 const stageHints={sealed:'轻点折叠封口 · 打开原包装',flapOpen:'轻点纸卡 · 沿袋口取出',cardOut:'轻点纸卡 · 顺着折痕展开',cardOpen:'轻点吸塑壳 · 轻轻拿出',blisterFree:'轻点冰箱贴 · 从壳中取出',magnetFree:'长按轻触 · 松手恢复'};
 function status(){const i=items[current],text=!held?'轻点藏品，拿近一点':current==='magnet'?(i?.busy?'正在轻轻打开…':stageHints[i?.stage]||'单指转动，双指靠近细节'):'轻点吊牌翻面 · 拖动珠链，松手垂落';if($('#status').textContent!==text)$('#status').textContent=text;}
 function updateLabels(){document.body.classList.toggle('holding',held);const i=items[current];if(!i)return;$('#itemName').textContent=i.title;$('#itemMaterial').textContent=i.material;$('#itemIndex').textContent=current==='plush'?'OBJECT 01 / 02':'OBJECT 02 / 02';$('#detailCopy').textContent=i.details;$('.gesture-hint').textContent=current==='plush'?'单指旋转 · 双指放大 · 轻点吊牌翻面':'单指旋转 · 双指放大 · 长按轻触';$('#repack').hidden=current!=='magnet';$('#returnItem').hidden=!held;document.querySelectorAll('[data-item]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.item===current)));status();}
+// Fit the actual convex silhouettes at their depths. Cache only boundary
+// vertices, so rounded card/feet corners do not force unnecessary zoom-out.
+const fitHulls=new WeakMap();
+function fitHull(geometry){
+ if(fitHulls.has(geometry))return fitHulls.get(geometry);
+ const pos=geometry.attributes.restPosition||geometry.attributes.position;
+ const points=Array.from({length:pos.count},(_,i)=>new THREE.Vector3().fromBufferAttribute(pos,i));
+ const size=geometry.boundingBox.getSize(new THREE.Vector3());let support=points;
+ if(points.length>32&&Math.min(size.x,size.y,size.z)>1e-8){
+  const hull=new ConvexHull().setFromPoints(points),vertices=new Set();
+  for(const face of hull.faces){let edge=face.edge;do{vertices.add(edge.head().point);edge=edge.next;}while(edge!==face.edge);}
+  if(vertices.size)support=[...vertices];
+ }
+ fitHulls.set(geometry,support);return support;
+}
+function plushRequiredDistance(root,center,tangent,restDistance){
+ const xLimit=Math.max(.3,1-20/innerWidth),top=Math.max(.3,1-160/innerHeight),bottom=Math.max(.3,1-24/innerHeight);
+ const kx=tangent*camera.aspect*xLimit,kt=tangent*top,kb=tangent*bottom;
+ const m=new THREE.Matrix4(),instance=new THREE.Matrix4(),point=new THREE.Vector3();
+ let left=Infinity,right=-Infinity,low=Infinity,high=-Infinity,near=.075;
+ function includePoint(){
+  point.sub(center);left=Math.min(left,point.x-kx*point.z);right=Math.max(right,point.x+kx*point.z);
+  low=Math.min(low,point.y-kb*point.z);high=Math.max(high,point.y+kt*point.z);near=Math.max(near,point.z+.005);
+ }
+ function corners(box,matrix){for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z]){point.set(x,y,z).applyMatrix4(matrix);includePoint();}}
+ root.traverseVisible(o=>{
+  if(!o.isMesh||o.userData.noExport||o.userData.isFur||(Array.isArray(o.material)?o.material:[o.material]).every(v=>v.visible===false))return;
+  if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();
+  if(o.isInstancedMesh){for(let i=0;i<o.count;i++){o.getMatrixAt(i,instance);if(Math.abs(instance.determinant())<1e-16)continue;corners(o.geometry.boundingBox,m.multiplyMatrices(o.matrixWorld,instance));}}
+  else for(const vertex of fitHull(o.geometry)){point.copy(vertex).applyMatrix4(o.matrixWorld);includePoint();}
+ });
+ const required=Math.max(near,(right-left)/(2*kx),(high-low)/(kt+kb)),distance=Math.max(restDistance,required);
+ // Solve the perspective pan intervals as well as distance. Keeping the world
+ // box midpoint wastes space below the feet when the raised card is nearer.
+ center.x+=THREE.MathUtils.clamp(0,right-kx*distance,left+kx*distance);
+ center.y+=THREE.MathUtils.clamp(0,high-kt*distance,low+kb*distance);
+ return required;
+}
 function measure(item){
+ if(item.id==='plush'){
+  // Gravity remains in world space while the held toy rotates. Measure its
+  // actual current envelope without temporarily changing the physics frame.
+  const bounds=visibleBounds(item.boundsRoot),center=bounds.getCenter(new THREE.Vector3());
+  // A tag moving toward the camera must not push the whole toy backward.
+  // Keep depth anchored to the supported body while following loose parts in XY.
+  center.z=visibleBounds(item.api.softRoot).getCenter(new THREE.Vector3()).z;
+  item.size=bounds.getSize(new THREE.Vector3());
+  const tangent=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+  const vertical=item.size.y/(2*tangent),horizontal=item.size.x/(2*tangent*camera.aspect);
+  const comfortable=Math.max(vertical*1.72,horizontal*1.48,.075)+item.size.z*.65;
+  if(item.presentationFit===undefined&&item.api.isSleeping)item.presentationFit=comfortable;
+  item.fit=item.presentationFit===undefined?comfortable:Math.max(item.presentationFit,plushRequiredDistance(item.boundsRoot,center,tangent,item.presentationFit*(held?.78:1))/(held?.78:1));
+  item.center=item.slot.parent.worldToLocal(center).sub(item.slot.position);
+  return;
+ }
  const q=pivot.quaternion.clone(),fp=floatRig.position.clone(),sp=item.slot.position.clone();
  pivot.quaternion.identity();floatRig.position.set(0,0,0);item.slot.position.set(0,0,0);scene.updateMatrixWorld(true);
  const b=visibleBounds(item.boundsRoot);item.center=b.getCenter(new THREE.Vector3());item.size=b.getSize(new THREE.Vector3());
@@ -49,7 +104,7 @@ function measure(item){
  item.fit=Math.max(vertical*1.72,horizontal*1.48,.075);
 }
 function frameTarget(){const i=items[current];if(i)targetDistance=i.fit*zoom*(held?.78:1);}
-function front(instant=false){cancelGesture();pivot.quaternion.identity();motion.stop();zoom=1;const i=items[current];if(i){i.resetMotion?.();measure(i);i.slot.position.copy(i.center).negate();frameTarget();if(instant)distance=targetDistance;}}
+function front(instant=false){cancelGesture();pivot.quaternion.identity();motion.stop();zoom=1;const i=items[current];if(i){delete i.presentationFit;i.resetMotion?.();measure(i);i.slot.position.copy(i.center).negate();frameTarget();if(instant)distance=targetDistance;}}
 function select(id){if(!items[id])return;cancelGesture();items[current]?.release();current=id;motion.setMaterial(id);held=false;lastStage=items[id].stage;Object.values(items).forEach(i=>i.slot.visible=i.id===id);front();updateLabels();closeGallery(false);}
 function pickup(){if(!ready)return;held=true;frameTarget();updateLabels();}
 function putBack(){cancelGesture();held=false;front();updateLabels();}
@@ -78,7 +133,7 @@ canvas.addEventListener('pointerdown',e=>{
  try{canvas.setPointerCapture(e.pointerId);}catch{}
  if(pointers.size===1){gesture={id:e.pointerId,x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,at:time,moved:false,press:false,hit:pickPointer(e)};
    gesture.part=items[current].interactionKind?.(gesture.hit);
-   if(gesture.part){gesture.physics=items[current].beginDrag(pointerInfo(e,gesture.hit.point));if(!held)pickup();}
+   if(gesture.part){gesture.physics=items[current].beginDrag(pointerInfo(e,gesture.hit.point),gesture.hit);if(!held)pickup();}
  }
  else beginPinch();
  document.body.classList.add('handling');
@@ -100,7 +155,7 @@ function pointerEnd(e){
  if(g?.physics)items[current].endDrag(pointerInfo(e));
  pointers.delete(e.pointerId);items[current]?.release();marker(0,0,false);
  if(!cancelled&&g&&g.id===e.pointerId&&!g.moved&&!g.press&&time-g.at<.4&&g.hit){
-   if(g.part==='tag')items.plush.flipTag();
+   if(g.part==='tag'){items.plush.presentationFit??=items.plush.fit;items.plush.flipTag();}
    else if(!g.part&&!held)pickup();
    else if(!g.part&&current==='magnet'){items.magnet.advance();status();}
    else if(!g.part){items.plush.touch(g.hit,.45);tapReleaseAt=time+.16;}
@@ -134,28 +189,29 @@ document.addEventListener('keydown',e=>{
  if(!modal&&e.target===canvas){if(e.key==='Enter')held?putBack():pickup();if(e.key==='ArrowLeft')rotate(-12,0);if(e.key==='ArrowRight')rotate(12,0);if(e.key==='ArrowUp')rotate(0,-12);if(e.key==='ArrowDown')rotate(0,12);}
 });
 $('#downloadModel').addEventListener('click',async()=>{const b=$('#downloadModel');b.disabled=true;try{const glb=await exportExhibit(items[current]);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([glb],{type:'model/gltf-binary'}));a.download=items[current].title+'.glb';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000);}finally{b.disabled=false;}});
-function resize(){cancelGesture();camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);if(ready){measure(items[current]);frameTarget();}}
+function resize(){cancelGesture();camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight,false);if(ready){delete items[current].presentationFit;measure(items[current]);frameTarget();}}
 addEventListener('resize',resize);
 function tick(dt){
  dt=Number.isFinite(dt)?Math.min(.05,Math.max(0,dt)):0;time+=dt;if(!ready)return;
- const item=items[current];item.update(dt);
+ const item=items[current];
+ if(!pointers.size&&!reduced)motion.update(dt);
+ item.update(dt);
  if(item.stage!==lastStage){lastStage=item.stage;measure(item);frameTarget();status();}
  const followMechanism=current==='plush'&&item.busy&&!item.grabbed;
- if(item.busy&&!item.grabbed){measure(item);frameTarget();}else if(current==='magnet')status();
- // Follow the changing suspension envelope while the tag turns and settles.
+ if((item.busy||current==='plush')&&!item.grabbed){measure(item);frameTarget();}else if(current==='magnet')status();
+ // Follow the changing loose-part envelope while the tag turns and settles.
  // The simulated path is already smooth; delaying this pan clips a lifted card
  // on narrow screens. Keep direct grabbing under the finger's control.
  if(followMechanism)item.slot.position.copy(item.center).negate();
  else item.slot.position.lerp(item.center.clone().negate(),reduced?1:1-Math.exp(-dt*7));
  if(gesture&&!gesture.physics&&!gesture.moved&&!gesture.press&&gesture.hit&&time-gesture.at>.36&&pointers.size===1){if(!held)pickup();gesture.press=item.touch(gesture.hit,.75);if(gesture.press)marker(gesture.x,gesture.y,true);}
  if(tapReleaseAt&&time>tapReleaseAt){item.release();tapReleaseAt=0;}
- if(!pointers.size&&!reduced)motion.update(dt);
  distance+=(targetDistance-distance)*(reduced?1:1-Math.exp(-dt*7));
  // Expand immediately to contain the current bounds; ease the return inward.
- if(followMechanism)distance=Math.max(distance,targetDistance);
+ if(current==='plush'&&!item.grabbed)distance=Math.max(distance,targetDistance);
  // Rest is stationary; motion is generated only by input and the mechanism.
  floatRig.position.y=0;
- camera.position.set(0,0,distance);camera.lookAt(0,-item.size.y*.04,0);camera.updateMatrixWorld();scene.updateMatrixWorld(true);
+ camera.position.set(0,0,distance);camera.lookAt(0,current==='plush'?0:-item.size.y*.04,0);camera.updateMatrixWorld();scene.updateMatrixWorld(true);
 }
 function snapshotState(){const i=items[current];return{current,held,stage:i?.stage,busy:!!i?.busy,zoom,distance,targetDistance,quaternion:pivot.quaternion.toArray(),angularVelocity:motion.velocity.toArray(),tagTurning:!!items.plush?.api.tagTurning,physicsSleeping:!!items.plush?.api.isSleeping,time,pointers:pointers.size,pressure:items.plush?.pressure||0,visible:Object.values(items).filter(i=>i.slot.visible).map(i=>i.id),viewport:[innerWidth,innerHeight]};}
 async function thumbnail(item){

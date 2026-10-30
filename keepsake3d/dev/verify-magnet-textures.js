@@ -37,4 +37,27 @@ export function verifyMagnetTextures({a,check}){
  let min=255,max=0,opaque=true;
  for(let i=0;i<data.length;i+=4){min=Math.min(min,data[i]);max=Math.max(max,data[i]);opaque&&=data[i+3]===255;}
  check('back photo includes opaque detailed lettering instead of a fallback',opaque&&max-min>120,{contrast:max-min});
+
+ // The backing paper is a separate object from the metal magnet. Its original
+ // photo included the bed fabric above a bowed edge; decoding alone missed it.
+ const card=a.items.magnet.api.debug.bodies.card;
+ const panel=card.backPivot.children.find(o=>o.isMesh&&Array.isArray(o.material));
+ const paperMap=panel.material[1].map,paper=paperMap.image;
+ const pc=document.createElement('canvas');pc.width=paper.width;pc.height=paper.height;
+ const pg=pc.getContext('2d',{willReadFrequently:true});pg.drawImage(paper,0,0);
+ const top=pg.getImageData(500,0,280,70).data;
+ let topMinimum=255;
+ for(let i=0;i<top.length;i+=4)topMinimum=Math.min(topMinimum,(top[i]+top[i+1]+top[i+2])/3);
+ check('backing card top samples paper instead of photographic fabric',paperMap.userData.photoRectified&&topMinimum>190,{topMinimum});
+ const lineAt=(x,w)=>{
+  const pixels=pg.getImageData(x,185,w,45).data,rows=[];
+  for(let i=0;i<pixels.length;i+=4)if((pixels[i]+pixels[i+1]+pixels[i+2])/3<160)rows.push(Math.floor(i/4/w)+185);
+  rows.sort((a,b)=>a-b);return {ink:rows.length,baseline:rows[Math.floor(rows.length/2)]};
+ };
+ const left=lineAt(130,170),right=lineAt(550,155);
+ check('backing card printed line is level after photographic unbending',left.ink>100&&right.ink>100&&Math.abs(left.baseline-right.baseline)<8,{left,right});
+ const barcode=pg.getImageData(80,970,360,100).data;
+ let light=0,dark=255;
+ for(let i=0;i<barcode.length;i+=4){light=Math.max(light,barcode[i]);dark=Math.min(dark,barcode[i]);}
+ check('backing card keeps original detailed barcode ink',light-dark>140,{contrast:light-dark});
 }

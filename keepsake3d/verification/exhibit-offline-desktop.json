@@ -55,7 +55,7 @@
       "pass": true,
       "detail": {
         "pressure": 0.7499916033863682,
-        "depth": 0.0003374784639058439
+        "depth": 0.0003374946205756157
       }
     },
     {
@@ -379,6 +379,34 @@
       }
     },
     {
+      "name": "backing card top samples paper instead of photographic fabric",
+      "pass": true,
+      "detail": {
+        "topMinimum": 231.66666666666666
+      }
+    },
+    {
+      "name": "backing card printed line is level after photographic unbending",
+      "pass": true,
+      "detail": {
+        "left": {
+          "ink": 798,
+          "baseline": 204
+        },
+        "right": {
+          "ink": 570,
+          "baseline": 207
+        }
+      }
+    },
+    {
+      "name": "backing card keeps original detailed barcode ink",
+      "pass": true,
+      "detail": {
+        "contrast": 183
+      }
+    },
+    {
       "name": "packaging can be restored",
       "pass": true
     },
@@ -418,7 +446,9 @@
       "name": "touch turns to alternate textured face 0",
       "pass": true,
       "detail": {
-        "dot": -0.9943124712187577
+        "dot": -0.8473134622164152,
+        "previousZ": -0.9685594496484806,
+        "currentZ": 0.939983547078859
       }
     },
     {
@@ -429,7 +459,9 @@
       "name": "touch turns to alternate textured face 1",
       "pass": true,
       "detail": {
-        "dot": 0.9979817308298722
+        "dot": -0.9998620913771231,
+        "previousZ": 0.939983547078859,
+        "currentZ": -0.9402353537921663
       }
     },
     {
@@ -440,7 +472,9 @@
       "name": "touch turns to alternate textured face 2",
       "pass": true,
       "detail": {
-        "dot": -0.9962893064185837
+        "dot": -0.9998086399725898,
+        "previousZ": -0.9402353537921663,
+        "currentZ": 0.9404716796378294
       }
     },
     {
@@ -451,7 +485,9 @@
       "name": "touch turns to alternate textured face 3",
       "pass": true,
       "detail": {
-        "dot": 0.9980447653905168
+        "dot": -0.9997970225393219,
+        "previousZ": 0.9404716796378294,
+        "currentZ": -0.9420984868690438
       }
     },
     {
@@ -467,12 +503,32 @@
       "pass": true
     },
     {
+      "name": "held toy does not hide a fixed chain bead",
+      "pass": true
+    },
+    {
       "name": "drag deforms the actual bead chain",
       "pass": true
     },
     {
-      "name": "chain falls back under gravity and settles",
-      "pass": true
+      "name": "free chain falls back while the held toy stays supported",
+      "pass": true,
+      "detail": {
+        "sleeping": true,
+        "core": [
+          -0.000762711864406784,
+          0.1054019608914731,
+          0.001623728813559321
+        ],
+        "coreBefore": [
+          -0.000762711864406784,
+          0.1054019608914731,
+          0.001623728813559321
+        ],
+        "tagAngular": 0,
+        "maxBeadSpeed": 0,
+        "resets": 0
+      }
     },
     {
       "name": "settled beads remain exactly stationary",
@@ -496,81 +552,192 @@
       "detail": 0
     },
     {
+      "name": "responsive turn exposes the opposite face 320px #0",
+      "pass": true,
+      "detail": {
+        "dot": -0.8473134502241266,
+        "normalZ": 0.9399835386580527
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 320px #1",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998620914363637,
+        "normalZ": -0.9402353552339656
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 320px #2",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998086400022176,
+        "normalZ": 0.9404716804374164
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 320px #3",
+      "pass": true,
+      "detail": {
+        "dot": -0.9997970225442523,
+        "normalZ": -0.9420984866947375
+      }
+    },
+    {
       "name": "complete automatic tag turn stays inside 320px viewport",
       "pass": true,
       "detail": {
-        "left": 46.73625630862617,
-        "right": 296.8471859810404,
-        "top": 109.54325237877188,
-        "bottom": 464.1498453245089,
-        "maxDistance": 0.4793946193916905
+        "left": 10.021539180147556,
+        "right": 309.45059082726624,
+        "top": 79.99999999999984,
+        "bottom": 643.2743971873803,
+        "maxDistance": 0.3595317714747766,
+        "minBodyHeight": 512.1266349791844
       }
     },
     {
-      "name": "responsive framing preserves model size at 320px",
+      "name": "responsive framing preserves actual model height at 320px",
       "pass": true,
       "detail": {
-        "smallestScale": 0.9065884902162368
+        "smallestScale": 0.9296164225716737,
+        "initialHeight": 550.9010195435734,
+        "minHeight": 512.1266349791844,
+        "cameraDistanceRatio": 0.928512050332279
       }
     },
     {
-      "name": "tag settles and original framing returns at 320px",
+      "name": "tag and framing remain steady after release at 320px",
       "pass": true,
       "detail": {
-        "initial": 0.43461364421210014,
-        "final": 0.4346114087403116
+        "initial": 0.3338295822916412,
+        "restingDistance": 0.3338295822916411,
+        "final": 0.3338295822916411
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 390px #0",
+      "pass": true,
+      "detail": {
+        "dot": -0.8473134435342755,
+        "normalZ": 0.9399835339605418
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 390px #1",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998620913820909,
+        "normalZ": -0.940235353008359
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 390px #2",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998086399432031,
+        "normalZ": 0.9404716796081788
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 390px #3",
+      "pass": true,
+      "detail": {
+        "dot": -0.9997970225397773,
+        "normalZ": -0.9420984868693123
       }
     },
     {
       "name": "complete automatic tag turn stays inside 390px viewport",
       "pass": true,
       "detail": {
-        "left": 80.71126521281928,
-        "right": 346.01803085425854,
-        "top": 90.99457597007672,
-        "bottom": 464.14984532380606,
-        "maxDistance": 0.4384596813545095
+        "left": 29.397460088147373,
+        "right": 354.44396622632746,
+        "top": 79.99999999999989,
+        "bottom": 663.2393133364542,
+        "maxDistance": 0.35953177142008813,
+        "minBodyHeight": 512.1266350569271
       }
     },
     {
-      "name": "responsive framing preserves model size at 390px",
+      "name": "responsive framing preserves actual model height at 390px",
       "pass": true,
       "detail": {
-        "smallestScale": 0.9912282991892709
+        "smallestScale": 0.8558979824044282,
+        "initialHeight": 598.3500902972539,
+        "minHeight": 512.1266350569271,
+        "cameraDistanceRatio": 0.8548787391971763
       }
     },
     {
-      "name": "tag settles and original framing returns at 390px",
+      "name": "tag and framing remain steady after release at 390px",
       "pass": true,
       "detail": {
-        "initial": 0.43461364421210014,
-        "final": 0.4346114087400955
+        "initial": 0.3073560674529323,
+        "restingDistance": 0.3073560674529323,
+        "final": 0.3073560674529323
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 430px #0",
+      "pass": true,
+      "detail": {
+        "dot": -0.8473134435342755,
+        "normalZ": 0.9399835339605418
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 430px #1",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998620913820909,
+        "normalZ": -0.940235353008359
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 430px #2",
+      "pass": true,
+      "detail": {
+        "dot": -0.9998086399432033,
+        "normalZ": 0.9404716796081829
+      }
+    },
+    {
+      "name": "responsive turn exposes the opposite face 430px #3",
+      "pass": true,
+      "detail": {
+        "dot": -0.9997970225397772,
+        "normalZ": -0.9420984868693149
       }
     },
     {
       "name": "complete automatic tag turn stays inside 430px viewport",
       "pass": true,
       "detail": {
-        "left": 100.71126521281926,
-        "right": 366.01803085425865,
-        "top": 90.99457597007672,
-        "bottom": 464.14984532380606,
-        "maxDistance": 0.4384596813545095
+        "left": 49.39746008814732,
+        "right": 374.4439662263275,
+        "top": 79.99999999999989,
+        "bottom": 663.2393133364542,
+        "maxDistance": 0.35953177142008935,
+        "minBodyHeight": 512.1266350569254
       }
     },
     {
-      "name": "responsive framing preserves model size at 430px",
+      "name": "responsive framing preserves actual model height at 430px",
       "pass": true,
       "detail": {
-        "smallestScale": 0.9912282991892709
+        "smallestScale": 0.8558979824044254,
+        "initialHeight": 598.3500902972539,
+        "minHeight": 512.1266350569254,
+        "cameraDistanceRatio": 0.8548787391971734
       }
     },
     {
-      "name": "tag settles and original framing returns at 430px",
+      "name": "tag and framing remain steady after release at 430px",
       "pass": true,
       "detail": {
-        "initial": 0.43461364421210014,
-        "final": 0.4346114087402264
+        "initial": 0.3073560674529323,
+        "restingDistance": 0.3073560674529323,
+        "final": 0.3073560674529323
       }
     },
     {
@@ -585,16 +752,18 @@
   "errors": [],
   "sourceHashes": {
     "index.html": "e27a8eeb92d3519dbca8d9a9dd532038fa6dc0935e437048e3337e59009f400c",
-    "src/app.js": "1a9aa5ce5d13123399871e287e973b5c980e895fca40224d3bbb93cc31e12e83",
-    "src/exhibit_objects.js": "a997706fbcd9675be4673cb1eb682742f36c7e50c7675b31541e4c2bab6fd29b",
-    "src/magnet_scene.js": "ca9bcd66d7cc5fdafae9aed273887aee225c8721e47d624a0ac549f90bf3a58a",
+    "src/app.js": "9d94891712a2e38f69ed001c0730f7e45eeb2bfa559efa5a872b2771152311a3",
+    "src/exhibit_objects.js": "85864c17d094cd694f0ad8a36a9e285b5922a42b2e3a037f559a7eb4c2b8a440",
+    "src/magnet_scene.js": "7550979aaa89539a4812de51a258dc4dc5b84616e3d78fe362b2775d04291844",
     "src/exhibit_motion.js": "45c267df7020df139a4ee32921d4c0417df4cb362c3356d4290291724802fa8b",
-    "src/plush_engine.js": "2367c911057375711396c977e737fc5430e72678d24fe8640652e8d9ca99475e",
-    "dev/verify-exhibit-physics.js": "a22548b0f5c7a2789d06499c26f9b24688f1c823e03fd0c6e374a5c992dadacf",
-    "dev/verify-magnet-textures.js": "4bd3a47ee48df14e811e9876955e0a6a3c6f1a07741b7b88e1fc3b161ab1e445",
-    "assets/magnet_spec.json": "ed54d68059d46efb29bd327f751320d6c0c15711555a67b8ce07cecbafa65a45",
+    "src/photo_rectification.js": "30db5bb4e7dc67e1b0692fb2e837fed669a92035957122d8a4857c5f520f423c",
+    "src/plush_engine.js": "e393e9d9a7f19caf15c2dc9000206e23a8c4d51be7e311ac58278904e8679236",
+    "dev/verify-exhibit-physics.js": "2ad30fb6df559dd5ca0513bafac96a6ffb6dd16a94a21ffd974e5a4252d55233",
+    "dev/verify-magnet-textures.js": "ae7dba5e28e4073af7826e05cb16b2376c8e7fc72a4d85a2dfb6f3efe9f8e470",
+    "assets/magnet_spec.json": "1cca2bd95c85879b59994278cfee8d556b832769f2b72d66a97a58c6fd00a051",
     "assets/tex/magnet_front.png": "dc9ee4652cf02d96b635197b6ebab31154f6b6dd0b47b07558e154971dd1f589",
     "assets/tex/magnet_back.png": "d923dd687f6099fe0a61f6d9677d94a631f7528bdf8ddf651a89588ed7359de4",
-    "dist/keepsake.html": "b2f0dbee5aac4da193294414e7af2368538025d01c58c5c7daaa1c91013f3ab8"
+    "assets/tex/card_back.png": "3bdfb70a2ed3c1432df7f818c3d1c54db254b9407166371e7a88d104ebdedd70",
+    "dist/keepsake.html": "efa9fa74a6e41f7ae2abe276c2c5351caf4ddcdba36d2e8be8a762bc2230b399"
   }
 }

@@ -1,0 +1,29 @@
+{
+  "status": "static_and_final_native_observed_pass",
+  "target": "back of the folded packaging paper card, not the metal magnet back",
+  "observations": [
+    "Gray photographic background outside the top paper edge is no longer mapped onto the card.",
+    "Visible paper perimeter is straight and continuous in front and oblique screenshots.",
+    "Printed rows and barcode details remain present and appear flattened; no obvious missing patch or stretching was observed in these screenshots.",
+    "The circular hole is a real opening revealing the magnet behind it in the shown packaging state, not the original dark photo disk."
+  ],
+  "limits": [
+    "The initial review used source-photo and static screenshots. It is supplemented by final HTML native UI cardOut back/oblique inspection in independent-review.json.",
+    "Physical iPhone/Safari not tested."
+  ],
+  "files": [
+    {
+      "path": "/workspace/cloud-setup/keepsake-references/IMG_0507.png",
+      "sha256": "cb44bf25ab7729ee7b26ac571decf0e6a585774b5a856f77e68f61e7ab4e1507"
+    },
+    {
+      "path": "/workspace/cloud-setup/keepsake-card-repair/card-back-corrected.png",
+      "sha256": "40308b8598416c02d7ff47b046c892dc5b0fb20fbac754df6b4a54b53b552cd4"
+    },
+    {
+      "path": "/workspace/cloud-setup/keepsake-card-repair/card-back-oblique-corrected.png",
+      "sha256": "386e6ba62c7a7aff98e105c59119aae1ac937012824c9d7102f3264e9282ad7a"
+    }
+  ],
+  "final_native_review": "independent-review.json"
+}

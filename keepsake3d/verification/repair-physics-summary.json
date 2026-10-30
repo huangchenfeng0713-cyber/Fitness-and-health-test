@@ -1,0 +1,93 @@
+{
+  "scope": [
+    "src/plush_engine.js",
+    "src/exhibit_objects.js",
+    "tools/exhibit_physics_verify.mjs",
+    "tools/contact_physics_verify.mjs"
+  ],
+  "sourceHashes": {
+    "src/plush_engine.js": "e393e9d9a7f19caf15c2dc9000206e23a8c4d51be7e311ac58278904e8679236",
+    "src/exhibit_objects.js": "85864c17d094cd694f0ad8a36a9e285b5922a42b2e3a037f559a7eb4c2b8a440",
+    "tools/exhibit_physics_verify.mjs": "c92504a181a756773045f8c0474ba9d7ee3f466e5f2f5d3185fe5c15776cd6b7",
+    "tools/contact_physics_verify.mjs": "1e43374dda6f1164674dbe5ff5b58dc8dce138b3d85e0b1d2c74dde2761d042d"
+  },
+  "focusedChecks": 83,
+  "focusedPasses": 83,
+  "limits": "Node mechanism and Chromium mobile touch emulation only; no physical iPhone testing. The browser baseline and fixed probe use the same eight-drag scenario, with a denser visible-tag picking grid after changing the resting geometry; world trajectories differ.",
+  "evidence": {
+    "baseline": "baseline.json",
+    "fixedApp": "final-browser-fixed60.json",
+    "chainReproduction": "chain-probe.log",
+    "chainFix": "chain-probe-fixed.log",
+    "awakeMechanism": "focused-center8-contact.log",
+    "eightFlips": "flip-center12.json",
+    "finalFullSuite": "test-suite-overhead-final.log",
+    "finalFullReport": "offline-plush-report-final.json",
+    "sameClaspReleaseBefore": "chain-release-contact-before.json",
+    "sameClaspReleaseFixed": "chain-release-contact-fixed.json",
+    "focusedReport": "physics-regression-final.json",
+    "frontTurnComparison": "front-turn-comparison.json",
+    "adaptiveTurnComparison": "adaptive-quality-comparison.json",
+    "eightFlipsLow": "overhead20-low-frozen8.json",
+    "eightFlipsHigh": "overhead20-high-frozen8.json",
+    "finalFocusedLog": "focused-e393-fallback-rapid.log"
+  },
+  "completeSuite": {
+    "checks": 131,
+    "passes": 131,
+    "errors": [],
+    "exitCode": 0,
+    "verifiedEngineHash": "e393e9d9a7f19caf15c2dc9000206e23a8c4d51be7e311ac58278904e8679236"
+  },
+  "lastRepair": "Finite hand assistance now pulls at the paper hole and damps the hole-point velocity, compensates the lifted chain load, clears the head before turning, lowers in front before retracting, then fades the pulling force while maintaining finite orientation assistance until the chain bears the paper. The target puts the hole vertically above the center, with FWD/SIDE fallbacks for degenerate projections. Ordinary chain, contact and sleep solvers remain unchanged from the previous frozen candidate.",
+  "pending": "Physics repair is frozen. Final offline mobile/desktop passed97 checks each at the final HTML; representative independent native check is recorded separately in independent-review.json.",
+  "turnMetrics": {
+    "low": {
+      "actualFlips": 8,
+      "allSleep": true,
+      "adjacentDots": [
+        -0.945,
+        -0.987,
+        -0.871,
+        -0.996,
+        -0.997,
+        -0.78,
+        -0.995,
+        -0.998
+      ],
+      "maxAbsCardX_m": 0.05292,
+      "peakFacePenetration_m": 5.4e-05,
+      "peakBeadBodyPenetration_m": 0.000298,
+      "peakTagBodyPenetration_m": 0,
+      "peakLinkRatio": 1.236,
+      "resets": 0
+    },
+    "high": {
+      "actualFlips": 8,
+      "allSleep": true,
+      "adjacentDots": [
+        -0.847,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "maxAbsCardX_m": 0.03158,
+      "peakFacePenetration_m": 3.4e-05,
+      "peakBeadBodyPenetration_m": 8.7e-05,
+      "peakTagBodyPenetration_m": 0,
+      "peakLinkRatio": 1.099,
+      "resets": 0
+    }
+  },
+  "boundaryLimit": "Synthetic horizontal-card / gravity-parallel-FWD fixtures verify finite rotation bases, no resets, cancellation, and fully dynamic beads. At exactly 90-degree gravity after direct pose construction, the card still rotates at 0.129 rad/s after 8 seconds; this artificial fixture does not assert sleep. Both quality levels strictly pass sleep after five rapid real turn restarts/cancellation and all eight consecutive ordinary turns.",
+  "integrationReports": [
+    "exhibit-offline-mobile.json",
+    "exhibit-offline-desktop.json",
+    "framing-regression.json",
+    "independent-review.json"
+  ]
+}

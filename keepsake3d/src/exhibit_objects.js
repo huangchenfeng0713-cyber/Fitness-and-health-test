@@ -37,7 +37,7 @@ export async function createExhibitObjects(ctx) {
     const api=await createPlush(ctx,{softMeshes:meshes,attachPoint:new THREE.Vector3(...meta.attach_point_m),
       tagTextures:{front:tf,back:tb},tagSize:{w:.0373,h:.0486,t:.00035},tagHole:{x:.0054,y:.0075,d:.0032},
       hookPosition:new THREE.Vector3(0,.21,0),origin:new THREE.Vector3(0,0,0),mount:'wall',wallZ:-.09,quality,
-      exhibition:true,params:{fleshHz:120,mechSubsteps:4,mechIters:3,tagLinDamp:2.4,tagAngDamp:4,chainDamp:2.8}});
+      exhibition:true,params:{fleshHz:120,mechSubsteps:4,mechIters:5,tagLinDamp:2.4,tagAngDamp:4,chainDamp:2.8}});
     for(let i=0;i<150;i++)api.update(1/60,i/60);
     api.hook.stand.visible=false;
     body.parent.add(fur.group);
@@ -51,7 +51,13 @@ export async function createExhibitObjects(ctx) {
       normal.copy(hit.face?.normal||new THREE.Vector3(0,0,1));target=Math.min(1,strength);return true;
     }
     function release(){target=0;}
+    function syncGravity(){
+      // The view rotates the held toy; loose parts still fall toward world down.
+      api.group.getWorldQuaternion(worldQ).invert();
+      api.setGravity(gravity.set(0,-1,0).applyQuaternion(worldQ));
+    }
     function update(dt){
+      syncGravity();
       api.update(dt);
       const before=pressure;pressure+= (target-pressure)*(1-Math.exp(-dt*(target?18:9)));
       if(pressure<.0005&&!target)pressure=0;
@@ -69,22 +75,32 @@ export async function createExhibitObjects(ctx) {
         changed=pressure!==0;
         if(pressure)fur.stroke(contact,point.set(.4,.9,.1),pressure*.18);
       }
-      // Display rotation is an orbit around the suspended scene. Fur follows the
-      // same gravity as the chain, expressed in the deforming body frame.
-      api.group.getWorldQuaternion(worldQ);
-      gravity.set(0,-1,0).applyQuaternion(worldQ);
       body.getWorldQuaternion(worldQ).invert();
-      fur.update(dt,gravity.applyQuaternion(worldQ));
+      fur.update(dt,gravity.set(0,-1,0).applyQuaternion(worldQ));
     }
     return {id:'plush',root:api.group,alignment:new THREE.Quaternion(),api,body,fur,touch,release,update,
       get boundsRoot(){return api.group;},get busy(){return !api.isSleeping;},get grabbed(){return api.isGrabbed;},get stage(){return 'plush';},
       get pressure(){return pressure;},advance(){return false;},
       interactionKind(hit){return hit?.object===api.tagMesh?'tag':[api.chain.beads,api.chain.links,api.chain.clasp].includes(hit?.object)?'chain':null;},
-      beginDrag(info){return api.pointerDown(info);},moveDrag(info){api.pointerMove(info);},endDrag(info){api.pointerUp(info);},
+      beginDrag(info,hit){
+        const part=this.interactionKind(hit);let bead;
+        if(part==='chain'){
+          const i=hit.object===api.chain.clasp?0:hit.instanceId;
+          if(Number.isInteger(i)){
+            bead=i;
+            if(hit.object!==api.chain.beads){
+              const local=api.group.worldToLocal(hit.point.clone()),j=(i+1)%api.chain.count,bx=api._debug.bx;
+              const distance=local.distanceToSquared(point.fromArray(bx,i*3));
+              if(local.distanceToSquared(point.fromArray(bx,j*3))<distance)bead=j;
+            }
+          }
+        }
+        return api.pointerDown({...info,part,bead});
+      },moveDrag(info){api.pointerMove(info);},endDrag(info){api.pointerUp(info);},
       flipTag(){return api.turnTag();},cancel(){api.cancelInteraction();release();},
       nudge(x,y){api.nudge(point.set(x*.075,-Math.abs(y)*.012,-y*.07));},
-      resetMotion(){api.reset();},
-      reset(){api.reset();target=0;pressure=0;for(const s of rest){s.mesh.geometry.attributes.position.array.set(s.p);s.mesh.geometry.attributes.position.needsUpdate=true;}},
+      resetMotion(){syncGravity();api.reset();},
+      reset(){syncGravity();api.reset();target=0;pressure=0;for(const s of rest){s.mesh.geometry.attributes.position.array.set(s.p);s.mesh.geometry.attributes.position.needsUpdate=true;}},
       title:'毛绒挂件',material:'短绒织物 · 珠链 · 纸质吊牌',details:'约 100 mm 高。保留原照片中的不对称轮廓、交叉缝线和缝入身体的布标。短绒与较实的填充物只产生轻微压痕。轻点吊牌翻看另一面，拖动吊牌或珠链，松手后自然垂落。'};
   }
   async function magnet(){

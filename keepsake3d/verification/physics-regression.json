@@ -1,0 +1,728 @@
+[
+  {
+    "name": "exhibition sleeps under gravity",
+    "pass": true
+  },
+  {
+    "name": "held toy supports a wholly dynamic chain below its sewn loop",
+    "pass": true,
+    "detail": {
+      "meanHeight": -0.02059928756699064
+    }
+  },
+  {
+    "name": "both tag faces have distinct full-size textures",
+    "pass": true
+  },
+  {
+    "name": "input moves the flexible chain while the hand supports the toy",
+    "pass": true,
+    "detail": {
+      "peakTravel": 0.0030562244134671322,
+      "coreTravel": 0
+    }
+  },
+  {
+    "name": "no invisible bead supports the exhibition",
+    "pass": true
+  },
+  {
+    "name": "released chain and body settle",
+    "pass": true
+  },
+  {
+    "name": "sleep is exactly stationary",
+    "pass": true
+  },
+  {
+    "name": "tag accepts turn 0",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 0",
+    "pass": true,
+    "detail": {
+      "dot": -0.9453219350539377,
+      "normal": [
+        -0.10132197310438804,
+        -0.06456339311923999,
+        0.9927564787172956
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 1",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 1",
+    "pass": true,
+    "detail": {
+      "dot": -0.9870553086310808,
+      "normal": [
+        0.2413769560154406,
+        -0.011414070962146278,
+        -0.9703643048303002
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 2",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 2",
+    "pass": true,
+    "detail": {
+      "dot": -0.8714680614189144,
+      "normal": [
+        0.2648882356567592,
+        -0.015435222531050702,
+        0.9641555769252523
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 3",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 3",
+    "pass": true,
+    "detail": {
+      "dot": -0.9963125295924823,
+      "normal": [
+        -0.3431879130334577,
+        -0.009509710138632749,
+        -0.9392186229844568
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 4",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 4",
+    "pass": true,
+    "detail": {
+      "dot": -0.9970249163710861,
+      "normal": [
+        0.2701539138767941,
+        0.0018031239951322858,
+        0.9628154608027999
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 5",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 5",
+    "pass": true,
+    "detail": {
+      "dot": -0.78028638051459,
+      "normal": [
+        0.39136860072546015,
+        -0.003062845488221,
+        -0.9202289048621057
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 6",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 6",
+    "pass": true,
+    "detail": {
+      "dot": -0.9952147549609738,
+      "normal": [
+        -0.30004755450594744,
+        0.013146370909580596,
+        0.9538336531947844
+      ]
+    }
+  },
+  {
+    "name": "tag accepts turn 7",
+    "pass": true
+  },
+  {
+    "name": "tag shows the opposite face on every turn 7",
+    "pass": true,
+    "detail": {
+      "dot": -0.9981884312513443,
+      "normal": [
+        0.2422214652756643,
+        -0.009638781575986508,
+        -0.9701731060225498
+      ]
+    }
+  },
+  {
+    "name": "repeated flips keep the held toy supported without pinning the chain",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "chain link stretch stays bounded during flips",
+    "pass": true,
+    "detail": {
+      "peakStretch": 1.2360075127711692
+    }
+  },
+  {
+    "name": "repeated flips settle",
+    "pass": true
+  },
+  {
+    "name": "mobile turn has a finite basis for horizontal card",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "mobile releases horizontal card back to free physics",
+    "pass": true,
+    "detail": {
+      "sleeping": true,
+      "angularSpeed": 0,
+      "maxBeadSpeed": 0,
+      "resets": 0
+    }
+  },
+  {
+    "name": "mobile turn has a finite basis for vertical view",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "mobile releases vertical view back to free physics",
+    "pass": true,
+    "detail": {
+      "sleeping": false,
+      "angularSpeed": 0.1290654199171862,
+      "maxBeadSpeed": 0.0003530249296921884,
+      "resets": 0
+    }
+  },
+  {
+    "name": "mobile survives five rapid turn restarts and release",
+    "pass": true,
+    "detail": {
+      "sleeping": true,
+      "resets": 0
+    }
+  },
+  {
+    "name": "paper tag is independently grabbable",
+    "pass": true
+  },
+  {
+    "name": "drag moves the tag independently of the view",
+    "pass": true
+  },
+  {
+    "name": "cancel releases the tag and preserves hand support",
+    "pass": true
+  },
+  {
+    "name": "gravity trajectory agrees at 30, 60 and 120 Hz",
+    "pass": true,
+    "detail": {
+      "frameError": 5.190385247882668e-7
+    }
+  },
+  {
+    "name": "changing world down wakes and reorients the free chain",
+    "pass": true,
+    "detail": {
+      "meanAlongDown": -0.027467676877153017
+    }
+  },
+  {
+    "name": "mechanism does not stretch sewn fabric",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 0",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 1",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 2",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 3",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 4",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 5",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 6",
+    "pass": true
+  },
+  {
+    "name": "repeated contact drag starts on the card 7",
+    "pass": true
+  },
+  {
+    "name": "continuous card/chain dragging exercises solid contact",
+    "pass": true,
+    "detail": {
+      "contactFrames": 4228
+    }
+  },
+  {
+    "name": "release never reintroduces the one-frame alignment kick",
+    "pass": true,
+    "detail": [
+      {
+        "trial": 0,
+        "firstAngular": 6.903745871214187,
+        "firstPoseJump": 0.04186747903880381,
+        "peakAngular": 6.903745871214187,
+        "tailAngular": 0.0002544110243610566,
+        "tailBead": 0.000036792256507917496
+      },
+      {
+        "trial": 1,
+        "firstAngular": 4.221559751601645,
+        "firstPoseJump": 0.05288781279468334,
+        "peakAngular": 16.710995041113954,
+        "tailAngular": 0.00023001141705963852,
+        "tailBead": 0.00006622483985293211
+      },
+      {
+        "trial": 2,
+        "firstAngular": 6.855836120765543,
+        "firstPoseJump": 0.08250195769956062,
+        "peakAngular": 21.362103185012824,
+        "tailAngular": 0.00016559532782423617,
+        "tailBead": 0.0000016659822784498333
+      },
+      {
+        "trial": 3,
+        "firstAngular": 4.005182044522097,
+        "firstPoseJump": 0.05000039411658754,
+        "peakAngular": 13.138599140513605,
+        "tailAngular": 0.000010671708688359765,
+        "tailBead": 1.0832672442561684e-7
+      },
+      {
+        "trial": 4,
+        "firstAngular": 3.89159747689469,
+        "firstPoseJump": 0.04094904267933082,
+        "peakAngular": 12.7354484813215,
+        "tailAngular": 0.0009183972981164804,
+        "tailBead": 0.000008282848852200308
+      },
+      {
+        "trial": 5,
+        "firstAngular": 2.921470204625709,
+        "firstPoseJump": 0.03276174268293965,
+        "peakAngular": 13.073092060561514,
+        "tailAngular": 0.00002318923873927577,
+        "tailBead": 2.3355016177044727e-7
+      },
+      {
+        "trial": 6,
+        "firstAngular": 4.729886492472857,
+        "firstPoseJump": 0.060284461717292855,
+        "peakAngular": 16.158062196192137,
+        "tailAngular": 0.0006133980396333009,
+        "tailBead": 0.0000055342545812974144
+      },
+      {
+        "trial": 7,
+        "firstAngular": 6.048867029621762,
+        "firstPoseJump": 0.06056771520570251,
+        "peakAngular": 22.11556199197311,
+        "tailAngular": 8.606049976128684e-8,
+        "tailBead": 1.2545303169979893e-8
+      }
+    ]
+  },
+  {
+    "name": "all eight releases settle while sleep is deliberately kept awake",
+    "pass": true,
+    "detail": [
+      {
+        "trial": 0,
+        "firstAngular": 6.903745871214187,
+        "firstPoseJump": 0.04186747903880381,
+        "peakAngular": 6.903745871214187,
+        "tailAngular": 0.0002544110243610566,
+        "tailBead": 0.000036792256507917496
+      },
+      {
+        "trial": 1,
+        "firstAngular": 4.221559751601645,
+        "firstPoseJump": 0.05288781279468334,
+        "peakAngular": 16.710995041113954,
+        "tailAngular": 0.00023001141705963852,
+        "tailBead": 0.00006622483985293211
+      },
+      {
+        "trial": 2,
+        "firstAngular": 6.855836120765543,
+        "firstPoseJump": 0.08250195769956062,
+        "peakAngular": 21.362103185012824,
+        "tailAngular": 0.00016559532782423617,
+        "tailBead": 0.0000016659822784498333
+      },
+      {
+        "trial": 3,
+        "firstAngular": 4.005182044522097,
+        "firstPoseJump": 0.05000039411658754,
+        "peakAngular": 13.138599140513605,
+        "tailAngular": 0.000010671708688359765,
+        "tailBead": 1.0832672442561684e-7
+      },
+      {
+        "trial": 4,
+        "firstAngular": 3.89159747689469,
+        "firstPoseJump": 0.04094904267933082,
+        "peakAngular": 12.7354484813215,
+        "tailAngular": 0.0009183972981164804,
+        "tailBead": 0.000008282848852200308
+      },
+      {
+        "trial": 5,
+        "firstAngular": 2.921470204625709,
+        "firstPoseJump": 0.03276174268293965,
+        "peakAngular": 13.073092060561514,
+        "tailAngular": 0.00002318923873927577,
+        "tailBead": 2.3355016177044727e-7
+      },
+      {
+        "trial": 6,
+        "firstAngular": 4.729886492472857,
+        "firstPoseJump": 0.060284461717292855,
+        "peakAngular": 16.158062196192137,
+        "tailAngular": 0.0006133980396333009,
+        "tailBead": 0.0000055342545812974144
+      },
+      {
+        "trial": 7,
+        "firstAngular": 6.048867029621762,
+        "firstPoseJump": 0.06056771520570251,
+        "peakAngular": 22.11556199197311,
+        "tailAngular": 8.606049976128684e-8,
+        "tailBead": 1.2545303169979893e-8
+      }
+    ]
+  },
+  {
+    "name": "beads stay outside the printed card faces",
+    "pass": true,
+    "detail": {
+      "peakPenetration": 0.00008438249517003522
+    }
+  },
+  {
+    "name": "contact solver keeps link stretch bounded",
+    "pass": true,
+    "detail": {
+      "peakStretch": 1.2547817893051183
+    }
+  },
+  {
+    "name": "contact repetitions do not pin a bead or reset the mechanism",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "normal sleeping remains available after awake contact verification",
+    "pass": true
+  },
+  {
+    "name": "hand can take the actual chain particle 0",
+    "pass": true
+  },
+  {
+    "name": "hand can take the actual chain particle 12",
+    "pass": true
+  },
+  {
+    "name": "hand can take the actual chain particle 22",
+    "pass": true
+  },
+  {
+    "name": "hand can take the actual chain particle 31",
+    "pass": true
+  },
+  {
+    "name": "chain pulls remain live when a bead presses against the held toy",
+    "pass": true,
+    "detail": [
+      {
+        "bead": 0,
+        "moved": 0.022510927431613377,
+        "remainedGrabbed": true,
+        "tailAngular": 0.00009280478659254426,
+        "tailBead": 0.0009168489958531681
+      },
+      {
+        "bead": 12,
+        "moved": 0.02913458449959644,
+        "remainedGrabbed": true,
+        "tailAngular": 0.000003941725117766004,
+        "tailBead": 2.8857469111192806e-8
+      },
+      {
+        "bead": 22,
+        "moved": 0.01107923437656692,
+        "remainedGrabbed": true,
+        "tailAngular": 2.914705428053071e-7,
+        "tailBead": 1.1553652771784506e-8
+      },
+      {
+        "bead": 31,
+        "moved": 0.010476498087756539,
+        "remainedGrabbed": true,
+        "tailAngular": 2.107717022152692e-8,
+        "tailBead": 1.0518044003674032e-9
+      }
+    ]
+  },
+  {
+    "name": "released chain contacts settle without relying on sleep",
+    "pass": true,
+    "detail": [
+      {
+        "bead": 0,
+        "moved": 0.022510927431613377,
+        "remainedGrabbed": true,
+        "tailAngular": 0.00009280478659254426,
+        "tailBead": 0.0009168489958531681
+      },
+      {
+        "bead": 12,
+        "moved": 0.02913458449959644,
+        "remainedGrabbed": true,
+        "tailAngular": 0.000003941725117766004,
+        "tailBead": 2.8857469111192806e-8
+      },
+      {
+        "bead": 22,
+        "moved": 0.01107923437656692,
+        "remainedGrabbed": true,
+        "tailAngular": 2.914705428053071e-7,
+        "tailBead": 1.1553652771784506e-8
+      },
+      {
+        "bead": 31,
+        "moved": 0.010476498087756539,
+        "remainedGrabbed": true,
+        "tailAngular": 2.107717022152692e-8,
+        "tailBead": 1.0518044003674032e-9
+      }
+    ]
+  },
+  {
+    "name": "chain/body contacts never reset or dislodge the held toy",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "desktop verification uses the finer 2 mm collision SDF",
+    "pass": true,
+    "detail": {
+      "sdfCell": 0.002
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 0",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 0",
+    "pass": true,
+    "detail": {
+      "dot": -0.8472639044234358,
+      "previousZ": -0.9685594496484802,
+      "currentZ": 0.9399490433802872,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 1",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 1",
+    "pass": true,
+    "detail": {
+      "dot": -0.9998619716880123,
+      "previousZ": 0.9399490433802872,
+      "currentZ": -0.9402310186118927,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 2",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 2",
+    "pass": true,
+    "detail": {
+      "dot": -0.999808641194821,
+      "previousZ": -0.9402310186118927,
+      "currentZ": 0.9405047386775856,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 3",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 3",
+    "pass": true,
+    "detail": {
+      "dot": -0.9997977692213448,
+      "previousZ": 0.9405047386775856,
+      "currentZ": -0.9420983303473425,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 4",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 4",
+    "pass": true,
+    "detail": {
+      "dot": -0.9997961907697561,
+      "previousZ": -0.9420983303473425,
+      "currentZ": 0.9405101205981031,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 5",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 5",
+    "pass": true,
+    "detail": {
+      "dot": -0.9997961966873466,
+      "previousZ": 0.9405101205981031,
+      "currentZ": -0.9420982725198395,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 6",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 6",
+    "pass": true,
+    "detail": {
+      "dot": -0.9997961967417281,
+      "previousZ": -0.9420982725198395,
+      "currentZ": 0.9405101203445332,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop card accepts independent turn 7",
+    "pass": true
+  },
+  {
+    "name": "desktop card actually changes face and settles 7",
+    "pass": true,
+    "detail": {
+      "dot": -0.9997961967414659,
+      "previousZ": 0.9405101203445332,
+      "currentZ": -0.9420982725224085,
+      "sleeping": true
+    }
+  },
+  {
+    "name": "desktop turns preserve solid card, chain and plush contact",
+    "pass": true,
+    "detail": {
+      "peakFacePen": 0.000033954570904033785,
+      "peakBeadBodyPen": 0.00008666877431152205,
+      "peakTagBodyPen": 0
+    }
+  },
+  {
+    "name": "desktop turns keep links attached without a hidden pin or reset",
+    "pass": true,
+    "detail": {
+      "peakStretch": 1.0989844913454945,
+      "resets": 0
+    }
+  },
+  {
+    "name": "desktop turn has a finite basis for horizontal card",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "desktop releases horizontal card back to free physics",
+    "pass": true,
+    "detail": {
+      "sleeping": true,
+      "angularSpeed": 0,
+      "maxBeadSpeed": 0,
+      "resets": 0
+    }
+  },
+  {
+    "name": "desktop turn has a finite basis for vertical view",
+    "pass": true,
+    "detail": {
+      "resets": 0
+    }
+  },
+  {
+    "name": "desktop releases vertical view back to free physics",
+    "pass": true,
+    "detail": {
+      "sleeping": false,
+      "angularSpeed": 0.1290654199171862,
+      "maxBeadSpeed": 0.0003530249296921884,
+      "resets": 0
+    }
+  },
+  {
+    "name": "desktop survives five rapid turn restarts and release",
+    "pass": true,
+    "detail": {
+      "sleeping": true,
+      "resets": 0
+    }
+  }
+]

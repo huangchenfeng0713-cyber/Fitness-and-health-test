@@ -1,0 +1,39 @@
+{
+  "checks": [
+    {
+      "texture": "",
+      "sourceFlipY": true,
+      "exportFlipY": false,
+      "maxDirectPixelError": 255,
+      "maxVerticalFlipPixelError": 255,
+      "visiblePixelsEquivalent": false
+    },
+    {
+      "texture": "",
+      "sourceFlipY": true,
+      "exportFlipY": false,
+      "maxDirectPixelError": 228,
+      "maxVerticalFlipPixelError": 0,
+      "visiblePixelsEquivalent": true
+    },
+    {
+      "texture": "",
+      "sourceFlipY": true,
+      "exportFlipY": false,
+      "maxDirectPixelError": 255,
+      "maxVerticalFlipPixelError": 255,
+      "visiblePixelsEquivalent": false
+    },
+    {
+      "texture": "",
+      "sourceFlipY": true,
+      "exportFlipY": false,
+      "maxDirectPixelError": 255,
+      "maxVerticalFlipPixelError": 255,
+      "visiblePixelsEquivalent": false
+    }
+  ],
+  "decodedMappedTextures": 7,
+  "correctedPaperRetained": true,
+  "pageErrors": []
+}

@@ -1,14 +1,39 @@
 {
   "exports": {
+    "magnet-packaged.glb": 13734040,
+    "exhibit-magnet.glb": 13734040,
     "magnet.glb": 7822032,
-    "magnet-packaged.glb": 13863512,
-    "exhibit-plush.glb": 21384600,
-    "exhibit-magnet.glb": 13863512
+    "exhibit-plush.glb": 21384432
   },
   "pageErrors": [],
-  "missingPhotoFailure": {
-    "error": "Error: magnet_scene: required photo failed to load: tex/magnet_back.png",
-    "ready": false,
-    "message": "暂时无法载入藏品，请刷新重试。"
-  }
+  "copied_models": [
+    "magnet-packaged.glb",
+    "plush-chain-tag.glb"
+  ],
+  "missingPhotoFailures": [
+    {
+      "asset": "tex/magnet_back.png",
+      "ready": false,
+      "message": "暂时无法载入藏品，请刷新重试。",
+      "requiredPhotoErrors": [
+        "Error: magnet_scene: required photo failed to load: tex/magnet_back.png\n    at loadTexture (http://127.0.0.1:8877/src/magnet_scene.js:378:13)\n    at async Promise.all (index 1)\n    at async createMagnetScene (http://127.0.0.1:8877/src/magnet_scene.js:385:83)\n    at async magnet (http://127.0.0.1:8877/src/exhibit_objects.js:107:15)\n    at async Promise.all (index 1)\n    at async createExhibitObjects (http://127.0.0.1:8877/src/exhibit_objects.js:119:16)\n    at async http://127.0.0.1:8877/src/app.js?v=9:200:23"
+      ]
+    },
+    {
+      "asset": "tex/card_back.png",
+      "ready": false,
+      "message": "暂时无法载入藏品，请刷新重试。",
+      "requiredPhotoErrors": [
+        "Error: magnet_scene: required photo failed to load: tex/card_back.png\n    at loadTexture (http://127.0.0.1:8877/src/magnet_scene.js:378:13)\n    at async Promise.all (index 3)\n    at async createMagnetScene (http://127.0.0.1:8877/src/magnet_scene.js:385:83)\n    at async magnet (http://127.0.0.1:8877/src/exhibit_objects.js:107:15)\n    at async Promise.all (index 1)\n    at async createExhibitObjects (http://127.0.0.1:8877/src/exhibit_objects.js:119:16)\n    at async http://127.0.0.1:8877/src/app.js?v=9:200:23"
+      ]
+    }
+  ],
+  "modelHashes": {
+    "plush-chain-tag.glb": "7fab5f19e89299969823b3466c5b25435925685968a26acfe480807809dfad53",
+    "plush-body.glb": "cf1dcd9e805617dc3bdd8b94c7ea35d3066e78b765db8bf87146ce0cf9845f60",
+    "magnet.glb": "0a93ac4706e2e887ba1c9ae94365a14fc0eb79696a942158afc319034265dba0",
+    "magnet-packaged.glb": "880891bdbbf177f2ad0cdac2fd662e0df062920306cc949b7dbced7c7eb66024"
+  },
+  "readbackReport": "exhibit-readback-report.json",
+  "rectifiedMaterialReadback": "exported-card-readback.json"
 }

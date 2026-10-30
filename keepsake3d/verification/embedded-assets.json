@@ -1,10 +1,10 @@
 {
-  "html_sha256": "b2f0dbee5aac4da193294414e7af2368538025d01c58c5c7daaa1c91013f3ab8",
+  "html_sha256": "efa9fa74a6e41f7ae2abe276c2c5351caf4ddcdba36d2e8be8a762bc2230b399",
   "checks": [
     {
       "name": "magnet_spec.json",
-      "source_sha256": "ed54d68059d46efb29bd327f751320d6c0c15711555a67b8ce07cecbafa65a45",
-      "embedded_sha256": "73e7bdabb56f9053e261568a84b0d78d3c213db2d3f9984884db04798dddebca",
+      "source_sha256": "1cca2bd95c85879b59994278cfee8d556b832769f2b72d66a97a58c6fd00a051",
+      "embedded_sha256": "06f0168517d5beee700bfac6be7f12acb83af5e27c92c8a4b37753df8026a241",
       "embedded_mime": "application/json",
       "comparison": "parsed JSON (build removes whitespace)",
       "pass": true

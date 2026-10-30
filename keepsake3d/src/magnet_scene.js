@@ -17,6 +17,8 @@
 // the viewer); on the fridge door the art frame is world-aligned.
 // ============================================================================
 
+import {rectifyCardPhoto} from './photo_rectification.js';
+
 const MM = 0.001;
 const PI = Math.PI;
 const HALF_PI = PI / 2;
@@ -386,6 +388,7 @@ export async function createMagnetScene(ctx, opts = {}) {
     loadTexture(SC.inside_front_texture.file), loadTexture(SC.inside_back_texture.file),
     loadTexture(SG.header_front_texture.file),
   ]);
+  rectifyCardPhoto(texCardB, SC.back_outside_texture.photo_registration);
   const imgW = (t, d) => (t.image && t.image.width) || d;
   const imgH = (t, d) => (t.image && t.image.height) || d;
 

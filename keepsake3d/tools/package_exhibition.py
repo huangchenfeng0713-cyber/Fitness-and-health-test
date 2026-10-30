@@ -29,10 +29,10 @@ text+='包含单件显示、真实模型缩略图、点选拿近、单指旋转�
 text+='320×568、390×844、844×390 控件边界和至少 44 像素触控区检查通过。说明文字不拦截触摸，拿近后底部说明隐去。\n'
 text+='离线测试拒绝 HTTP/HTTPS 请求，使用与交付文件相同的内嵌资产。报告包含 HTML 及主模块 SHA-256。\n'
 text+='四份原有独立 GLB 的几何和内嵌贴图重新校验；新下载功能另作导出与读回检查。\n'
-text+='本轮保留毛绒照片几何，修复磁贴背面 UV 与两个轮廓凹口；提供珠链重力和碰撞、吊牌翻面与拖动、按秒衰减的旋转惯性；不提供落桌或磁吸操作。\n'
+text+='本轮保留毛绒照片几何，由本体支撑全动态珠链，重力保持世界向下；修复珠链／纸卡接触及抓链释放，校正包装卡照片的背景和弯曲；保留磁贴背面 UV、独立翻牌和旋转惯性；不提供落桌或磁吸操作。\n'
 text+='触摸测试为浏览器程序模拟，未逐台实测手机硬件。尺寸和材料反应为照片估算。\n'
 (DEST/'验证记录.txt').write_text(text,encoding='utf-8')
-allowed_tools={'build.py','verify_embedded_assets.py','devserver.py','validate_glb.py','render_plush_review.py','offline_plush_verify.mjs','test.mjs','exhibit_physics_verify.mjs','rebuild_plush_from_photos.py','package_collection.py','package_exhibition.py'}
+allowed_tools={'build.py','verify_embedded_assets.py','devserver.py','validate_glb.py','render_plush_review.py','offline_plush_verify.mjs','test.mjs','exhibit_physics_verify.mjs','contact_physics_verify.mjs','rebuild_plush_from_photos.py','package_collection.py','package_exhibition.py'}
 allowed_dev={'exhibit-check.html','exhibit-check.js','verify-exhibit-physics.js','verify-magnet-textures.js','native-touch.py','exhibit-readback.html','qa-server.py','readback.html','appearance.html'}
 with zipfile.ZipFile(DEST/'工程源码.zip','w',zipfile.ZIP_DEFLATED,compresslevel=7) as z:
     for folder in ['src','assets','tools','dev']:

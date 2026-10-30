@@ -3,20 +3,22 @@ export async function verifyExhibitPhysics({a,w,check,step,event}){
  a.select('plush');a.front(true);step(360);
  const screen=point=>{const v=point.clone().project(a.camera),r=c.getBoundingClientRect();return{x:r.left+(v.x+1)*r.width/2,y:r.top+(1-v.y)*r.height/2};};
  function tagHit(){
-  for(const x of [-.014,0,.014])for(const y of [.018,.01,0,-.016]){
+  for(const x of [-.017,-.012,-.006,0,.006,.012,.017])for(const y of [.021,.016,.010,.003,-.005,-.013,-.021]){
    const pos=screen(p.tagMesh.localToWorld(p.tagMesh.position.clone().set(x,y,0)));
    if(a.pick(pos.x,pos.y)?.object===p.tagMesh)return pos;
   }
   throw Error('No visible paper tag touch target');
  }
  const normal=()=>p.tagMesh.position.clone().set(0,0,1).applyQuaternion(p.tagMesh.quaternion);
- const initial=normal(),maps=p.tagMesh.material.slice(0,2).map(m=>m.map);
+ let previous=normal();
+ const maps=p.tagMesh.material.slice(0,2).map(m=>m.map);
  check('paper tag front and back textures are complete',maps.every(t=>t?.image?.width>=500&&t.image.height>=600)&&maps[0]!==maps[1]);
  for(let i=0;i<4;i++){
   const h=tagHit();event('pointerdown',1,h.x,h.y);step(3);event('pointerup',1,h.x,h.y);
   check('tap starts an independent card turn '+i,a.state().tagTurning&&a.state().held);
-  step(420);const dot=normal().dot(initial);
-  check('touch turns to alternate textured face '+i,i%2?dot>.75:dot<-.75,{dot});
+  step(420);const current=normal(),dot=current.dot(previous);
+  check('touch turns to alternate textured face '+i,dot<-.75&&current.z*previous.z<0,{dot,previousZ:previous.z,currentZ:current.z});
+  previous=current;
  }
  const at=tagHit();event('pointerdown',1,at.x,at.y);step(2);
  const before=p.tagMesh.position.clone(),q=a.pivot.quaternion.clone();
@@ -35,12 +37,13 @@ export async function verifyExhibitPhysics({a,w,check,step,event}){
   if(a.items.plush.interactionKind(a.pick(pos.x,pos.y))==='chain'){bead=pos;break;}
  }
  check('chain has a visible touch target',!!bead);
- const chain=d.bx.slice(),pin=Array.from(d.bx.slice(d.exhibitionPin*3,d.exhibitionPin*3+3));
+ const chain=d.bx.slice(),coreBefore=[d.core.x,d.core.y,d.core.z];
+ check('held toy does not hide a fixed chain bead',d.exhibitionPin===-1&&Array.from(d.bim).every(v=>v>0));
  event('pointerdown',1,bead.x,bead.y);
  for(let i=1;i<=20;i++){event('pointermove',1,bead.x+55*i/20,bead.y+25*i/20);step(2);}
  check('drag deforms the actual bead chain',d.bx.some((v,i)=>Math.abs(v-chain[i])>.003));
  event('pointerup',1,bead.x+55,bead.y+25);step(720);
- check('chain falls back under gravity and settles',p.isSleeping&&JSON.stringify(pin)===JSON.stringify(Array.from(d.bx.slice(d.exhibitionPin*3,d.exhibitionPin*3+3)))&&p.hooked);
+ check('free chain falls back while the held toy stays supported',p.isSleeping&&[d.core.x,d.core.y,d.core.z].every((v,i)=>Math.abs(v-coreBefore[i])<1e-9)&&d.exhibitionPin===-1,{sleeping:p.isSleeping,core:[d.core.x,d.core.y,d.core.z],coreBefore,tagAngular:Math.hypot(d.tag.wx,d.tag.wy,d.tag.wz),maxBeadSpeed:Math.max(...Array.from({length:d.N},(_,i)=>Math.hypot(d.bv[i*3],d.bv[i*3+1],d.bv[i*3+2]))),resets:p.stats.mechResets,gesture:d.gesture?.kind});
  const resting=d.bx.slice();step(300);
  check('settled beads remain exactly stationary',d.bx.every((v,i)=>v===resting[i]));
 
@@ -57,8 +60,16 @@ export async function verifyExhibitPhysics({a,w,check,step,event}){
 export async function verifyResponsiveTagFraming({a,w,frame,check,step,event,waitFor}){
  const oldWidth=frame.style.width,oldHeight=frame.style.height,p=a.items.plush.api;
  const screen=point=>{const v=point.clone().project(a.camera);return{x:(v.x+1)*w.innerWidth/2,y:(1-v.y)*w.innerHeight/2};};
+ function bodyHeight(){
+  // Measure the rendered model itself: camera distance alone misses depth pan.
+  const v=p.tagMesh.position.clone();let low=Infinity,high=-Infinity;
+  for(const mesh of p.softMeshes){const pos=mesh.geometry.attributes.position;
+   for(let i=0;i<pos.count;i+=8){v.fromBufferAttribute(pos,i).applyMatrix4(mesh.matrixWorld).project(a.camera);low=Math.min(low,v.y);high=Math.max(high,v.y);}
+  }
+  return (high-low)*w.innerHeight/2;
+ }
  function tagHit(){
-  for(const x of [-.014,0,.014])for(const y of [.018,.01,0,-.016]){
+  for(const x of [-.017,-.012,-.006,0,.006,.012,.017])for(const y of [.021,.016,.010,.003,-.005,-.013,-.021]){
    const pos=screen(p.tagMesh.localToWorld(p.tagMesh.position.clone().set(x,y,0)));
    if(a.pick(pos.x,pos.y)?.object===p.tagMesh)return pos;
   }
@@ -68,22 +79,30 @@ export async function verifyResponsiveTagFraming({a,w,frame,check,step,event,wai
   frame.style.width=width+'px';frame.style.height='844px';
   await waitFor(()=>w.innerWidth===width&&Math.abs(a.camera.aspect-width/844)<1e-6);
   a.select('plush');a.front(true);a.pickup();step(300);
-  const initial=a.state().distance,bounds={left:Infinity,right:-Infinity,top:Infinity,bottom:-Infinity,maxDistance:initial};
-  for(let turn=0;turn<2;turn++){
+  const initial=a.state().distance,initialHeight=bodyHeight(),bounds={left:Infinity,right:-Infinity,top:Infinity,bottom:-Infinity,maxDistance:initial,minBodyHeight:initialHeight};
+  for(let turn=0;turn<4;turn++){
+   const previous=p.tagMesh.position.clone().set(0,0,1).applyQuaternion(p.tagMesh.quaternion);
    const h=tagHit();event('pointerdown',1,h.x,h.y);step(3);event('pointerup',1,h.x,h.y);
    for(let i=0;i<480;i++){
     step();
-    for(const x of [-.0373/2,.0373/2])for(const y of [-.0486/2,.0486/2])for(const z of [-.00035/2,.00035/2]){
-     const pos=screen(p.tagMesh.localToWorld(p.tagMesh.position.clone().set(x,y,z)));
+    const vertices=p.tagMesh.geometry.attributes.position;
+    for(let vertex=0;vertex<vertices.count;vertex++){
+     const pos=screen(p.tagMesh.localToWorld(p.tagMesh.position.clone().fromBufferAttribute(vertices,vertex)));
      bounds.left=Math.min(bounds.left,pos.x);bounds.right=Math.max(bounds.right,pos.x);bounds.top=Math.min(bounds.top,pos.y);bounds.bottom=Math.max(bounds.bottom,pos.y);
     }
-    bounds.maxDistance=Math.max(bounds.maxDistance,a.state().distance);
+    bounds.maxDistance=Math.max(bounds.maxDistance,a.state().distance);bounds.minBodyHeight=Math.min(bounds.minBodyHeight,bodyHeight());
    }
+   const normal=p.tagMesh.position.clone().set(0,0,1).applyQuaternion(p.tagMesh.quaternion),dot=previous.dot(normal);
+   check('responsive turn exposes the opposite face '+width+'px #'+turn,dot<-.75&&previous.z*normal.z<0,{dot,normalZ:normal.z});
   }
   check('complete automatic tag turn stays inside '+width+'px viewport',bounds.left>=8&&bounds.right<=width-8&&bounds.top>=76&&bounds.bottom<=820,bounds);
-  const scale=initial/bounds.maxDistance;
-  check('responsive framing preserves model size at '+width+'px',scale>=.85,{smallestScale:scale});
-  check('tag settles and original framing returns at '+width+'px',p.isSleeping&&Math.abs(a.state().distance-initial)<.002,{initial,final:a.state().distance});
+  const scale=bounds.minBodyHeight/initialHeight;
+  check('responsive framing preserves actual model height at '+width+'px',scale>=.85,{smallestScale:scale,initialHeight,minHeight:bounds.minBodyHeight,cameraDistanceRatio:initial/bounds.maxDistance});
+  // Free contact can leave the card in a different resting pose. Keep the same
+  // full-motion size/bounds requirements above, and require the camera to stop
+  // with that actual pose rather than forcing it back to the old pinned pose.
+  const restingDistance=a.state().distance,restingTag=p.tagMesh.position.clone();step(300);
+  check('tag and framing remain steady after release at '+width+'px',p.isSleeping&&Math.abs(a.state().distance-restingDistance)<1e-6&&p.tagMesh.position.distanceTo(restingTag)<1e-9,{initial,restingDistance,final:a.state().distance});
  }
  frame.style.width=oldWidth;frame.style.height=oldHeight;
  await waitFor(()=>w.innerWidth===parseInt(oldWidth)&&Math.abs(a.camera.aspect-parseInt(oldWidth)/parseInt(oldHeight))<1e-6);
